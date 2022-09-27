@@ -6,13 +6,20 @@ build-backend = "poetry.core.masonry.api"
 name = "sqlalchemy-filterset"
 version = "0.1.0"
 description = ""
-authors = ["Arseny Sysolyatin <as@idaproject.com>", "Ivan Moiseev <imoiseev.work@gmail.com>"]
+authors = [
+    "Arseny Sysolyatin <as@idaproject.com>",
+    "Ivan Moiseev <imoiseev.work@gmail.com>",
+    "Yuri Mezentsev <y.mezentsev@idaproject.com>"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
 SQLAlchemy = { version = ">=1.4,<2", extras = ["asyncio", "mypy"] }
 
 [tool.poetry.dev-dependencies]
+# Documentation
+mkdocs-material = {version = "^8.4.3"}
+
 commitizen = "^2.20.5"
 asyncpg = ">=0.26.0"
 

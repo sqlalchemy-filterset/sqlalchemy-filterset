@@ -1,0 +1,67 @@
+site_name: SQLAlchemy Filterset
+site_description: An easy way to filter SQLAlchemy queries
+
+theme:
+  name: 'material'
+  palette:
+    - scheme: default
+      primary: 'deep purple'
+      accent: 'deep purple'
+      toggle:
+          icon: material/weather-sunny
+          name: Switch to dark mode
+    - scheme: slate
+      primary: 'deep purple'
+      accent: 'deep purple'
+      toggle:
+          icon: material/weather-night
+          name: Switch to light mode
+  icon:
+    logo: material/filter
+  favicon: 'favicon.png'
+  features:
+    - navigation.instant
+    - navigation.top
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+
+repo_name: idaproject/sqlalchemy-filterset
+repo_url: https://github.com/idaproject/sqlalchemy-filterset
+edit_uri: ""
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - attr_list
+  - tables
+  - def_list
+
+plugins:
+  - search
+
+nav:
+  - About: index.md
+  - Installation: installation.md
+  - Development: development.md
+  - Usage:
+    - usage/flow.md
+    - usage/filterset.md
+    - usage/filters.md
+    - usage/custom_filters.md
+  - Examples:
+    - FastAPI: examples/fastapi.md

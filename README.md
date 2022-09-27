@@ -1,36 +1,34 @@
-## Разработка
+<span style="font-size: 65px; color: #7e56c2">**SQLAlchemy Filterset**</span>
 
-### Установка библиотеки
+<p align="left">
+    <em>An easy way to filter SQLAlchemy queries</em>
+</p>
 
-```shell
-git clone git@github.com:idaproject/sqlalchemy-filterset.git
-cd sqlalchemy-filterset
-poetry install
-pre-commit install
-```
+---
+**Documentation**: <a href="https://idaproject.github.io/sqlalchemy-filterset/" target="_blank">https://idaproject.github.io/sqlalchemy-filterset/</a>
 
-### Внесение изменений
+**Source Code**: <a href="https://github.com/idaproject/sqlalchemy-filterset" target="_blank">https://github.com/idaproject/sqlalchemy-filterset</a>
 
-Добавьте необходимые файлы в stage
+---
 
-```shell
-git add .
-```
+An easy way to filter SQLAlchemy queries
+An easy way to filter SQLAlchemy queries
+An easy way to filter SQLAlchemy queries
+An easy way to filter SQLAlchemy queries
+An easy way to filter SQLAlchemy queries
+An easy way to filter SQLAlchemy queries
 
-Сделайте коммит при помощи commitizen
 
-```shell
-poetry run cz commit
-```
+## Features
 
-Обновите версию в коде проекта и создайте новый git-тег при помощи commitizen
+* [X] Feature 1
+* [X] Feature 2
+* [X] Feature 3
+* [X] Feature 4
+* [X] Feature 5
+    * [X] Feature 5.1
+    * [X] Feature 5.2
 
-```shell
-poetry run cz bump
-```
+## License
 
-Пуш тэгов
-
-```shell
-git push --tags
-```
+This project is licensed under the terms of the MIT license.
