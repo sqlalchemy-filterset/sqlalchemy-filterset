@@ -14,8 +14,8 @@ class PostgresConfig:
     scheme: str = "postgresql+asyncpg"
     host: str = "localhost"
     port: str = "5432"
-    user: str = "dev"
-    password: str = "ida223322"
+    user: str = "postgres"
+    password: str = "postgres"
     db: str = "test"
     pool_size: int = 10
     pool_overflow_size: int = 10
