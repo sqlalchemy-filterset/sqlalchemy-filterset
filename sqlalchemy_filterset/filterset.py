@@ -80,18 +80,13 @@ class BaseFilterSet(IFilterSet):
     async def filter(self) -> Result:
         return await self.session.execute(self.filter_query())
 
-    async def count(
-        self, attr_name: str = "id", distinct: bool = False, exclude_pagination: bool = True
-    ) -> int:
+    async def count(self) -> int:
         """Получения кол-ва результатов для данного FilterSet"""
-        base_query = self.filter_query().order_by(None)
-        if exclude_pagination:
-            base_query = base_query.limit(None).offset(None)
-        subquery = base_query.alias("s")
-        attr = getattr(subquery.c, attr_name)
-        if distinct:
-            attr = sa.distinct(attr)
-        query = sa.select([sa.func.count(attr)])
+        query = self.filter_query().limit(None).offset(None)
+        if (query._distinct and not query._distinct_on) or not query._distinct:  # type: ignore
+            query = sa.select(sa.func.count()).select_from(query.order_by(None).subquery())
+        elif query._distinct and query._distinct_on:  # type: ignore
+            query = sa.select(sa.func.count()).select_from(query.subquery())
         return (await self.session.execute(query)).scalar()  # type: ignore
 
 

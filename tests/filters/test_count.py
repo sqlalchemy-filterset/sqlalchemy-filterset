@@ -26,5 +26,5 @@ async def test_count_with_filter(db_session: AsyncSession) -> None:
 
 async def test_count_with_distinct(db_session: AsyncSession) -> None:
     three_items: typing.List[ItemForFilters] = await ItemFactory.create_batch(3)
-    filter_set = FilterSetClass({}, db_session, select(ItemForFilters))
-    assert await filter_set.count(distinct=True) == len(three_items)
+    filter_set = FilterSetClass({}, db_session, select(ItemForFilters).distinct())
+    assert await filter_set.count() == len(three_items)
