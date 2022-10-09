@@ -9,12 +9,14 @@ description = ""
 authors = [
     "Arseny Sysolyatin <as@idaproject.com>",
     "Ivan Moiseev <imoiseev.work@gmail.com>",
-    "Yuri Mezentsev <y.mezentsev@idaproject.com>"
+    "Yuri Mezentsev <y.mezentsev@idaproject.com>",
+    "Artem Titorenko <ya.titorenko7@yandex.ru>"
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
 SQLAlchemy = { version = ">=1.4,<2", extras = ["asyncio", "mypy"] }
+greenlet = ">=1.1.2"
 
 [tool.poetry.dev-dependencies]
 # Documentation
