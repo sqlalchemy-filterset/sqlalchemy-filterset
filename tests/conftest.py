@@ -44,7 +44,6 @@ class PostgresConfig:
 
 
 db_config = PostgresConfig()
-logger.warning(db_config.dsn)
 
 
 @pytest.fixture(scope="session")
