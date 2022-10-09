@@ -7,6 +7,11 @@ poetry install
 pre-commit install
 ```
 
+### Documentation
+```shell
+mkdocs serve
+```
+
 ### Develop
 
 Add files to stage
