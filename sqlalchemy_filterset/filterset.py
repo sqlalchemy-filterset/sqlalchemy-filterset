@@ -22,7 +22,7 @@ class FilterSetMetaclass(type):
         return new_class
 
     @classmethod
-    def get_declared_filters(mcs, attrs: dict) -> OrderedDict:
+    def get_declared_filters(mcs, attrs: dict) -> Dict:
         filters = [
             (filter_name, attrs.pop(filter_name))
             for filter_name, obj in list(attrs.items())
@@ -39,7 +39,7 @@ class FilterSetMetaclass(type):
 class BaseFilterSet(IFilterSet):
     """Базовый FilterSet"""
 
-    declared_filters: OrderedDict
+    declared_filters: Dict[str, BaseFilter]
 
     def __init__(
         self,
@@ -74,9 +74,9 @@ class BaseFilterSet(IFilterSet):
         return self._optimization_enabled
 
     @classmethod
-    def get_filters(cls) -> OrderedDict:  # -> OrderedDict[str, BaseFilter]: todo: fix type hint
+    def get_filters(cls) -> Dict[str, BaseFilter]:
         """Получение фильтров для данного FilterSet"""
-        filters: OrderedDict = OrderedDict()
+        filters: Dict[str, BaseFilter] = OrderedDict()
         filters.update(cls.declared_filters)
         return filters
 

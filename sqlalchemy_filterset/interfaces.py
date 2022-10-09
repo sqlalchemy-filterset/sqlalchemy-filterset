@@ -1,6 +1,8 @@
 import abc
-from collections import OrderedDict
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
+
+if TYPE_CHECKING:
+    from sqlalchemy_filterset.filters import BaseFilter
 
 
 class IBaseFilter(abc.ABC):
@@ -20,7 +22,7 @@ class IBaseFilter(abc.ABC):
 
 
 class IFilterSet(abc.ABC):
-    declared_filters: OrderedDict
+    declared_filters: Dict[str, "BaseFilter"]
 
     @abc.abstractmethod
     async def filter(self) -> Any:
