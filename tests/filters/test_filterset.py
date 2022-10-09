@@ -1,3 +1,4 @@
+import abc
 import typing
 from typing import Any
 
@@ -35,3 +36,17 @@ async def test_wrong_field(db_session: AsyncSession) -> None:
     result = await db_session.execute(f.filter_query())
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
+
+
+async def test_abstract_filter_set(db_session: AsyncSession) -> None:
+    class AbstractFilterSetClass(FilterSet):
+        id = Filter(ItemForFilters, "id")
+        ids = InFilter(ItemForFilters, "id")
+
+        @abc.abstractmethod
+        async def some_method(self) -> Any:
+            ...
+
+    base_query = select(ItemForFilters).join(Parent).join(GrandParent).join(GrandGrandParent)
+    with pytest.raises(TypeError):
+        AbstractFilterSetClass({"test": "test"}, db_session, base_query)  # type: ignore

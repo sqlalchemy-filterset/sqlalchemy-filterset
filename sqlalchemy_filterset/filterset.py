@@ -1,19 +1,18 @@
 import abc
 import copy
 from collections import OrderedDict
-from typing import Any, Callable, Dict, Mapping, Sequence, Union
+from typing import Dict
 
 import sqlalchemy as sa
-from sqlalchemy.engine import Result, Row
+from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Bundle
-from sqlalchemy.sql import ColumnElement, Select
+from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.filters import BaseFilter
 from sqlalchemy_filterset.interfaces import IFilterSet
 
 
-class FilterSetMetaclass(type):
+class FilterSetMetaclass(abc.ABCMeta):
     """Метакласс для создания FilterSet"""
 
     def __new__(mcs, name: str, bases: tuple, attrs: dict) -> "FilterSetMetaclass":
@@ -22,18 +21,17 @@ class FilterSetMetaclass(type):
         return new_class
 
     @classmethod
-    def get_declared_filters(mcs, attrs: dict) -> Dict:
-        filters = [
-            (filter_name, attrs.pop(filter_name))
-            for filter_name, obj in list(attrs.items())
-            if isinstance(obj, BaseFilter)
-        ]
+    def get_declared_filters(mcs, attrs: dict) -> Dict[str, BaseFilter]:
+        filters: Dict[str, BaseFilter] = OrderedDict()
+        for filter_name, filter_ in list(attrs.items()):
+            if not isinstance(filter_, BaseFilter):
+                continue
+            del attrs[filter_name]
+            filters[filter_name] = filter_
+            if getattr(filter_, "field_name", None) is None:
+                filter_.field_name = filter_name
 
-        for filter_name, f in filters:
-            if getattr(f, "field_name", None) is None:
-                f.field_name = filter_name
-
-        return OrderedDict(filters)
+        return filters
 
 
 class BaseFilterSet(IFilterSet):
@@ -46,32 +44,22 @@ class BaseFilterSet(IFilterSet):
         params: dict,
         session: AsyncSession,
         query: Select,
-        enable_optimization: bool = True,
     ) -> None:
         """
         :param params: Словарь параметров для фильтрации
         :param session: Сессия базы данных
         :param query: Базовый запрос, на основе которого происходит фильтрация
-        :param enable_optimization: Включает оптимизацию запросов при вычислении specs и facets
         """
         self.params = params
         self.__base_query = query
         self.session = session
         self.base_filters = self.get_filters()
         self.filters = copy.deepcopy(self.base_filters)
-        self._optimization_enabled = enable_optimization
         for filter_ in self.filters.values():
             filter_.parent = self
 
     def get_base_query(self) -> Select:
         return copy.copy(self.__base_query)
-
-    @property
-    def optimization_enabled(self) -> bool:
-        # Оптимизация не совместима с DISTINCT и DISTINCT ON
-        if self.get_base_query()._distinct:  # type: ignore
-            return False
-        return self._optimization_enabled
 
     @classmethod
     def get_filters(cls) -> Dict[str, BaseFilter]:
@@ -106,24 +94,6 @@ class BaseFilterSet(IFilterSet):
         query = sa.select([sa.func.count(attr)])
         return (await self.session.execute(query)).scalar()  # type: ignore
 
-    async def _fetch_common_columns(self, columns: Sequence[Union[Bundle, ColumnElement]]) -> Row:
-        query = self.filter_query()
-        query = query.with_only_columns(columns).order_by(None)
-        return (await self.session.execute(query)).one()
 
-    @staticmethod
-    def _parse_common_columns(
-        result: Row, field_name_to_parser: Mapping[str, Callable]
-    ) -> Dict[str, Any]:
-        mapped_result: Dict[str, Any] = {}
-        for field_name, parse in field_name_to_parser.items():
-            mapped_result[field_name] = parse(getattr(result, field_name))
-        return mapped_result
-
-
-class ABCFilterSetMetaclass(abc.ABCMeta, FilterSetMetaclass):
-    pass
-
-
-class FilterSet(BaseFilterSet, metaclass=ABCFilterSetMetaclass):
+class FilterSet(BaseFilterSet, metaclass=FilterSetMetaclass):
     pass
