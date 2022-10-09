@@ -1,7 +1,7 @@
 import abc
 import copy
 from collections import OrderedDict
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Dict, Mapping, Sequence, Union
 
 import sqlalchemy as sa
 from sqlalchemy.engine import Result, Row
@@ -74,7 +74,7 @@ class BaseFilterSet(IFilterSet):
         return self._optimization_enabled
 
     @classmethod
-    def get_filters(cls) -> OrderedDict[str, BaseFilter]:
+    def get_filters(cls):  # -> OrderedDict[str, BaseFilter]: todo: fix type hint
         """Получение фильтров для данного FilterSet"""
         filters: OrderedDict = OrderedDict()
         filters.update(cls.declared_filters)
@@ -106,7 +106,7 @@ class BaseFilterSet(IFilterSet):
         query = sa.select([sa.func.count(attr)])
         return (await self.session.execute(query)).scalar()  # type: ignore
 
-    async def _fetch_common_columns(self, columns: Sequence[Bundle | ColumnElement]) -> Row:
+    async def _fetch_common_columns(self, columns: Sequence[Union[Bundle, ColumnElement]]) -> Row:
         query = self.filter_query()
         query = query.with_only_columns(columns).order_by(None)
         return (await self.session.execute(query)).one()
@@ -114,8 +114,8 @@ class BaseFilterSet(IFilterSet):
     @staticmethod
     def _parse_common_columns(
         result: Row, field_name_to_parser: Mapping[str, Callable]
-    ) -> dict[str, Any]:
-        mapped_result: dict[str, Any] = {}
+    ) -> Dict[str, Any]:
+        mapped_result: Dict[str, Any] = {}
         for field_name, parse in field_name_to_parser.items():
             mapped_result[field_name] = parse(getattr(result, field_name))
         return mapped_result

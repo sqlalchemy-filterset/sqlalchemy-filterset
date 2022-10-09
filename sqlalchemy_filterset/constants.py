@@ -1,1 +1,3 @@
-EMPTY_VALUES: tuple[list, tuple, dict, str, None] = ([], (), {}, "", None)
+from typing import Tuple
+
+EMPTY_VALUES: Tuple[list, tuple, dict, str, None] = ([], (), {}, "", None)

@@ -2,7 +2,6 @@ import re
 from typing import Any, Union
 from uuid import UUID
 
-from loguru import logger
 from sqlalchemy import MetaData, Table
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
@@ -33,12 +32,4 @@ class Base:
 class WrappedAsyncSession(AsyncSession):
     """Этот класс Session позволяет нам заменить commit на flush для реализации транзакций."""
 
-    async def commit(self) -> None:
-        if self.info.get("disabled", False):
-            await self.flush()
-            self.info.get("logger", logger).warning(
-                "Step function tried to issue a commit. It should not! "
-                "Will execute commit on behalf of step function when it returns."
-            )
-        else:
-            await super().commit()
+    pass

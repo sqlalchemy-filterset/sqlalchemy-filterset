@@ -1,6 +1,7 @@
 import datetime
 import uuid
 from decimal import Decimal
+from typing import Optional
 
 import sqlalchemy as sa
 from sqlalchemy import UniqueConstraint
@@ -21,7 +22,7 @@ class RealtyObject(Base):
 
     id: uuid.UUID = sa.Column(UUID(as_uuid=True), default=uuid.uuid4(), primary_key=True)
     number: int = sa.Column(sa.Integer(), server_default=sa.text("0"), nullable=False)
-    name: str | None = sa.Column(sa.String(), nullable=True)
+    name: Optional[str] = sa.Column(sa.String(), nullable=True)
     changed: datetime.datetime = sa.Column(
         sa.DateTime(),
         nullable=False,
@@ -78,5 +79,5 @@ class ItemForFilters(Base):
 
 class Item(Base):
     id: int = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    parent_id: int | None = sa.Column(sa.Integer, nullable=True)
+    parent_id: Optional[int] = sa.Column(sa.Integer, nullable=True)
     order: int = sa.Column(sa.Integer(), server_default=sa.text("0"), nullable=False)

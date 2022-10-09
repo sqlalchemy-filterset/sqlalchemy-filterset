@@ -1,25 +1,21 @@
 import asyncio
 import sys
 from asyncio import AbstractEventLoop
-from typing import AsyncGenerator, Callable, Generator, Sequence
+from typing import Callable, Generator
 
 import pytest
-from loguru import logger
-from pytest_async_sqlalchemy import create_database, drop_database
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, AsyncTransaction
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.async_alchemy_factory import AsyncSQLAlchemyModelFactory
 from tests.database import Base
-from tests.database.base import WrappedAsyncSession
 
 
 class PostgresConfig:
     scheme: str = "postgresql+asyncpg"
     host: str = "localhost"
-    port: str = "15432"
-    user: str = "postgres"
-    password: str = "postgres"
+    port: str = "5432"
+    user: str = "dev"
+    password: str = "ida223322"
     db: str = "test"
     pool_size: int = 10
     pool_overflow_size: int = 10
@@ -29,8 +25,6 @@ class PostgresConfig:
     autocommit: bool = False
     expire_on_commit: bool = False
     engine_health_check_delay: int = 1
-    slave_hosts: Sequence[str] | str = ""
-    slave_dsns: Sequence[str] | str = ""
 
     @property
     def dsn(self) -> str:
@@ -45,7 +39,6 @@ class PostgresConfig:
 
 
 db_config = PostgresConfig()
-logger.warning(db_config.dsn)
 
 
 @pytest.fixture(scope="session")

@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Sequence, Type
+from typing import Any, Optional, Sequence, Type
 
 from sqlalchemy.orm import DeclarativeMeta
 from sqlalchemy.sql import Select
@@ -11,7 +11,7 @@ from sqlalchemy_filterset.interfaces import IBaseFilter
 class BaseFilter(IBaseFilter):
     """Абстрактный класс фильтра"""
 
-    field_name: str | None = None
+    field_name: Optional[str] = None
     "Название фильтра в filterset. проставляется в метаклассе при создании."
     has_specs: bool = False
     "Показатель того, что фильтр имплементировал метод получения specs"
