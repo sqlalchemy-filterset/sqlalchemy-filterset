@@ -4,7 +4,6 @@ from asyncio import AbstractEventLoop
 from typing import AsyncGenerator, Callable, Generator, Sequence
 
 import pytest
-from loguru import logger
 from pytest_async_sqlalchemy import create_database, drop_database
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, AsyncTransaction
 from sqlalchemy.orm import sessionmaker

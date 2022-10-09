@@ -2,7 +2,6 @@ import re
 from typing import Any, Union
 from uuid import UUID
 
-from loguru import logger
 from sqlalchemy import MetaData, Table
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
