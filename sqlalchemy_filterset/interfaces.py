@@ -1,9 +1,6 @@
 import abc
 from collections import OrderedDict
-from typing import Any, Callable, Optional
-
-from sqlalchemy.orm import Bundle
-from sqlalchemy.sql import ColumnElement
+from typing import Any, Optional
 
 
 class IBaseFilter(abc.ABC):

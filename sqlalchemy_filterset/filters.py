@@ -1,7 +1,6 @@
 import abc
-from typing import Any, Optional, Sequence, Type
+from typing import Any, Optional, Sequence
 
-from sqlalchemy.orm import DeclarativeMeta
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES

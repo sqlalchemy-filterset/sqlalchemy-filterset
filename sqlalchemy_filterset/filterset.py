@@ -74,7 +74,7 @@ class BaseFilterSet(IFilterSet):
         return self._optimization_enabled
 
     @classmethod
-    def get_filters(cls):  # -> OrderedDict[str, BaseFilter]: todo: fix type hint
+    def get_filters(cls) -> OrderedDict:  # -> OrderedDict[str, BaseFilter]: todo: fix type hint
         """Получение фильтров для данного FilterSet"""
         filters: OrderedDict = OrderedDict()
         filters.update(cls.declared_filters)

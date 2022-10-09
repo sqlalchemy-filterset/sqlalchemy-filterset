@@ -83,6 +83,12 @@ warn_no_return = true
 
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 
+[[tool.mypy.overrides]]
+module = [
+    "factory.*", "sqlalchemy_utils.*", "itsdangerous.*", "pytest_async_sqlalchemy.*"
+]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"

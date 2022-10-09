@@ -13,7 +13,7 @@ from tests.database import Base
 class PostgresConfig:
     scheme: str = "postgresql+asyncpg"
     host: str = "localhost"
-    port: str = "5432"
+    port: str = "15432"
     user: str = "postgres"
     password: str = "postgres"
     db: str = "test"
