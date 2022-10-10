@@ -1,41 +1,41 @@
 import asyncio
 import sys
 from asyncio import AbstractEventLoop
-from typing import Callable, Generator
+from typing import Any, Callable, Dict, Generator, Optional
 
 import pytest
+from pydantic import BaseSettings, PostgresDsn, validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.async_alchemy_factory import AsyncSQLAlchemyModelFactory
 from tests.database import Base
 
 
-class PostgresConfig:
+class PostgresConfig(BaseSettings):
     scheme: str = "postgresql+asyncpg"
     host: str = "localhost"
-    port: str = "15432"
+    port: str = "5432"
     user: str = "postgres"
     password: str = "postgres"
-    db: str = "test"
-    pool_size: int = 10
-    pool_overflow_size: int = 10
-    leader_usage_coefficient: float = 0.3
-    echo: bool = False
-    autoflush: bool = False
-    autocommit: bool = False
-    expire_on_commit: bool = False
-    engine_health_check_delay: int = 1
+    db: str = "postgres"
+    dsn: Optional[PostgresDsn] = None
 
-    @property
-    def dsn(self) -> str:
-        return "{scheme}://{user}:{password}@{host}:{port}/{db}".format(
-            scheme=self.scheme,
-            user=self.user,
-            password=self.password,
-            host=self.host,
-            port=self.port,
-            db=self.db,
+    @validator("dsn", pre=True)
+    def assemble_dsn(cls, v: Optional[str], values: Dict[str, Any]) -> str:
+        if isinstance(v, str):
+            return v
+        return PostgresDsn.build(
+            scheme=values.get("scheme"),
+            user=values.get("user"),
+            password=values.get("password"),
+            host=values.get("host"),
+            port=values.get("port"),
+            path=f"/{values.get('db')}",
         )
+
+    class Config:
+        env_prefix = "postgres_"
+        env_file = ".env"
 
 
 db_config = PostgresConfig()
