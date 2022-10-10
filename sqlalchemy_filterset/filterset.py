@@ -1,7 +1,7 @@
 import abc
 import copy
 from collections import OrderedDict
-from typing import Dict
+from typing import Any, Dict
 
 import sqlalchemy as sa
 from sqlalchemy.engine import Result
@@ -15,14 +15,21 @@ from sqlalchemy_filterset.interfaces import IFilterSet
 class FilterSetMetaclass(abc.ABCMeta):
     """Метакласс для создания FilterSet"""
 
-    def __new__(mcs, name: str, bases: tuple, attrs: dict) -> "FilterSetMetaclass":
-        attrs["declared_filters"] = mcs.get_declared_filters(attrs)
+    def __new__(mcs, name: str, bases: tuple, attrs: Dict[str, Any]) -> "FilterSetMetaclass":
+        attrs["declared_filters"] = mcs.get_declared_filters(bases, attrs)
         new_class = super().__new__(mcs, name, bases, attrs)
         return new_class
 
     @classmethod
-    def get_declared_filters(mcs, attrs: dict) -> Dict[str, BaseFilter]:
+    def get_declared_filters(mcs, bases: tuple, attrs: Dict[str, Any]) -> Dict[str, BaseFilter]:
         filters: Dict[str, BaseFilter] = OrderedDict()
+
+        for base in bases:
+            if not hasattr(base, "declared_filters"):
+                continue
+            for filter_name, filter_ in base.declared_filters.items():
+                filters[filter_name] = filter_
+
         for filter_name, filter_ in list(attrs.items()):
             if not isinstance(filter_, BaseFilter):
                 continue
@@ -34,9 +41,7 @@ class FilterSetMetaclass(abc.ABCMeta):
         return filters
 
 
-class BaseFilterSet(IFilterSet):
-    """Базовый FilterSet"""
-
+class FilterSet(IFilterSet, metaclass=FilterSetMetaclass):
     declared_filters: Dict[str, BaseFilter]
 
     def __init__(
@@ -88,7 +93,3 @@ class BaseFilterSet(IFilterSet):
         elif query._distinct and query._distinct_on:  # type: ignore
             query = sa.select(sa.func.count()).select_from(query.subquery())
         return (await self.session.execute(query)).scalar()  # type: ignore
-
-
-class FilterSet(BaseFilterSet, metaclass=FilterSetMetaclass):
-    pass

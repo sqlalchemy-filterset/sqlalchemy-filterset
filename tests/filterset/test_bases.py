@@ -1,5 +1,5 @@
-import abc
 import typing
+import uuid
 from typing import Any
 
 import pytest
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_filterset.constants import EMPTY_VALUES
 from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filterset import FilterSet
-from tests.filters.conftest import ItemFactory
+from tests.filterset.conftest import ItemFactory
 from tests.models import GrandGrandParent, GrandParent, ItemForFilters, Parent
 
 
@@ -36,17 +36,3 @@ async def test_wrong_field(db_session: AsyncSession) -> None:
     result = await db_session.execute(f.filter_query())
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
-
-
-async def test_abstract_filter_set(db_session: AsyncSession) -> None:
-    class AbstractFilterSetClass(FilterSet):
-        id = Filter(ItemForFilters, "id")
-        ids = InFilter(ItemForFilters, "id")
-
-        @abc.abstractmethod
-        async def some_method(self) -> Any:
-            ...
-
-    base_query = select(ItemForFilters).join(Parent).join(GrandParent).join(GrandGrandParent)
-    with pytest.raises(TypeError):
-        AbstractFilterSetClass({"test": "test"}, db_session, base_query)  # type: ignore
