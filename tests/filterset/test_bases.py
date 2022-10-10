@@ -1,5 +1,4 @@
 import typing
-import uuid
 from typing import Any
 
 import pytest
@@ -23,8 +22,8 @@ class FilterSetClass(FilterSet):
 async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSession) -> None:
     three_items: typing.List[ItemForFilters] = await ItemFactory.create_batch(3)
     base_query = select(ItemForFilters).join(Parent).join(GrandParent).join(GrandGrandParent)
-    f = FilterSetClass({f"{field}": empty_value}, db_session, base_query)
-    result = await db_session.execute(f.filter_query())
+    filter_set = FilterSetClass({f"{field}": empty_value}, db_session, base_query)
+    result = await db_session.execute(filter_set.filter_query())
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
 
@@ -32,7 +31,14 @@ async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSessi
 async def test_wrong_field(db_session: AsyncSession) -> None:
     three_items: typing.List[ItemForFilters] = await ItemFactory.create_batch(3)
     base_query = select(ItemForFilters).join(Parent).join(GrandParent).join(GrandGrandParent)
-    f = FilterSetClass({"test": "test"}, db_session, base_query)
-    result = await db_session.execute(f.filter_query())
+    filter_set = FilterSetClass({"test": "test"}, db_session, base_query)
+    result = await db_session.execute(filter_set.filter_query())
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
+
+
+async def test_filter_field_name_set(db_session: AsyncSession) -> None:
+    filter_set = FilterSetClass({}, db_session, select(ItemForFilters))
+    filters = filter_set.get_filters()
+    for filter_name, filter_ in filters.items():
+        assert filter_.field_name == filter_name
