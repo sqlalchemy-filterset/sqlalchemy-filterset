@@ -76,3 +76,21 @@ async def test_one_inherited_filters_ordering(
     detected_filters = filter_set.get_filters()
 
     assert list(detected_filters.keys()) == expected_order
+
+
+@pytest.mark.parametrize(
+    "filter_set_class",
+    [
+        FirstFilterSet,
+        SecondInheritedFilterSet,
+        ThirdInheritedFilterSet,
+        OverrideInheritedFilterSet,
+    ],
+)
+async def test_filter_field_name_set(
+    filter_set_class: Type[FilterSet], db_session: AsyncSession
+) -> None:
+    filter_set = filter_set_class({}, db_session, select(ItemForFilters))
+    filters = filter_set.get_filters()
+    for filter_name, filter_ in filters.items():
+        assert filter_.field_name == filter_name

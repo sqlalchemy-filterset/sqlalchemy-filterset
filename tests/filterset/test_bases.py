@@ -35,10 +35,3 @@ async def test_wrong_field(db_session: AsyncSession) -> None:
     result = await db_session.execute(filter_set.filter_query())
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
-
-
-async def test_filter_field_name_set(db_session: AsyncSession) -> None:
-    filter_set = FilterSetClass({}, db_session, select(ItemForFilters))
-    filters = filter_set.get_filters()
-    for filter_name, filter_ in filters.items():
-        assert filter_.field_name == filter_name
