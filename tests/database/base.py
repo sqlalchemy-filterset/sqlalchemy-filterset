@@ -3,7 +3,6 @@ from typing import Any, Union
 from uuid import UUID
 
 from sqlalchemy import MetaData, Table
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
@@ -27,9 +26,3 @@ class Base:
         return camel_to_snake(cls.__name__)
 
     __mapper_args__ = {"eager_defaults": True}
-
-
-class WrappedAsyncSession(AsyncSession):
-    """Этот класс Session позволяет нам заменить commit на flush для реализации транзакций."""
-
-    pass
