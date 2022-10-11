@@ -10,8 +10,6 @@ if TYPE_CHECKING:
 
 
 class BaseFilter:
-    """Абстрактный класс фильтра"""
-
     field_name: Optional[str] = None
     "Название фильтра в filterset. проставляется в метаклассе при создании."
     has_specs: bool = False
@@ -28,7 +26,7 @@ class BaseFilter:
 
     @property
     def parent(self) -> Optional["BaseFilterSet"]:
-        """FilterSet родитель, данного фильтра"""
+        """FilterSet parent of this Filter"""
         return self._parent
 
     @parent.setter

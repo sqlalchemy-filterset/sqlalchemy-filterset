@@ -13,7 +13,7 @@ from sqlalchemy_filterset.filters import BaseFilter
 
 
 class FilterSetMetaclass(abc.ABCMeta):
-    """Метакласс для создания FilterSet"""
+    """Metaclass for creating a FilterSet"""
 
     def __new__(mcs, name: str, bases: tuple, attrs: Dict[str, Any]) -> "FilterSetMetaclass":
         attrs["declared_filters"] = mcs.get_declared_filters(bases, attrs)
@@ -46,8 +46,8 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
 
     def __init__(self, params: dict, query: Select) -> None:
         """
-        :param params: Словарь параметров для фильтрации
-        :param query: Базовый запрос, на основе которого происходит фильтрация
+        :param params: Dictionary of filtration params
+        :param query: Base query which uses for building filter query
         """
         self.params = params
         self.__base_query = query
@@ -61,13 +61,13 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
 
     @classmethod
     def get_filters(cls) -> Dict[str, BaseFilter]:
-        """Получение фильтров для данного FilterSet"""
+        """Get Filters of this FilterSet"""
         filters: Dict[str, BaseFilter] = OrderedDict()
         filters.update(cls.declared_filters)
         return filters
 
     def filter_query(self) -> Select:
-        """Построение запроса для фильтрации"""
+        """Build filtration query"""
         query = self.get_base_query()
         for name, value in self.params.items():
             if name not in self.filters:
@@ -76,6 +76,7 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
         return query
 
     def count_query(self) -> Select:
+        """Build query for calculating the total number of filtration results"""
         query = self.filter_query().limit(None).offset(None)
         if (query._distinct and not query._distinct_on) or not query._distinct:  # type: ignore
             query = sa.select(sa.func.count()).select_from(query.order_by(None).subquery())
@@ -92,18 +93,19 @@ class FilterSet(BaseFilterSet):
         query: Select,
     ) -> None:
         """
-        :param params: Словарь параметров для фильтрации
-        :param session: Сессия базы данных
-        :param query: Базовый запрос, на основе которого происходит фильтрация
+        :param params: Dictionary of filtration params
+        :param session: DB Session
+        :param query: Base query which uses for building filter query
         """
         self.session = session
         super().__init__(params, query)
 
     def filter(self) -> Result:
+        """Get filtration results"""
         return self.session.execute(self.filter_query())
 
     def count(self) -> int:
-        """Получения кол-ва результатов для данного FilterSet"""
+        """Calculating the total number of filtration results"""
         return self.session.execute(self.count_query()).scalar()  # type: ignore
 
 
@@ -115,16 +117,17 @@ class AsyncFilterSet(BaseFilterSet):
         query: Select,
     ) -> None:
         """
-        :param params: Словарь параметров для фильтрации
-        :param session: Сессия базы данных
-        :param query: Базовый запрос, на основе которого происходит фильтрация
+        :param params: Dictionary of filtration params
+        :param session: DB Session
+        :param query: Base query which uses for building filter query
         """
         self.session = session
         super().__init__(params, query)
 
     async def filter(self) -> Result:
+        """Get filtration results"""
         return await self.session.execute(self.filter_query())
 
     async def count(self) -> int:
-        """Получения кол-ва результатов для данного FilterSet"""
+        """Calculating the total number of filtration results"""
         return (await self.session.execute(self.count_query())).scalar()  # type: ignore
