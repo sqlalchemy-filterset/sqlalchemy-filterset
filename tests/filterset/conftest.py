@@ -1,7 +1,7 @@
 import factory
 
 from tests.async_alchemy_factory import AsyncSQLAlchemyModelFactory
-from tests.models.base import GrandGrandParent, GrandParent, ItemForFilters, Parent
+from tests.models.base import GrandGrandParent, GrandParent, Item, Parent
 
 
 class GrandGrandParentFactory(AsyncSQLAlchemyModelFactory):
@@ -43,5 +43,5 @@ class ItemFactory(AsyncSQLAlchemyModelFactory):
     title = factory.Faker("pystr")
 
     class Meta:
-        model = ItemForFilters
+        model = Item
         sqlalchemy_session_persistence = "commit"

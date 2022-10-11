@@ -3,23 +3,21 @@ from typing import Any
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import Filter, InFilter
-from sqlalchemy_filterset.filtersets import AsyncFilterSet
-from tests.models import ItemForFilters
+from sqlalchemy_filterset.filtersets import BaseFilterSet
+from tests.models import Item
 
 
-class AbstractFilterSetClass(AsyncFilterSet):
-    id = Filter(ItemForFilters, "id")
-    ids = InFilter(ItemForFilters, "id")
+class AbstractFilterSetClass(BaseFilterSet):
+    id = Filter(Item, "id")
+    ids = InFilter(Item, "id")
 
     @abc.abstractmethod
     async def some_method(self) -> Any:
         ...
 
 
-async def test_abstract_filter_set(db_session: AsyncSession) -> None:
-    base_query = select(ItemForFilters)
+def test_abstract_filter_set() -> None:
     with pytest.raises(TypeError):
-        AbstractFilterSetClass({"test": "test"}, db_session, base_query)  # type: ignore
+        AbstractFilterSetClass({"test": "test"}, select(Item))  # type: ignore

@@ -3,30 +3,29 @@ from typing import Dict, List, Type
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import BaseFilter, Filter, InFilter
-from sqlalchemy_filterset.filtersets import AsyncFilterSet
-from tests.models import ItemForFilters
+from sqlalchemy_filterset.filtersets import BaseFilterSet
+from tests.models import Item
 
 
-class FirstFilterSet(AsyncFilterSet):
-    id = Filter(ItemForFilters, "id")
-    title = Filter(ItemForFilters, "title")
+class FirstFilterSet(BaseFilterSet):
+    id = Filter(Item, "id")
+    title = Filter(Item, "title")
 
     some_attr = "Some attr"
 
 
 class SecondInheritedFilterSet(FirstFilterSet):
-    ids = InFilter(ItemForFilters, "id")
+    ids = InFilter(Item, "id")
 
 
 class ThirdInheritedFilterSet(SecondInheritedFilterSet):
-    other_id = Filter(ItemForFilters, "id")
+    other_id = Filter(Item, "id")
 
 
 class OverrideInheritedFilterSet(FirstFilterSet):
-    id = InFilter(ItemForFilters, "id")
+    id = InFilter(Item, "id")
 
 
 @pytest.mark.parametrize(
@@ -41,13 +40,12 @@ class OverrideInheritedFilterSet(FirstFilterSet):
         (OverrideInheritedFilterSet, {"id": InFilter, "title": Filter}),
     ],
 )
-async def test_filters_detection(
-    filter_set_class: Type[AsyncFilterSet],
+def test_filters_detection(
+    filter_set_class: Type[BaseFilterSet],
     expected_filters: Dict[str, Type[BaseFilter]],
-    db_session: AsyncSession,
 ) -> None:
-    base_query = select(ItemForFilters)
-    filter_set = filter_set_class({"id": uuid.uuid4()}, db_session, base_query)
+    base_query = select(Item)
+    filter_set = filter_set_class({"id": uuid.uuid4()}, base_query)
     detected_filters = filter_set.get_filters()
     assert len(detected_filters) == len(expected_filters)
 
@@ -66,13 +64,12 @@ async def test_filters_detection(
         (OverrideInheritedFilterSet, ["id", "title"]),
     ],
 )
-async def test_one_inherited_filters_ordering(
-    filter_set_class: Type[AsyncFilterSet],
+async def test_inherited_filters_ordering(
+    filter_set_class: Type[BaseFilterSet],
     expected_order: List[str],
-    db_session: AsyncSession,
 ) -> None:
-    base_query = select(ItemForFilters)
-    filter_set = filter_set_class({"id": uuid.uuid4()}, db_session, base_query)
+    base_query = select(Item)
+    filter_set = filter_set_class({"id": uuid.uuid4()}, base_query)
     detected_filters = filter_set.get_filters()
 
     assert list(detected_filters.keys()) == expected_order
@@ -87,10 +84,8 @@ async def test_one_inherited_filters_ordering(
         OverrideInheritedFilterSet,
     ],
 )
-async def test_filter_field_name_set(
-    filter_set_class: Type[AsyncFilterSet], db_session: AsyncSession
-) -> None:
-    filter_set = filter_set_class({}, db_session, select(ItemForFilters))
+async def test_filter_field_name_set(filter_set_class: Type[BaseFilterSet]) -> None:
+    filter_set = filter_set_class({}, select(Item))
     filters = filter_set.get_filters()
     for filter_name, filter_ in filters.items():
         assert filter_.field_name == filter_name

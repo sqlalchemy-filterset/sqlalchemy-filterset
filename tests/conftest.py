@@ -6,6 +6,7 @@ from typing import Any, Callable, Dict, Generator, Optional
 import pytest
 from pydantic import BaseSettings, PostgresDsn, validator
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from tests.async_alchemy_factory import AsyncSQLAlchemyModelFactory
 from tests.database import Base
@@ -70,3 +71,8 @@ def init_database() -> Callable:
 def init_factories(db_session: AsyncSession) -> None:
     """Init factories."""
     AsyncSQLAlchemyModelFactory._session = db_session
+
+
+@pytest.fixture()
+def sync_db_session(db_session: AsyncSession) -> Session:
+    return db_session.sync_session
