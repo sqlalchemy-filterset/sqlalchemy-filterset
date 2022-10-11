@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.filters import BaseFilter
-from sqlalchemy_filterset.interfaces import IFilterSet
 
 
 class FilterSetMetaclass(abc.ABCMeta):
@@ -41,7 +40,7 @@ class FilterSetMetaclass(abc.ABCMeta):
         return filters
 
 
-class FilterSet(IFilterSet, metaclass=FilterSetMetaclass):
+class FilterSet(metaclass=FilterSetMetaclass):
     declared_filters: Dict[str, BaseFilter]
 
     def __init__(

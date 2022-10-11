@@ -1,13 +1,15 @@
 import abc
-from typing import Any, Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence
 
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES
-from sqlalchemy_filterset.interfaces import IBaseFilter
+
+if TYPE_CHECKING:
+    from sqlalchemy_filterset.filterset import FilterSet
 
 
-class BaseFilter(IBaseFilter):
+class BaseFilter:
     """Абстрактный класс фильтра"""
 
     field_name: Optional[str] = None
@@ -21,6 +23,18 @@ class BaseFilter(IBaseFilter):
     has_facets_columns: bool = False
     "Показатель того, что фильтр имплементировал метод получения facets в колонке основного запроса"
 
+    def __init__(self) -> None:
+        self._parent: Optional["FilterSet"] = None
+
+    @property
+    def parent(self) -> Optional["FilterSet"]:
+        """FilterSet родитель, данного фильтра"""
+        return self._parent
+
+    @parent.setter
+    def parent(self, value: "FilterSet") -> None:
+        self._parent = value
+
     @abc.abstractmethod
     def filter(self, query: Select, value: Any) -> Select:
         """Метод реализующий фильтрацию"""
@@ -32,7 +46,7 @@ class Filter(BaseFilter):
 
     def __init__(
         self,
-        model: Any,  # todo: typehint
+        model: Any,
         field: str,
         *,
         exclude: bool = False,
