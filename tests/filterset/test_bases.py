@@ -7,12 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES
 from sqlalchemy_filterset.filters import Filter, InFilter
-from sqlalchemy_filterset.filterset import FilterSet
+from sqlalchemy_filterset.filtersets import AsyncFilterSet
 from tests.filterset.conftest import ItemFactory
 from tests.models import GrandGrandParent, GrandParent, ItemForFilters, Parent
 
 
-class FilterSetClass(FilterSet):
+class FilterSetClass(AsyncFilterSet):
     id = Filter(ItemForFilters, "id")
     ids = InFilter(ItemForFilters, "id")
 

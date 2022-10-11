@@ -6,11 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import BaseFilter, Filter, InFilter
-from sqlalchemy_filterset.filterset import FilterSet
+from sqlalchemy_filterset.filtersets import AsyncFilterSet
 from tests.models import ItemForFilters
 
 
-class FirstFilterSet(FilterSet):
+class FirstFilterSet(AsyncFilterSet):
     id = Filter(ItemForFilters, "id")
     title = Filter(ItemForFilters, "title")
 
@@ -42,7 +42,7 @@ class OverrideInheritedFilterSet(FirstFilterSet):
     ],
 )
 async def test_filters_detection(
-    filter_set_class: Type[FilterSet],
+    filter_set_class: Type[AsyncFilterSet],
     expected_filters: Dict[str, Type[BaseFilter]],
     db_session: AsyncSession,
 ) -> None:
@@ -67,7 +67,7 @@ async def test_filters_detection(
     ],
 )
 async def test_one_inherited_filters_ordering(
-    filter_set_class: Type[FilterSet],
+    filter_set_class: Type[AsyncFilterSet],
     expected_order: List[str],
     db_session: AsyncSession,
 ) -> None:
@@ -88,7 +88,7 @@ async def test_one_inherited_filters_ordering(
     ],
 )
 async def test_filter_field_name_set(
-    filter_set_class: Type[FilterSet], db_session: AsyncSession
+    filter_set_class: Type[AsyncFilterSet], db_session: AsyncSession
 ) -> None:
     filter_set = filter_set_class({}, db_session, select(ItemForFilters))
     filters = filter_set.get_filters()

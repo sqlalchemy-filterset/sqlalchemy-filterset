@@ -6,7 +6,7 @@ from sqlalchemy.sql import Select
 from sqlalchemy_filterset.constants import EMPTY_VALUES
 
 if TYPE_CHECKING:
-    from sqlalchemy_filterset.filterset import FilterSet
+    from sqlalchemy_filterset.filtersets import BaseFilterSet
 
 
 class BaseFilter:
@@ -24,15 +24,15 @@ class BaseFilter:
     "Показатель того, что фильтр имплементировал метод получения facets в колонке основного запроса"
 
     def __init__(self) -> None:
-        self._parent: Optional["FilterSet"] = None
+        self._parent: Optional["BaseFilterSet"] = None
 
     @property
-    def parent(self) -> Optional["FilterSet"]:
+    def parent(self) -> Optional["BaseFilterSet"]:
         """FilterSet родитель, данного фильтра"""
         return self._parent
 
     @parent.setter
-    def parent(self, value: "FilterSet") -> None:
+    def parent(self, value: "BaseFilterSet") -> None:
         self._parent = value
 
     @abc.abstractmethod

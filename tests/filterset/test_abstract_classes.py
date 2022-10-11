@@ -6,11 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import Filter, InFilter
-from sqlalchemy_filterset.filterset import FilterSet
+from sqlalchemy_filterset.filtersets import AsyncFilterSet
 from tests.models import ItemForFilters
 
 
-class AbstractFilterSetClass(FilterSet):
+class AbstractFilterSetClass(AsyncFilterSet):
     id = Filter(ItemForFilters, "id")
     ids = InFilter(ItemForFilters, "id")
 

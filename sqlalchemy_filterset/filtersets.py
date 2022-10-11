@@ -6,6 +6,7 @@ from typing import Any, Dict
 import sqlalchemy as sa
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.filters import BaseFilter
@@ -40,23 +41,16 @@ class FilterSetMetaclass(abc.ABCMeta):
         return filters
 
 
-class FilterSet(metaclass=FilterSetMetaclass):
+class BaseFilterSet(metaclass=FilterSetMetaclass):
     declared_filters: Dict[str, BaseFilter]
 
-    def __init__(
-        self,
-        params: dict,
-        session: AsyncSession,
-        query: Select,
-    ) -> None:
+    def __init__(self, params: dict, query: Select) -> None:
         """
         :param params: Словарь параметров для фильтрации
-        :param session: Сессия базы данных
         :param query: Базовый запрос, на основе которого происходит фильтрация
         """
         self.params = params
         self.__base_query = query
-        self.session = session
         self.base_filters = self.get_filters()
         self.filters = copy.deepcopy(self.base_filters)
         for filter_ in self.filters.values():
@@ -81,14 +75,56 @@ class FilterSet(metaclass=FilterSetMetaclass):
             query = self.filters[name].filter(query, value)
         return query
 
-    async def filter(self) -> Result:
-        return await self.session.execute(self.filter_query())
-
-    async def count(self) -> int:
-        """Получения кол-ва результатов для данного FilterSet"""
+    def count_query(self) -> Select:
         query = self.filter_query().limit(None).offset(None)
         if (query._distinct and not query._distinct_on) or not query._distinct:  # type: ignore
             query = sa.select(sa.func.count()).select_from(query.order_by(None).subquery())
         elif query._distinct and query._distinct_on:  # type: ignore
             query = sa.select(sa.func.count()).select_from(query.subquery())
-        return (await self.session.execute(query)).scalar()  # type: ignore
+        return query
+
+
+class FilterSet(BaseFilterSet):
+    def __init__(
+        self,
+        params: dict,
+        session: Session,
+        query: Select,
+    ) -> None:
+        """
+        :param params: Словарь параметров для фильтрации
+        :param session: Сессия базы данных
+        :param query: Базовый запрос, на основе которого происходит фильтрация
+        """
+        self.session = session
+        super().__init__(params, query)
+
+    def filter(self) -> Result:
+        return self.session.execute(self.filter_query())
+
+    def count(self) -> int:
+        """Получения кол-ва результатов для данного FilterSet"""
+        return self.session.execute(self.count_query()).scalar()  # type: ignore
+
+
+class AsyncFilterSet(BaseFilterSet):
+    def __init__(
+        self,
+        params: dict,
+        session: AsyncSession,
+        query: Select,
+    ) -> None:
+        """
+        :param params: Словарь параметров для фильтрации
+        :param session: Сессия базы данных
+        :param query: Базовый запрос, на основе которого происходит фильтрация
+        """
+        self.session = session
+        super().__init__(params, query)
+
+    async def filter(self) -> Result:
+        return await self.session.execute(self.filter_query())
+
+    async def count(self) -> int:
+        """Получения кол-ва результатов для данного FilterSet"""
+        return (await self.session.execute(self.count_query())).scalar()  # type: ignore
