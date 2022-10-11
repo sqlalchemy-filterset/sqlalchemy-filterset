@@ -11,15 +11,7 @@ if TYPE_CHECKING:
 
 class BaseFilter:
     field_name: Optional[str] = None
-    "Название фильтра в filterset. проставляется в метаклассе при создании."
-    has_specs: bool = False
-    "Показатель того, что фильтр имплементировал метод получения specs"
-    has_facets: bool = False
-    "Показатель того, что фильтр имплементировал метод получения facets"
-    has_specs_columns: bool = False
-    "Показатель того, что фильтр имплементировал метод получения specs в колонке основного запроса"
-    has_facets_columns: bool = False
-    "Показатель того, что фильтр имплементировал метод получения facets в колонке основного запроса"
+    "Name of Filter in FilterSet. Set by FilterSet after creation."
 
     def __init__(self) -> None:
         self._parent: Optional["BaseFilterSet"] = None
@@ -35,12 +27,12 @@ class BaseFilter:
 
     @abc.abstractmethod
     def filter(self, query: Select, value: Any) -> Select:
-        """Метод реализующий фильтрацию"""
+        """Implementation of query build for this Filter"""
         ...
 
 
 class Filter(BaseFilter):
-    """Базовый фильтр для поля модели"""
+    """Base Filter by filed"""
 
     def __init__(
         self,
@@ -51,10 +43,10 @@ class Filter(BaseFilter):
         nullable: bool = False,
     ) -> None:
         """
-        :param model: Модель для фильтрации
-        :param field: Поле модели для фильтрации
-        :param exclude: Производить инвертированную фильтрацию
-        :param nullable: Допускать пустые значения
+        :param model: Model for filtration
+        :param field: Filed of Model for filtration
+        :param exclude: Use inverted filtration
+        :param nullable: Allow empty values in filtration process
         """
         super().__init__()
         self.model = model
