@@ -84,7 +84,9 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
         elif query._distinct and query._distinct_on:  # type: ignore
             query = sa.select(cnt).select_from(query.subquery())
         else:
-            query = query.order_by(None).with_only_columns(cnt, **{"maintain_column_froms": True})
+            query = query.order_by(None).with_only_columns(  # type: ignore
+                cnt, maintain_column_froms=True
+            )
         return query
 
 
