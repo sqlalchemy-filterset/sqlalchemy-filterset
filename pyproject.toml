@@ -86,7 +86,11 @@ plugins = ["sqlalchemy.ext.mypy.plugin"]
 
 [[tool.mypy.overrides]]
 module = [
-    "factory.*", "sqlalchemy_utils.*", "itsdangerous.*", "pytest_async_sqlalchemy.*"
+    "factory.*",
+    "sqlalchemy_utils.*",
+    "sqlalchemy.testing.*",
+    "itsdangerous.*",
+    "pytest_async_sqlalchemy.*"
 ]
 ignore_missing_imports = true
 

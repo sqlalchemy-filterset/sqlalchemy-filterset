@@ -1,7 +1,9 @@
 import abc
-from typing import TYPE_CHECKING, Any, Optional, Sequence
+from enum import Enum, auto
+from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
-from sqlalchemy.sql import Select
+from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.sql import ColumnElement, Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES
 
@@ -69,3 +71,82 @@ class InFilter(Filter):
 
         expression = getattr(self.model, self.field).in_(value)
         return query.where(~expression if self.exclude else expression)
+
+
+class NullsPosition(Enum):
+    first = auto()
+    last = auto()
+
+
+class OrderingField(NamedTuple):
+    field: InstrumentedAttribute
+    nulls: Optional[NullsPosition] = None
+
+    def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
+        """Build sqlalchemy ordering field
+        based on predefined parameters and passed ordering direction"""
+        if reverse:
+            field = self.field.desc()
+        else:
+            field = self.field.asc()
+
+        if self.nulls == NullsPosition.first:
+            field = field.nullsfirst()
+        elif self.nulls == NullsPosition.last:
+            field = field.nullslast()
+        return field
+
+
+class OrderingFilter(BaseFilter):
+    def __init__(self, **fields: OrderingField) -> None:
+        """
+        :param fields: Fields available for future ordering
+            Example::
+                ordering_filter = OrderingFilter(
+                    area=OrderingField(Item.area),
+                    date=OrderingField(Item.title, nulls=NullsPosition.last)
+                    date=OrderingField(Item.id)
+                )
+        """
+        super().__init__()
+        self.fields: Dict[str, OrderingField] = fields
+
+    def filter(self, query: Select, value: List[str]) -> Select:
+        """Apply ordering to a query instance.
+
+        :param query:
+            query instance for ordering
+        :param value:
+            A list of strings, where each one specify
+            which ordering field from available self.fields should be applied
+            Also specify ordering direction
+            Example::
+                value = ["area", "-date", "id"]
+        :returns:
+            query instance after the provided ordering has been applied.
+        """
+
+        if not value:
+            return query
+
+        ordering_fields = self._get_sqlalchemy_fields(value)
+        if ordering_fields:
+            query = query.order_by(*ordering_fields)
+        return query
+
+    def _get_sqlalchemy_fields(self, params: List[str]) -> List[ColumnElement]:
+        sqlalchemy_fields = []
+        for param in params:
+            reverse, param = self._parse_param(param)
+
+            if param in EMPTY_VALUES or param not in self.fields:
+                continue
+
+            ordering: OrderingField = self.fields[param]
+            sqlalchemy_fields.append(ordering.build_sqlalchemy_field(reverse))
+        return sqlalchemy_fields
+
+    @staticmethod
+    def _parse_param(param: str) -> Tuple[bool, str]:
+        """Parse direction and ordering field name"""
+        return param.startswith("-"), param.lstrip("-")
