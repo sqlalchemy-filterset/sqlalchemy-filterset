@@ -1,7 +1,7 @@
 import abc
 from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
-from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
@@ -37,7 +37,7 @@ class Filter(BaseFilter):
 
     def __init__(
         self,
-        field: InstrumentedAttribute,
+        field: QueryableAttribute,
         *,
         exclude: bool = False,
         nullable: bool = False,
@@ -70,7 +70,7 @@ class InFilter(Filter):
 
 
 class OrderingField(NamedTuple):
-    field: InstrumentedAttribute
+    field: QueryableAttribute
     nulls: Optional[NullsPosition] = None
 
     def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
