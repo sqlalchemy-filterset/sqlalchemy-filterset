@@ -1,11 +1,10 @@
 import abc
-from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
-from sqlalchemy_filterset.constants import EMPTY_VALUES
+from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
 
 if TYPE_CHECKING:
     from sqlalchemy_filterset.filtersets import BaseFilterSet
@@ -68,11 +67,6 @@ class InFilter(Filter):
 
         expression = self.field.in_(value)
         return query.where(~expression if self.exclude else expression)
-
-
-class NullsPosition(Enum):
-    first = auto()
-    last = auto()
 
 
 class OrderingField(NamedTuple):
