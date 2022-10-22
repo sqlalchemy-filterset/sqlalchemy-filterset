@@ -1,7 +1,7 @@
 import abc
 from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
-from sqlalchemy.orm import InstrumentedAttribute
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
@@ -15,16 +15,7 @@ class BaseFilter:
     "Name of Filter in FilterSet. Set by FilterSet after creation."
 
     def __init__(self) -> None:
-        self._parent: Optional["BaseFilterSet"] = None
-
-    @property
-    def parent(self) -> Optional["BaseFilterSet"]:
-        """FilterSet parent of this Filter"""
-        return self._parent
-
-    @parent.setter
-    def parent(self, value: "BaseFilterSet") -> None:
-        self._parent = value
+        self.parent: Optional["BaseFilterSet"] = None
 
     @abc.abstractmethod
     def filter(self, query: Select, value: Any) -> Select:
@@ -37,7 +28,7 @@ class Filter(BaseFilter):
 
     def __init__(
         self,
-        field: InstrumentedAttribute,
+        field: QueryableAttribute,
         *,
         exclude: bool = False,
         nullable: bool = False,
@@ -70,7 +61,7 @@ class InFilter(Filter):
 
 
 class OrderingField(NamedTuple):
-    field: InstrumentedAttribute
+    field: QueryableAttribute
     nulls: Optional[NullsPosition] = None
 
     def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
