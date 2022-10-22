@@ -22,8 +22,8 @@ class FilterSetClass(AsyncFilterSet):
 async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSession) -> None:
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
-    filter_set = FilterSetClass({f"{field}": empty_value}, db_session, base_query)
-    result = await db_session.execute(filter_set.filter_query())
+    filter_set = FilterSetClass(db_session, base_query)
+    result = await db_session.execute(filter_set.filter_query({f"{field}": empty_value}))
     actual = result.scalars().all()
     assert set(three_items) == set(actual)
 
@@ -31,7 +31,7 @@ async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSessi
 async def test_wrong_field(db_session: AsyncSession) -> None:
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
-    filter_set = FilterSetClass({"test": "test"}, db_session, base_query)
-    result = await db_session.execute(filter_set.filter_query())
+    filter_set = FilterSetClass(db_session, base_query)
+    result = await db_session.execute(filter_set.filter_query({"test": "test"}))
     actual = result.scalars().all()
     assert set(three_items) == set(actual)

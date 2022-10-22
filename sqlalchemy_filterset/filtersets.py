@@ -44,12 +44,10 @@ class FilterSetMetaclass(abc.ABCMeta):
 class BaseFilterSet(metaclass=FilterSetMetaclass):
     declared_filters: Dict[str, BaseFilter]
 
-    def __init__(self, params: dict, query: Select) -> None:
+    def __init__(self, query: Select) -> None:
         """
-        :param params: Dictionary of filtration params
         :param query: Base query which uses for building filter query
         """
-        self.params = params
         self.__base_query = query
         self.base_filters = self.get_filters()
         self.filters = copy.deepcopy(self.base_filters)
@@ -66,18 +64,18 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
         filters.update(cls.declared_filters)
         return filters
 
-    def filter_query(self) -> Select:
+    def filter_query(self, params: Dict) -> Select:
         """Build filtration query"""
         query = self.get_base_query()
-        for name, value in self.params.items():
+        for name, value in params.items():
             if name not in self.filters:
                 continue
             query = self.filters[name].filter(query, value)
         return query
 
-    def count_query(self) -> Select:
+    def count_query(self, params: Dict) -> Select:
         """Build query for calculating the total number of filtration results"""
-        query = self.filter_query().limit(None).offset(None)
+        query = self.filter_query(params).limit(None).offset(None)
         cnt = sa.func.count(sa.literal_column("1"))
         if query._distinct and not query._distinct_on:  # type: ignore
             query = sa.select(cnt).select_from(query.order_by(None).subquery())
@@ -93,46 +91,42 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
 class FilterSet(BaseFilterSet):
     def __init__(
         self,
-        params: dict,
         session: Session,
         query: Select,
     ) -> None:
         """
-        :param params: Dictionary of filtration params
         :param session: DB Session
         :param query: Base query which uses for building filter query
         """
         self.session = session
-        super().__init__(params, query)
+        super().__init__(query)
 
-    def filter(self) -> Result:
+    def filter(self, params: Dict) -> Result:
         """Get filtration results"""
-        return self.session.execute(self.filter_query())
+        return self.session.execute(self.filter_query(params))
 
-    def count(self) -> int:
+    def count(self, params: Dict) -> int:
         """Calculating the total number of filtration results"""
-        return self.session.execute(self.count_query()).scalar()  # type: ignore
+        return self.session.execute(self.count_query(params)).scalar()  # type: ignore
 
 
 class AsyncFilterSet(BaseFilterSet):
     def __init__(
         self,
-        params: dict,
         session: AsyncSession,
         query: Select,
     ) -> None:
         """
-        :param params: Dictionary of filtration params
         :param session: DB Session
         :param query: Base query which uses for building filter query
         """
         self.session = session
-        super().__init__(params, query)
+        super().__init__(query)
 
-    async def filter(self) -> Result:
+    async def filter(self, params: Dict) -> Result:
         """Get filtration results"""
-        return await self.session.execute(self.filter_query())
+        return await self.session.execute(self.filter_query(params))
 
-    async def count(self) -> int:
+    async def count(self, params: Dict) -> int:
         """Calculating the total number of filtration results"""
-        return (await self.session.execute(self.count_query())).scalar()  # type: ignore
+        return (await self.session.execute(self.count_query(params))).scalar()  # type: ignore

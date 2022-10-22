@@ -45,7 +45,7 @@ def test_filters_detection(
     expected_filters: Dict[str, Type[BaseFilter]],
 ) -> None:
     base_query = select(Item)
-    filter_set = filter_set_class({"id": uuid.uuid4()}, base_query)
+    filter_set = filter_set_class(base_query)
     detected_filters = filter_set.get_filters()
     assert len(detected_filters) == len(expected_filters)
 
@@ -69,7 +69,7 @@ async def test_inherited_filters_ordering(
     expected_order: List[str],
 ) -> None:
     base_query = select(Item)
-    filter_set = filter_set_class({"id": uuid.uuid4()}, base_query)
+    filter_set = filter_set_class(base_query)
     detected_filters = filter_set.get_filters()
 
     assert list(detected_filters.keys()) == expected_order
@@ -85,7 +85,7 @@ async def test_inherited_filters_ordering(
     ],
 )
 async def test_filter_field_name_set(filter_set_class: Type[BaseFilterSet]) -> None:
-    filter_set = filter_set_class({}, select(Item))
+    filter_set = filter_set_class(select(Item))
     filters = filter_set.get_filters()
     for filter_name, filter_ in filters.items():
         assert filter_.field_name == filter_name
