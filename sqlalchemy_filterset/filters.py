@@ -1,6 +1,7 @@
 import abc
 from typing import TYPE_CHECKING, Any, Optional, Sequence
 
+from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES
@@ -36,20 +37,17 @@ class Filter(BaseFilter):
 
     def __init__(
         self,
-        model: Any,
-        field: str,
+        field: InstrumentedAttribute,
         *,
         exclude: bool = False,
         nullable: bool = False,
     ) -> None:
         """
-        :param model: Model for filtration
         :param field: Filed of Model for filtration
         :param exclude: Use inverted filtration
         :param nullable: Allow empty values in filtration process
         """
         super().__init__()
-        self.model = model
         self.field = field
         self.exclude = exclude
         self.nullable = nullable
@@ -58,7 +56,7 @@ class Filter(BaseFilter):
         if not self.nullable and value in EMPTY_VALUES:
             return query
 
-        expression = getattr(self.model, self.field) == value
+        expression = self.field == value
         return query.where(~expression if self.exclude else expression)
 
 
@@ -67,5 +65,5 @@ class InFilter(Filter):
         if not self.nullable and value in EMPTY_VALUES:
             return query
 
-        expression = getattr(self.model, self.field).in_(value)
+        expression = self.field.in_(value)
         return query.where(~expression if self.exclude else expression)

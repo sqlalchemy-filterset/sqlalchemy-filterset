@@ -10,8 +10,8 @@ from tests.models import Item
 
 
 class AbstractFilterSetClass(BaseFilterSet):
-    id = Filter(Item, "id")
-    ids = InFilter(Item, "id")
+    id = Filter(Item.id)
+    ids = InFilter(Item.id)
 
     @abc.abstractmethod
     async def some_method(self) -> Any:

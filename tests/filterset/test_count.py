@@ -10,7 +10,7 @@ from tests.filterset.conftest import Item, ItemFactory
 
 
 class ItemFilterSet(AsyncFilterSet):
-    id = Filter(Item, "id")
+    id = Filter(Item.id)
 
 
 async def test_count(db_session: AsyncSession) -> None:

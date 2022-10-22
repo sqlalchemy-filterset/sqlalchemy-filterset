@@ -10,22 +10,22 @@ from tests.models import Item
 
 
 class FirstFilterSet(BaseFilterSet):
-    id = Filter(Item, "id")
-    title = Filter(Item, "title")
+    id = Filter(Item.id)
+    title = Filter(Item.title)
 
     some_attr = "Some attr"
 
 
 class SecondInheritedFilterSet(FirstFilterSet):
-    ids = InFilter(Item, "id")
+    ids = InFilter(Item.id)
 
 
 class ThirdInheritedFilterSet(SecondInheritedFilterSet):
-    other_id = Filter(Item, "id")
+    other_id = Filter(Item.id)
 
 
 class OverrideInheritedFilterSet(FirstFilterSet):
-    id = InFilter(Item, "id")
+    id = InFilter(Item.id)
 
 
 @pytest.mark.parametrize(

@@ -51,8 +51,7 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
         """
         self.params = params
         self.__base_query = query
-        self.base_filters = self.get_filters()
-        self.filters = copy.deepcopy(self.base_filters)
+        self.filters = self.get_filters()
         for filter_ in self.filters.values():
             filter_.parent = self
 

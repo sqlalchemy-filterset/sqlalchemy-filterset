@@ -13,8 +13,8 @@ from tests.models import GrandGrandParent, GrandParent, Item, Parent
 
 
 class FilterSetClass(AsyncFilterSet):
-    id = Filter(Item, "id")
-    ids = InFilter(Item, "id")
+    id = Filter(Item.id)
+    ids = InFilter(Item.id)
 
 
 @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
