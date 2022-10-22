@@ -92,3 +92,14 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
         filter_ = OrderingFilter(area=OrderingField(Item.area))
         stmt = filter_.filter(select(Item.id), ["bad_value"])
         self.assert_compile(stmt, "SELECT item.id FROM item")
+
+    def test_ordering_apply_order(self) -> None:
+        filter_ = OrderingFilter(
+            area=OrderingField(Item.area),
+            date=OrderingField(Item.date),
+            title=OrderingField(Item.title),
+        )
+        stmt = filter_.filter(select(Item.id), ["date", "title", "area"])
+        self.assert_compile(
+            stmt, "SELECT item.id FROM item ORDER BY item.date ASC, item.title ASC, item.area ASC"
+        )
