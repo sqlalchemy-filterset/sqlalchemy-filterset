@@ -76,10 +76,7 @@ class OrderingField(NamedTuple):
     def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
         """Build sqlalchemy ordering field
         based on predefined parameters and passed ordering direction"""
-        if reverse:
-            field = self.field.desc()
-        else:
-            field = self.field.asc()
+        field = self.field.asc() if not reverse else self.field.desc()
 
         if self.nulls == NullsPosition.first:
             field = field.nullsfirst()
