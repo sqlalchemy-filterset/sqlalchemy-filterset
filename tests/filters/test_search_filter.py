@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
@@ -30,18 +32,11 @@ class TestSearchBuildSelect(AssertsCompiledSQL):
         stmt = filter_.filter(select(Item.id), "test")
         self.assert_compile(stmt, f"SELECT item.id FROM item {expected}")
 
-    @pytest.mark.parametrize("value", ["test", ""])
-    @pytest.mark.parametrize("nullable", [False, True])
-    def test_nullable(self, value: str, nullable: bool) -> None:
-        filter_ = SearchFilter(Item.title, nullable=nullable)
+    @pytest.mark.parametrize("value", EMPTY_VALUES)
+    def test_with_empty_value(self, value: Any) -> None:
+        filter_ = SearchFilter(Item.title)
         stmt = filter_.filter(select(Item.id), value)
-        select_query = "SELECT item.id FROM item"
-        if not nullable and value in EMPTY_VALUES:
-            self.assert_compile(stmt, select_query)
-        else:
-            self.assert_compile(
-                stmt, f"{select_query} WHERE lower(item.title) LIKE lower(:title_1)"
-            )
+        self.assert_compile(stmt, "SELECT item.id FROM item")
 
     def test_search_with_many_fields(self) -> None:
         filter_ = SearchFilter(Item.title, Item.name)

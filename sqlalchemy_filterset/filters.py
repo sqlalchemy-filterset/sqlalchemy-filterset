@@ -77,20 +77,17 @@ class SearchFilter(BaseFilter):
         self,
         *fields: QueryableAttribute,
         exclude: bool = False,
-        nullable: bool = False,
     ) -> None:
         """
         :param fields: Fields of Model for filtration
         :param exclude: Use inverted filtration
-        :param nullable: Allow empty values in filtration process
         """
         super().__init__()
         self.fields = fields
         self.exclude = exclude
-        self.nullable = nullable
 
     def filter(self, query: Select, value: Any) -> Select:
-        if not self.nullable and value in EMPTY_VALUES:
+        if value in EMPTY_VALUES:
             return query
 
         if "*" in value or "_" in value:
