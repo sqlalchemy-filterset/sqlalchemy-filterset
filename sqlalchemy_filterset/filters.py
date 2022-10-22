@@ -80,7 +80,7 @@ class SearchFilter(BaseFilter):
         nullable: bool = False,
     ) -> None:
         """
-        :param field: Filed of Model for filtration
+        :param fields: Fields of Model for filtration
         :param exclude: Use inverted filtration
         :param nullable: Allow empty values in filtration process
         """
