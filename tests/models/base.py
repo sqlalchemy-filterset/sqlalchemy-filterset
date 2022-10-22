@@ -43,6 +43,7 @@ class Parent(Base):
 
 class Item(Base):
     id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    name: str = sa.Column(sa.String, nullable=True)
     date: datetime.datetime = sa.Column(
         sa.DateTime(timezone=False), nullable=False, server_default=sa.func.now()
     )
