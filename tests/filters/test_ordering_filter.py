@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import pytest
 from sqlalchemy import select
@@ -51,11 +51,6 @@ class TestOrderingBuildFields:
 class TestOrderingBuildSelect(AssertsCompiledSQL):
     __dialect__: str = "default"
 
-    def test_no_ordering(self) -> None:
-        filter_ = OrderingFilter(area=OrderingField(Item.area))
-        stmt = filter_.filter(select(Item.id), [])
-        self.assert_compile(stmt, "SELECT item.id FROM item")
-
     @pytest.mark.parametrize(
         "fields, expected_ordering",
         [
@@ -78,22 +73,18 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
         stmt = filter_.filter(select(Item.id), fields)
         self.assert_compile(stmt, f"SELECT item.id FROM item ORDER BY {expected_ordering}")
 
-    def test_non_defined_field(self) -> None:
+    @pytest.mark.parametrize("value", [None, (), [], ["-"], ["error_value"]])
+    def test_no_ordering(self, value: Any) -> None:
+        filter_ = OrderingFilter(area=OrderingField(Item.area))
+        stmt = filter_.filter(select(Item.id), value)
+        self.assert_compile(stmt, "SELECT item.id FROM item")
+
+    def test_with_additional_non_defined_field(self) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
         stmt = filter_.filter(select(Item.id), ["area", "test"])
         self.assert_compile(stmt, "SELECT item.id FROM item ORDER BY item.area ASC")
 
-    def test_error_bad_value(self) -> None:
-        filter_ = OrderingFilter(area=OrderingField(Item.area))
-        stmt = filter_.filter(select(Item.id), ["-"])
-        self.assert_compile(stmt, "SELECT item.id FROM item")
-
-    def test_error_bad_value_non_defined_field(self) -> None:
-        filter_ = OrderingFilter(area=OrderingField(Item.area))
-        stmt = filter_.filter(select(Item.id), ["bad_value"])
-        self.assert_compile(stmt, "SELECT item.id FROM item")
-
-    def test_ordering_apply_order(self) -> None:
+    def test_in_which_order_apply(self) -> None:
         filter_ = OrderingFilter(
             area=OrderingField(Item.area),
             date=OrderingField(Item.date),
