@@ -9,7 +9,7 @@ from sqlalchemy_filterset.filtersets import AsyncFilterSet
 from tests.models.factories import Item, ItemFactory
 
 
-class ItemFilterSet(AsyncFilterSet):
+class ItemFilterSet(AsyncFilterSet[Item]):
     id = Filter(Item.id)
 
 

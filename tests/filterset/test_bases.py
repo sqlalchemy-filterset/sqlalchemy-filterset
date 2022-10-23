@@ -12,7 +12,7 @@ from tests.models import GrandGrandParent, GrandParent, Item, Parent
 from tests.models.factories import ItemFactory
 
 
-class FilterSetClass(AsyncFilterSet):
+class FilterSetClass(AsyncFilterSet[Item]):
     id = Filter(Item.id)
     ids = InFilter(Item.id)
 
@@ -23,15 +23,13 @@ async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSessi
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
     filter_set = FilterSetClass(db_session, base_query)
-    result = await db_session.execute(filter_set.filter_query({f"{field}": empty_value}))
-    actual = result.scalars().all()
-    assert set(three_items) == set(actual)
+    result = await filter_set.filter({f"{field}": empty_value})
+    assert set(three_items) == set(result)
 
 
 async def test_wrong_field(db_session: AsyncSession) -> None:
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
     filter_set = FilterSetClass(db_session, base_query)
-    result = await db_session.execute(filter_set.filter_query({"test": "test"}))
-    actual = result.scalars().all()
-    assert set(three_items) == set(actual)
+    result = await filter_set.filter({"test": "test"})
+    assert set(three_items) == set(result)
