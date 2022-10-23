@@ -1,6 +1,8 @@
 import abc
-from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
+import operator as op
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
+import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
@@ -67,6 +69,61 @@ class InFilter(Filter):
 
         expression = self.field.in_(value)
         return query.where(~expression if self.exclude else expression)
+
+
+class RangeFilter(Filter):
+    def __init__(
+        self,
+        field: QueryableAttribute,
+        *,
+        exclude: bool = False,
+        min_operator: Callable = op.ge,
+        max_operator: Callable = op.le,
+    ) -> None:
+        """
+        :param field: Filed of Model for filtration
+        :param exclude: Use inverted filtration
+        :param min_operator: Comparsion operator for min_value. Available values (">=", ">")
+        :param max_operator: Comparsion operator for max_value. Available values ("<=", "<")
+        """
+
+        assert min_operator in (op.ge, op.gt)
+        assert max_operator in (op.le, op.lt)
+
+        self.min_operator = min_operator
+        self.max_operator = max_operator
+        super().__init__(field=field, exclude=exclude)
+
+    def filter(self, query: Select, value: Sequence[Any]) -> Select:
+        """Apply filtering by range to a query instance.
+
+        :param query: query instance for filtering
+        :param value:
+            A sequence of two values: min_value, max_value, where:
+                min_value - left border for range
+                max_value - right border for range
+            Example::
+                value = [100, 1000] - filter 100 <= value <= 1000
+                value = [100, None] - filter value >= 100
+                value = [None, 1000] - filter value <= 1000
+                value = [datetime.now() - timedelta(days=10), datetime.now()] - filter last 10 days
+        :returns: query instance after the provided filtering has been applied.
+        """
+
+        if not value:
+            return query
+        min_value, max_value, *args = value
+
+        min_operator = self.min_operator if not self.exclude else self.max_operator
+        max_operator = self.max_operator if not self.exclude else self.min_operator
+        logical_operator = sa.and_ if not self.exclude else sa.or_
+
+        expressions = []
+        if min_value is not None:
+            expressions.append(min_operator(self.field, min_value))
+        if max_value is not None:
+            expressions.append(max_operator(self.field, max_value))
+        return query.where(logical_operator(*expressions))
 
 
 class OrderingField(NamedTuple):
