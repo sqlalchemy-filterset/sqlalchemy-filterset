@@ -1,10 +1,9 @@
 import abc
 import copy
 from collections import OrderedDict
-from typing import Any, Dict
+from typing import Any, Dict, Generic, Sequence, TypeVar
 
 import sqlalchemy as sa
-from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
@@ -41,7 +40,10 @@ class FilterSetMetaclass(abc.ABCMeta):
         return filters
 
 
-class BaseFilterSet(metaclass=FilterSetMetaclass):
+Model = TypeVar("Model")
+
+
+class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
     declared_filters: Dict[str, BaseFilter]
 
     def __init__(self, query: Select) -> None:
@@ -87,7 +89,7 @@ class BaseFilterSet(metaclass=FilterSetMetaclass):
         return query
 
 
-class FilterSet(BaseFilterSet):
+class FilterSet(BaseFilterSet[Model]):
     def __init__(
         self,
         session: Session,
@@ -100,16 +102,16 @@ class FilterSet(BaseFilterSet):
         self.session = session
         super().__init__(query)
 
-    def filter(self, params: Dict) -> Result:
+    def filter(self, params: Dict) -> Sequence[Model]:
         """Get filtration results"""
-        return self.session.execute(self.filter_query(params))
+        return self.session.execute(self.filter_query(params)).unique().scalars().all()
 
     def count(self, params: Dict) -> int:
         """Calculating the total number of filtration results"""
         return self.session.execute(self.count_query(params)).scalar()  # type: ignore
 
 
-class AsyncFilterSet(BaseFilterSet):
+class AsyncFilterSet(BaseFilterSet[Model]):
     def __init__(
         self,
         session: AsyncSession,
@@ -122,9 +124,9 @@ class AsyncFilterSet(BaseFilterSet):
         self.session = session
         super().__init__(query)
 
-    async def filter(self, params: Dict) -> Result:
+    async def filter(self, params: Dict) -> Sequence[Model]:
         """Get filtration results"""
-        return await self.session.execute(self.filter_query(params))
+        return (await self.session.execute(self.filter_query(params))).unique().scalars().all()
 
     async def count(self, params: Dict) -> int:
         """Calculating the total number of filtration results"""

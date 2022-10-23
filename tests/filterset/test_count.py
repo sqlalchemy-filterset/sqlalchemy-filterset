@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.filtersets import AsyncFilterSet
-from tests.filterset.conftest import Item, ItemFactory
+from tests.models.factories import Item, ItemFactory
 
 
-class ItemFilterSet(AsyncFilterSet):
+class ItemFilterSet(AsyncFilterSet[Item]):
     id = Filter(Item.id)
 
 

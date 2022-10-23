@@ -1,4 +1,3 @@
-import uuid
 from typing import Dict, List, Type
 
 import pytest
