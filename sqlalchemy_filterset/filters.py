@@ -71,37 +71,45 @@ class InFilter(Filter):
         return query.where(~expression if self.exclude else expression)
 
 
+# handle case when exclude
 class RangeFilter(Filter):
     def __init__(
         self,
         field: QueryableAttribute,
         *,
         exclude: bool = False,
-        min_operator: Callable = op.ge,
-        max_operator: Callable = op.le,
+        left_operator: Callable = op.ge,
+        right_operator: Callable = op.le,
     ) -> None:
         """
         :param field: Filed of Model for filtration
         :param exclude: Use inverted filtration
-        :param min_operator: Comparsion operator for min_value. Available values (">=", ">")
-        :param max_operator: Comparsion operator for max_value. Available values ("<=", "<")
+        :param left_operator: Comparsion operator for left_value. Available values (">=", ">")
+        :param right_operator: Comparsion operator for right_value. Available values ("<=", "<")
         """
 
-        assert min_operator in (op.ge, op.gt)
-        assert max_operator in (op.le, op.lt)
+        assert left_operator in (op.ge, op.gt)
+        assert right_operator in (op.le, op.lt)
 
-        self.min_operator = min_operator
-        self.max_operator = max_operator
+        exclude_map: Dict[Callable, Callable] = {
+            op.ge: op.lt,
+            op.gt: op.le,
+            op.le: op.gt,
+            op.lt: op.ge,
+        }
+        self.left_operator = left_operator if not exclude else exclude_map[left_operator]
+        self.right_operator = right_operator if not exclude else exclude_map[right_operator]
+        self.logical_operator = sa.and_ if not exclude else sa.or_
         super().__init__(field=field, exclude=exclude)
 
-    def filter(self, query: Select, value: Sequence[Any]) -> Select:
+    def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
         """Apply filtering by range to a query instance.
 
         :param query: query instance for filtering
         :param value:
-            A sequence of two values: min_value, max_value, where:
-                min_value - left border for range
-                max_value - right border for range
+            A sequence of two values: left_value, right_value, where:
+                left_operator - left border for range
+                right_operator - right border for range
             Example::
                 value = [100, 1000] - filter 100 <= value <= 1000
                 value = [100, None] - filter value >= 100
@@ -112,18 +120,14 @@ class RangeFilter(Filter):
 
         if not value:
             return query
-        min_value, max_value, *args = value
 
-        min_operator = self.min_operator if not self.exclude else self.max_operator
-        max_operator = self.max_operator if not self.exclude else self.min_operator
-        logical_operator = sa.and_ if not self.exclude else sa.or_
-
+        left_value, right_value = value
         expressions = []
-        if min_value is not None:
-            expressions.append(min_operator(self.field, min_value))
-        if max_value is not None:
-            expressions.append(max_operator(self.field, max_value))
-        return query.where(logical_operator(*expressions))
+        if left_value is not None:
+            expressions.append(self.left_operator(self.field, left_value))
+        if right_value is not None:
+            expressions.append(self.right_operator(self.field, right_value))
+        return query.where(self.logical_operator(*expressions))
 
 
 class OrderingField(NamedTuple):
