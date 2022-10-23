@@ -73,7 +73,7 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
         stmt = filter_.filter(select(Item.id), fields)
         self.assert_compile(stmt, f"SELECT item.id FROM item ORDER BY {expected_ordering}")
 
-    @pytest.mark.parametrize("value", [None, (), [], ["-"], ["error_value"]])
+    @pytest.mark.parametrize("value", [None, (), ["-"], ["error_value"], [""], ["", ""]])
     def test_no_ordering(self, value: Any) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
         stmt = filter_.filter(select(Item.id), value)

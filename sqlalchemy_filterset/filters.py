@@ -102,16 +102,14 @@ class OrderingFilter(BaseFilter):
     def filter(self, query: Select, value: Sequence[str]) -> Select:
         """Apply ordering to a query instance.
 
-        :param query:
-            query instance for ordering
+        :param query: query instance for ordering
         :param value:
             A sequence of strings, where each one specify
             which ordering field from available self.fields should be applied
             Also specify ordering direction
             Example::
                 value = ["area", "-date", "id"]
-        :returns:
-            query instance after the provided ordering has been applied.
+        :returns: query instance after the provided ordering has been applied.
         """
 
         if not value:
@@ -127,9 +125,8 @@ class OrderingFilter(BaseFilter):
         for param in params:
             reverse, param = self._parse_param(param)
 
-            if param in EMPTY_VALUES or param not in self.fields:
+            if not param or param not in self.fields:
                 continue
-
             ordering: OrderingField = self.fields[param]
             sqlalchemy_fields.append(ordering.build_sqlalchemy_field(reverse))
         return sqlalchemy_fields
