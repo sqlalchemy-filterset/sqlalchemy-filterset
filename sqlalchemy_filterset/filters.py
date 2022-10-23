@@ -60,6 +60,32 @@ class InFilter(Filter):
         return query.where(~expression if self.exclude else expression)
 
 
+class BooleanFilter(Filter):
+    """A special case of Filter for filtering by boolean value."""
+
+    def filter(self, query: Select, value: Optional[bool]) -> Select:
+        """Apply filtering by boolean value to a query instance.
+
+        :param query: query instance for filtering
+        :param value: bool value
+        :returns: query instance after the provided filtering has been applied.
+
+        Examples::
+
+            BooleanFilter(select(Item), value=True)
+
+            BooleanFilter(select(Item), value=False)
+
+            BooleanFilter(select(Item), value=None)
+        """
+
+        if not self.nullable and value is None:
+            return query
+
+        expression = self.field.is_(value)
+        return query.where(~expression if self.exclude else expression)
+
+
 class OrderingField(NamedTuple):
     field: QueryableAttribute
     nulls: Optional[NullsPosition] = None
