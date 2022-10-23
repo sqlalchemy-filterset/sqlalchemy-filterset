@@ -131,3 +131,25 @@ class OrderingFilter(BaseFilter):
     def _parse_param(param: str) -> Tuple[bool, str]:
         """Parse direction and ordering field name"""
         return param.startswith("-"), param.lstrip("-")
+
+
+class LimitOffsetPagination(BaseFilter):
+    """Filter for managing limit and offset"""
+
+    def filter(self, query: Select, value: Optional[Tuple[Optional[int], Optional[int]]]) -> Select:
+        """Apply limit offset pagination to a query instance.
+
+        :param query: query instance for pagination
+        :param value: A tuple of positive integers (limit, offset)
+        :returns: query instance after the provided pagination has been applied.
+
+        Example::
+
+            LimitOffsetPagination(select(Item), value=(100, 0))
+        """
+
+        if not value:
+            return query
+
+        limit, offset = value
+        return query.limit(limit).offset(offset)
