@@ -62,7 +62,6 @@ class InFilter(Filter):
         return query.where(~expression if self.exclude else expression)
 
 
-# handle case when exclude
 class RangeFilter(Filter):
     def __init__(
         self,
@@ -97,16 +96,18 @@ class RangeFilter(Filter):
         """Apply filtering by range to a query instance.
 
         :param query: query instance for filtering
-        :param value:
-            A sequence of two values: left_value, right_value, where:
-                left_operator - left border for range
-                right_operator - right border for range
-            Example::
-                value = [100, 1000] - filter 100 <= value <= 1000
-                value = [100, None] - filter value >= 100
-                value = [None, 1000] - filter value <= 1000
-                value = [datetime.now() - timedelta(days=10), datetime.now()] - filter last 10 days
+        :param value: A tuple with two values: left_value, right_value, where:
+            left_value - left border of range
+            right_value - right border of range
         :returns: query instance after the provided filtering has been applied.
+
+        Examples::
+
+            RangeFilter(select(Item), value=(100, 1000))
+
+            RangeFilter(select(Item), value=(None, 1000))
+
+            RangeFilter(select(Item), value=(datetime.now() - timedelta(days=10), datetime.now()))
         """
 
         if not value:

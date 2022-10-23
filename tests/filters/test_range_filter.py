@@ -70,7 +70,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_no_filtering(self, value: Any) -> None:
         filter_ = RangeFilter(Item.area)
         stmt = filter_.filter(select(Item.id), value)
-        self.assert_compile(stmt, f"SELECT item.id FROM item")
+        self.assert_compile(stmt, "SELECT item.id FROM item")
 
     def test_error_incorrect_operator(self) -> None:
         with pytest.raises(AssertionError):
