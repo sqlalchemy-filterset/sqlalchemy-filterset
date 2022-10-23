@@ -1,12 +1,14 @@
 import asyncio
 import sys
 from asyncio import AbstractEventLoop
-from typing import Any, Callable, Dict, Generator, Optional
+from typing import Any, AsyncIterator, Dict, Generator, Iterator, Optional
 
 import pytest
 from pydantic import BaseSettings, PostgresDsn, validator
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from tests.async_alchemy_factory import AsyncSQLAlchemyModelFactory
 from tests.database import Base
@@ -39,9 +41,6 @@ class PostgresConfig(BaseSettings):
         env_file = ".env"
 
 
-db_config = PostgresConfig()
-
-
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[AbstractEventLoop, None, None]:
     """
@@ -58,21 +57,60 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _database_url() -> str:
-    return f"{db_config.dsn}"
+def async_database_url(worker_id: str) -> str:
+    return f"{PostgresConfig(scheme='postgresql+asyncpg').dsn}-{worker_id}"
 
 
 @pytest.fixture(scope="session")
-def init_database() -> Callable:
-    return Base.metadata.create_all
+def sync_database_url(worker_id: str) -> str:
+    return f"{PostgresConfig(scheme='postgresql').dsn}-{worker_id}"
 
 
-@pytest.fixture(autouse=True)
-def init_factories(db_session: AsyncSession) -> None:
-    """Init factories."""
-    AsyncSQLAlchemyModelFactory._session = db_session
+@pytest.fixture(scope="session", autouse=True)
+def database(sync_database_url: str) -> Iterator[None]:
+    if database_exists(sync_database_url):
+        drop_database(sync_database_url)
+    create_database(sync_database_url)
+    engine = create_engine(sync_database_url)
+    Base.metadata.create_all(engine)
+    yield
+    Base.metadata.drop_all(engine)
+    drop_database(sync_database_url)
 
 
 @pytest.fixture()
-def sync_db_session(db_session: AsyncSession) -> Session:
-    return db_session.sync_session
+def sync_session(sync_database_url: str) -> Iterator[Session]:
+    engine = create_engine(sync_database_url)
+    Session = sessionmaker(engine, expire_on_commit=False)
+    session = Session()
+
+    try:
+        yield session
+    finally:
+        for table in reversed(Base.metadata.sorted_tables):
+            session.execute(table.delete())
+
+        session.commit()
+        session.close()
+
+
+@pytest.fixture()
+async def async_session(async_database_url: str) -> AsyncIterator[AsyncSession]:
+    engine = create_async_engine(async_database_url)
+
+    Session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    session: AsyncSession = Session()
+
+    try:
+        yield session
+    finally:
+        for table in reversed(Base.metadata.sorted_tables):
+            await session.execute(table.delete())
+        await session.commit()
+        await session.close()
+
+
+@pytest.fixture(autouse=True)
+def init_factories(async_session: AsyncSession) -> None:
+    """Init factories."""
+    AsyncSQLAlchemyModelFactory._session = async_session

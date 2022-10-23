@@ -19,17 +19,17 @@ class FilterSetClass(AsyncFilterSet[Item]):
 
 @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
 @pytest.mark.parametrize("field", ["id", "ids"])
-async def test_empty_values(empty_value: Any, field: str, db_session: AsyncSession) -> None:
+async def test_empty_values(empty_value: Any, field: str, async_session: AsyncSession) -> None:
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
-    filter_set = FilterSetClass(db_session, base_query)
+    filter_set = FilterSetClass(async_session, base_query)
     result = await filter_set.filter({f"{field}": empty_value})
     assert set(three_items) == set(result)
 
 
-async def test_wrong_field(db_session: AsyncSession) -> None:
+async def test_wrong_field(async_session: AsyncSession) -> None:
     three_items: typing.List[Item] = await ItemFactory.create_batch(3)
     base_query = select(Item).join(Parent).join(GrandParent).join(GrandGrandParent)
-    filter_set = FilterSetClass(db_session, base_query)
+    filter_set = FilterSetClass(async_session, base_query)
     result = await filter_set.filter({"test": "test"})
     assert set(three_items) == set(result)
