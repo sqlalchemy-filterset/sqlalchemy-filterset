@@ -80,12 +80,14 @@ class OrderingFilter(BaseFilter):
     def __init__(self, **fields: OrderingField) -> None:
         """
         :param fields: Fields available for future ordering
-            Example::
-                ordering_filter = OrderingFilter(
-                    area=OrderingField(Item.area),
-                    date=OrderingField(Item.title, nulls=NullsPosition.last)
-                    date=OrderingField(Item.id)
-                )
+
+        Example::
+
+            ordering_filter = OrderingFilter(
+                area=OrderingField(Item.area),
+                title=OrderingField(Item.title, nulls=NullsPosition.last),
+                id=OrderingField(Item.id)
+            )
         """
         super().__init__()
         self.fields: Dict[str, OrderingField] = fields
@@ -98,9 +100,12 @@ class OrderingFilter(BaseFilter):
             A sequence of strings, where each one specify
             which ordering field from available self.fields should be applied
             Also specify ordering direction
-            Example::
-                value = ["area", "-date", "id"]
+
         :returns: query instance after the provided ordering has been applied.
+
+        Example::
+
+            OrderingFilter(select(Item), value=["area", "-date", "id"])
         """
 
         if not value:
