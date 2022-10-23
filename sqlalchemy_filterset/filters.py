@@ -1,5 +1,5 @@
 import abc
-from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
@@ -7,7 +7,7 @@ from sqlalchemy.sql import ColumnElement, Select
 from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
 
 if TYPE_CHECKING:
-    from sqlalchemy_filterset.filtersets import BaseFilterSet
+    from sqlalchemy_filterset.filtersets import BaseFilterSet  # pragma: no cover
 
 
 class BaseFilter:
@@ -15,12 +15,21 @@ class BaseFilter:
     "Name of Filter in FilterSet. Set by FilterSet after creation."
 
     def __init__(self) -> None:
-        self.parent: Optional["BaseFilterSet"] = None
+        self._filter_set: Optional["BaseFilterSet"] = None
+
+    @property
+    def filter_set(self) -> Optional["BaseFilterSet"]:
+        """FilterSet of this Filter"""
+        return self._filter_set  # pragma: no cover
+
+    @filter_set.setter
+    def filter_set(self, value: "BaseFilterSet") -> None:
+        self._filter_set = value
 
     @abc.abstractmethod
     def filter(self, query: Select, value: Any) -> Select:
         """Implementation of query build for this Filter"""
-        ...
+        ...  # pragma: no cover
 
 
 class Filter(BaseFilter):
@@ -131,3 +140,42 @@ class OrderingFilter(BaseFilter):
     def _parse_param(param: str) -> Tuple[bool, str]:
         """Parse direction and ordering field name"""
         return param.startswith("-"), param.lstrip("-")
+
+
+class MethodFilter(BaseFilter):
+    """This helper is used to override Filter.filter() when a 'method' argument
+    is passed. It proxies the call to the actual method on the filter's parent filterset.
+    """
+
+    def __init__(self, method: str) -> None:
+        """
+        :param method: Method name in parent FilterSet
+        """
+        super().__init__()
+        self.method = method
+        self._filter: Optional[Callable] = None
+
+    @property
+    def filter_set(self) -> Optional["BaseFilterSet"]:
+        """FilterSet of this Filter"""
+        return self._filter_set
+
+    @filter_set.setter
+    def filter_set(self, value: "BaseFilterSet") -> None:
+        self._filter_set = value
+        self.init_filter_method()
+
+    def init_filter_method(self) -> None:
+        from sqlalchemy_filterset.filtersets import BaseFilterSet
+
+        assert isinstance(self.filter_set, BaseFilterSet)
+        assert hasattr(self.filter_set, self.method)
+        self._filter = getattr(self.filter_set, self.method)
+
+    def filter(self, query: Select, value: Any) -> Select:
+        assert self._filter
+
+        if value in EMPTY_VALUES:
+            return query
+
+        return self._filter(query, value)
