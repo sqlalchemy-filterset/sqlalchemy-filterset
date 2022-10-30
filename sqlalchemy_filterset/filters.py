@@ -1,6 +1,7 @@
 import abc
 from typing import TYPE_CHECKING, Any, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
+from sqlalchemy import or_
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
@@ -57,6 +58,34 @@ class InFilter(Filter):
             return query
 
         expression = self.field.in_(value)
+        return query.where(~expression if self.exclude else expression)
+
+
+class SearchFilter(BaseFilter):
+    """Filter by ILIKE"""
+
+    def __init__(
+        self,
+        *fields: QueryableAttribute,
+        exclude: bool = False,
+    ) -> None:
+        """
+        :param fields: Fields of Model for filtration
+        :param exclude: Use inverted filtration
+        """
+        super().__init__()
+        self.fields = fields
+        self.exclude = exclude
+
+    def filter(self, query: Select, value: Any) -> Select:
+        if value in EMPTY_VALUES:
+            return query
+
+        if "*" in value or "_" in value:
+            looking_for = value.replace("_", "__").replace("*", "%").replace("?", "_")
+        else:
+            looking_for = "%{0}%".format(value)
+        expression = or_(*[field.ilike(looking_for) for field in self.fields])
         return query.where(~expression if self.exclude else expression)
 
 
