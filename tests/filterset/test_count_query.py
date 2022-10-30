@@ -32,22 +32,22 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
         )
 
     async def test_with_distinct(self, async_session: AsyncSession) -> None:
-        filter_set = ItemFilterSet(select(Item).distinct())
+        filter_set = ItemFilterSet(select(Item.id, Item.date).distinct())
         self.assert_compile(
             filter_set.count_query({}),
-            "SELECT count(1) AS count_1 FROM (SELECT DISTINCT item.id AS id, item.date AS date, "
-            "item.area AS area, item.is_active AS is_active, item.title AS title, "
-            "item.parent_id AS parent_id FROM item) AS anon_1",
+            "SELECT count(1) AS count_1 FROM (SELECT DISTINCT item.id AS id, item.date AS date "
+            "FROM item) AS anon_1",
         )
 
     async def test_with_distinct_on(self, async_session: AsyncSession) -> None:
-        query = select(Item).distinct(Item.title).order_by(Item.title, Item.date.desc())
+        query = (
+            select(Item.id, Item.title).distinct(Item.title).order_by(Item.title, Item.date.desc())
+        )
         filter_set = ItemFilterSet(query)
         self.assert_compile(
             filter_set.count_query({}),
             "SELECT count(1) AS count_1 FROM (SELECT DISTINCT ON (item.title) item.id AS id, "
-            "item.date AS date, item.area AS area, item.is_active AS is_active, "
-            "item.title AS title, item.parent_id AS parent_id FROM item "
+            "item.title AS title FROM item "
             "ORDER BY item.title, item.date DESC) AS anon_1",
             dialect="postgresql",
         )

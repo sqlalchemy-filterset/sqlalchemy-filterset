@@ -28,11 +28,10 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
         ],
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
-        filter_set = ItemFilterSet(select(Item))
+        filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.filter_query({field: value}),
-            "SELECT item.id, item.date, item.area, item.is_active, item.title, "
-            f"item.parent_id FROM item WHERE {expected_where}",
+            "SELECT item.id " f"FROM item WHERE {expected_where}",
         )
 
     @pytest.mark.parametrize(
@@ -45,11 +44,10 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
         ],
     )
     def test_filter_multiple_param(self, params: Dict[str, Any], expected_where: str) -> None:
-        filter_set = ItemFilterSet(select(Item))
+        filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.filter_query(params),
-            "SELECT item.id, item.date, item.area, item.is_active, item.title, "
-            f"item.parent_id FROM item WHERE {expected_where}",
+            f"SELECT item.id FROM item WHERE {expected_where}",
         )
 
     @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
@@ -57,17 +55,15 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     async def test_empty_values(
         self, empty_value: Any, field: str, async_session: AsyncSession
     ) -> None:
-        filter_set = ItemFilterSet(select(Item))
+        filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.filter_query({field: empty_value}),
-            "SELECT item.id, item.date, item.area, item.is_active, item.title, "
-            "item.parent_id FROM item",
+            "SELECT item.id FROM item",
         )
 
     async def test_wrong_field(self) -> None:
-        filter_set = ItemFilterSet(select(Item))
+        filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.filter_query({"test": "test"}),
-            "SELECT item.id, item.date, item.area, item.is_active, item.title, "
-            "item.parent_id FROM item",
+            "SELECT item.id FROM item",
         )
