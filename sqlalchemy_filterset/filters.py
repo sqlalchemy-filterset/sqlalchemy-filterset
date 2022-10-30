@@ -7,7 +7,7 @@ from sqlalchemy.sql import ColumnElement, Select
 from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
 
 if TYPE_CHECKING:
-    from sqlalchemy_filterset.filtersets import BaseFilterSet
+    from sqlalchemy_filterset.filtersets import BaseFilterSet  # pragma: no cover
 
 
 class BaseFilter:
@@ -20,7 +20,7 @@ class BaseFilter:
     @abc.abstractmethod
     def filter(self, query: Select, value: Any) -> Select:
         """Implementation of query build for this Filter"""
-        ...
+        ...  # pragma: no cover
 
 
 class Filter(BaseFilter):
