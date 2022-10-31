@@ -14,16 +14,18 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     @pytest.mark.parametrize(
         "value, expected_filtering",
         [
-            ((0, 10), "LIMIT :param_1 OFFSET :param_2"),
-            ((50, 100), "LIMIT :param_1 OFFSET :param_2"),
-            ((None, 100), "LIMIT -1 OFFSET :param_1"),
-            ((0, None), "LIMIT :param_1"),
+            ((0, 10), "LIMIT 0 OFFSET 10"),
+            ((50, 100), "LIMIT 50 OFFSET 100"),
+            ((None, 100), "LIMIT -1 OFFSET 100"),
+            ((0, None), "LIMIT 0"),
         ],
     )
     def test_pagination(self, value: Any, expected_filtering: str) -> None:
         filter_ = LimitOffsetPagination()
         stmt = filter_.filter(select(Item.id), value)
-        self.assert_compile(stmt, f"SELECT item.id FROM item {expected_filtering}")
+        self.assert_compile(
+            stmt, f"SELECT item.id FROM item {expected_filtering}", literal_binds=True
+        )
 
     @pytest.mark.parametrize("value", [None, (), (None, None)])
     def test_no_pagination(self, value: Any) -> None:
