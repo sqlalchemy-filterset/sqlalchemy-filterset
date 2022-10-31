@@ -17,7 +17,7 @@ class TestSearchBuildSelect(AssertsCompiledSQL):
         stmt = filter_.filter(select(Item.id), "test")
         self.assert_compile(
             stmt,
-            f"SELECT item.id FROM item WHERE lower(item.title) LIKE lower(:title_1)",
+            "SELECT item.id FROM item WHERE lower(item.title) LIKE lower(:title_1)",
         )
 
     @pytest.mark.parametrize(
