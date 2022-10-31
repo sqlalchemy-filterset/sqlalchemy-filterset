@@ -48,7 +48,9 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
         filter_set = TestMethodFilterSet(query=select(Item.id))
         filter_ = filter_set.filters["area"]
         stmt = filter_.filter(filter_set.get_base_query(), value)
-        self.assert_compile(stmt, "SELECT item.id FROM item WHERE item.area = :area_1")
+        self.assert_compile(
+            stmt, f"SELECT item.id FROM item WHERE item.area = {value}", literal_binds=True
+        )
 
     @pytest.mark.parametrize("value", [None, "", [], (), {}])
     def test_no_filtering(self, value: Any) -> None:
