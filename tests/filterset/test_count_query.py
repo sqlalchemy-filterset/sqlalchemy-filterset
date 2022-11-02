@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES
-from sqlalchemy_filterset.filters import Filter, InFilter
+from sqlalchemy_filterset.filters import Filter, InFilter, SearchFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
 from tests.models.factories import Item
 
@@ -15,6 +15,7 @@ from tests.models.factories import Item
 class ItemFilterSet(BaseFilterSet[Item]):
     id = Filter(Item.id)
     ids = InFilter(Item.id)
+    title = SearchFilter(Item.title)
 
 
 class TestFilterSetCountQuery(AssertsCompiledSQL):
@@ -53,7 +54,7 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
         )
 
     @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
-    @pytest.mark.parametrize("field", ["id", "ids"])
+    @pytest.mark.parametrize("field", ["id", "ids", "title"])
     async def test_empty_values(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item))
         self.assert_compile(
