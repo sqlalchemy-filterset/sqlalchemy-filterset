@@ -1,216 +1,122 @@
 import operator as op
+from datetime import datetime
 from functools import partial
 from typing import Any
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import ArgumentError
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters2 import Filter
 from tests.models import Item
+from tests.models.base import ItemType
 
 
 class TestFilterBuildSelect(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
+        "field, lookup_expr, value, expected",
         [
-            (1000, op.eq, "item.area = 1000"),
-            (0, op.eq, "item.area = 0"),
-            (1000, op.ne, "item.area != 1000"),
-            (1000, op.le, "item.area <= 1000"),
-            (1000, op.lt, "item.area < 1000"),
-            (1000, op.ge, "item.area >= 1000"),
-            (1000, op.gt, "item.area > 1000"),
-        ],
-    )
-    def test_op_filtering(self, value: Any, lookup_expr: Any, expected_filtering: str) -> None:
-        filter_ = Filter(Item.area, lookup_expr=lookup_expr)
-        self.assert_compile(
-            filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
-            literal_binds=True,
-        )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr",
-        [
-            ([], sa_op.in_op),
-            (None, sa_op.in_op),
-            ([], sa_op.not_in_op),
-            (None, sa_op.not_in_op),
-        ],
-    )
-    def test_op_no_filtering(self, value: Any, lookup_expr: Any) -> None:
-        filter_ = Filter(Item.name, lookup_expr=lookup_expr)
-        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
-        [
-            (None, op.eq, "item.area IS NULL"),
-            (None, op.ne, "item.area IS NOT NULL"),
-            # (None, op.le, "item.area IS NULL"),  # todo: not working with nullable
-            # (None, op.lt, "item.area IS NULL"),  # todo: not working with nullable
-            # (None, op.ge, "item.area IS NULL"),  # todo: not working with nullable
-            # (None, op.gt, "item.area IS NULL"),  # todo: not working with nullable
-        ],
-    )
-    def test_op_nullable_filtering(
-        self, value: Any, lookup_expr: Any, expected_filtering: str
-    ) -> None:
-        filter_ = Filter(Item.area, lookup_expr=lookup_expr, nullable=True)
-        self.assert_compile(
-            filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
-            literal_binds=True,
-        )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
-        [
-            (["test"], sa_op.in_op, "item.name IN ('test')"),
-            (["test1", "test2"], sa_op.in_op, "item.name IN ('test1', 'test2')"),
-            (["test1", "test2"], sa_op.not_in_op, "(item.name NOT IN ('test1', 'test2'))"),
-        ],
-    )
-    def test_list_in_filtering(self, value: Any, lookup_expr: Any, expected_filtering: str) -> None:
-        filter_ = Filter(Item.name, lookup_expr=lookup_expr)
-        self.assert_compile(
-            filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
-            literal_binds=True,
-        )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr",
-        [
-            ([], sa_op.in_op),
-            (None, sa_op.in_op),
-            ([], sa_op.not_in_op),
-            (None, sa_op.not_in_op),
-        ],
-    )
-    def test_list_in_no_filtering(self, value: Any, lookup_expr: Any) -> None:
-        filter_ = Filter(Item.name, lookup_expr=lookup_expr)
-        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
-
-    # @pytest.mark.parametrize(
-    #     "value, lookup_expr, expected_filtering",
-    #     [
-    #         (None, sa_op.in_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         ([], sa_op.in_op, "item.name IS NULL"),  # todo: not working with nullable
-    #     ],
-    # )
-    # def test_list_in_nullable_filtering(
-    #     self, value: Any, lookup_expr: Any, expected_filtering: str
-    # ) -> None:
-    #     filter_ = Filter(Item.name, lookup_expr=lookup_expr, nullable=True)
-    #     self.assert_compile(
-    #         filter_.filter(select(Item.id), value),
-    #         f"SELECT item.id FROM item WHERE {expected_filtering}",
-    #         literal_binds=True,
-    #     )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
-        [
-            (True, sa_op.is_, "item.is_active IS 1"),
-            (False, sa_op.is_, "item.is_active IS 0"),
-            (True, sa_op.is_not, "item.is_active IS NOT 1"),
-            (False, sa_op.is_not, "item.is_active IS NOT 0"),
-        ],
-    )
-    def test_is_filtering(self, value: Any, lookup_expr: Any, expected_filtering: str) -> None:
-        filter_ = Filter(Item.is_active, lookup_expr=lookup_expr)
-        self.assert_compile(
-            filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
-            literal_binds=True,
-        )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr",
-        [
-            (None, sa_op.is_),
-            (None, sa_op.is_not),
-        ],
-    )
-    def test_list_is_no_filtering(self, value: Any, lookup_expr: Any) -> None:
-        filter_ = Filter(Item.name, lookup_expr=lookup_expr)
-        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
-        [
-            (None, sa_op.is_, "item.is_active IS NULL"),
-            (None, sa_op.is_not, "item.is_active IS NOT NULL"),
-        ],
-    )
-    def test_is_nullable_filtering(
-        self, value: Any, lookup_expr: Any, expected_filtering: str
-    ) -> None:
-        filter_ = Filter(Item.is_active, lookup_expr=lookup_expr, nullable=True)
-        self.assert_compile(
-            filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
-            literal_binds=True,
-        )
-
-    @pytest.mark.parametrize(
-        "value, lookup_expr, expected_filtering",
-        [
-            ("foo", sa_op.like_op, "item.name LIKE 'foo'"),
-            ("foo", sa_op.not_like_op, "item.name NOT LIKE 'foo'"),
-            # ("", sa_op.like_op, "item.name LIKE ''"),  # todo: need nullable=True, not obvious
-            ("foo", partial(sa_op.like_op, escape="^"), "item.name LIKE 'foo' ESCAPE '^'"),
-            ("foo", partial(sa_op.not_like_op, escape="^"), "item.name NOT LIKE 'foo' ESCAPE '^'"),
-            ("foo", sa_op.ilike_op, "lower(item.name) LIKE lower('foo')"),
-            ("foo", sa_op.not_ilike_op, "lower(item.name) NOT LIKE lower('foo')"),
-            ("foo", sa_op.startswith_op, "(item.name LIKE 'foo' || '%')"),
-            ("foo", sa_op.not_startswith_op, "(item.name NOT LIKE 'foo' || '%')"),
-            ("foo", sa_op.endswith_op, "(item.name LIKE '%' || 'foo')"),
-            ("foo", sa_op.not_endswith_op, "(item.name NOT LIKE '%' || 'foo')"),
-            ("foo", sa_op.contains_op, "(item.name LIKE '%' || 'foo' || '%')"),
-            ("foo", sa_op.not_contains_op, "(item.name NOT LIKE '%' || 'foo' || '%')"),
+            (Item.area, op.eq, 1000, "item.area = 1000"),
+            (Item.area, op.eq, "foo", "item.area = 'foo'"),
+            (Item.area, op.eq, "", "item.area = ''"),
+            (Item.type, op.eq, "foo", "item.type = 'foo'"),
+            (Item.type, op.eq, ItemType.foo, "item.type = 'foo'"),
+            (Item.name, op.eq, ItemType.foo.value, "item.name = 'foo'"),  # todo: strenum?
+            (Item.area, op.eq, 0, "item.area = 0"),
+            (Item.area, op.eq, None, "item.area IS NULL"),
+            (Item.area, op.ne, 1000, "item.area != 1000"),
+            (Item.area, op.ne, None, "item.area IS NOT NULL"),
+            (Item.area, op.le, 1000, "item.area <= 1000"),
+            (Item.area, op.le, 0, "item.area <= 0"),
+            (Item.date, op.le, datetime(2000, 1, 1), "item.date <= '2000-01-01 00:00:00'"),
+            (Item.area, op.lt, 1000, "item.area < 1000"),
+            (Item.area, op.ge, 1000, "item.area >= 1000"),
+            (Item.area, op.gt, 1000, "item.area > 1000"),
+            (Item.name, sa_op.in_op, ["foo"], "item.name IN ('foo')"),
+            (Item.name, sa_op.in_op, [""], "item.name IN ('')"),
+            (Item.type, sa_op.in_op, [ItemType.foo], "item.type IN ('foo')"),
+            (Item.name, sa_op.in_op, [ItemType.foo.value], "item.name IN ('foo')"),  # todo: strenum
+            (Item.name, sa_op.in_op, ["foo", "bar"], "item.name IN ('foo', 'bar')"),
+            (Item.name, sa_op.in_op, [], "item.name IN (NULL) AND (1 != 1)"),
+            (Item.name, sa_op.in_op, (), "item.name IN (NULL) AND (1 != 1)"),
+            (Item.name, sa_op.not_in_op, ["foo", "bar"], "(item.name NOT IN ('foo', 'bar'))"),
+            (Item.name, sa_op.not_in_op, [], "(item.name NOT IN (NULL) OR (1 = 1))"),
+            (Item.name, sa_op.not_in_op, (), "(item.name NOT IN (NULL) OR (1 = 1))"),
+            (Item.is_active, sa_op.is_, True, "item.is_active IS 1"),
+            (Item.is_active, sa_op.is_, False, "item.is_active IS 0"),
+            (Item.is_active, sa_op.is_, None, "item.is_active IS NULL"),
+            (Item.is_active, sa_op.is_not, True, "item.is_active IS NOT 1"),
+            (Item.is_active, sa_op.is_not, False, "item.is_active IS NOT 0"),
+            (Item.is_active, sa_op.is_not, None, "item.is_active IS NOT NULL"),
+            (Item.name, sa_op.like_op, "foo", "item.name LIKE 'foo'"),
+            (Item.name, sa_op.not_like_op, "foo", "item.name NOT LIKE 'foo'"),
+            (Item.name, sa_op.like_op, "", "item.name LIKE ''"),
             (
-                "foo/%bar",
+                Item.name,
+                partial(sa_op.like_op, escape="^"),
+                "foo",
+                "item.name LIKE 'foo' ESCAPE '^'",
+            ),
+            (
+                Item.name,
+                partial(sa_op.not_like_op, escape="^"),
+                "foo",
+                "item.name NOT LIKE 'foo' ESCAPE '^'",
+            ),
+            (Item.name, sa_op.ilike_op, "foo", "lower(item.name) LIKE lower('foo')"),
+            (Item.name, sa_op.not_ilike_op, "foo", "lower(item.name) NOT LIKE lower('foo')"),
+            (Item.name, sa_op.startswith_op, "foo", "(item.name LIKE 'foo' || '%')"),
+            (Item.name, sa_op.not_startswith_op, "foo", "(item.name NOT LIKE 'foo' || '%')"),
+            (Item.name, sa_op.endswith_op, "foo", "(item.name LIKE '%' || 'foo')"),
+            (Item.name, sa_op.not_endswith_op, "foo", "(item.name NOT LIKE '%' || 'foo')"),
+            (Item.name, sa_op.contains_op, "foo", "(item.name LIKE '%' || 'foo' || '%')"),
+            (Item.name, sa_op.not_contains_op, "foo", "(item.name NOT LIKE '%' || 'foo' || '%')"),
+            (
+                Item.name,
                 partial(sa_op.contains_op, escape="^", autoescape=True),
+                "foo/%bar",
                 "(item.name LIKE '%' || 'foo/^%bar' || '%' ESCAPE '^')",
             ),
         ],
     )
-    def test_text_filtering(self, value: Any, lookup_expr: Any, expected_filtering: str) -> None:
-        filter_ = Filter(Item.name, lookup_expr=lookup_expr)
+    def test_op_filtering(
+        self, field: QueryableAttribute, lookup_expr: Any, value: Any, expected: str
+    ) -> None:
+        filter_ = Filter(field, lookup_expr=lookup_expr)
         self.assert_compile(
             filter_.filter(select(Item.id), value),
-            f"SELECT item.id FROM item WHERE {expected_filtering}",
+            f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
         )
 
-    # @pytest.mark.parametrize(
-    #     "value, lookup_expr, expected_filtering",
-    #     [
-    #         (None, sa_op.like_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.not_like_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.ilike_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.not_ilike_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.startswith_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.not_startswith_op, "item.name IS NULL"),  # todo: not working with null
-    #         (None, sa_op.endswith_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.not_endswith_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.contains_op, "item.name IS NULL"),  # todo: not working with nullable
-    #         (None, sa_op.not_contains_op, "item.name IS NULL"),  # todo: not working with nullable
-    #     ],
-    # )
-    # def test_text_nullable_filtering(
-    #     self, value: Any, lookup_expr: Any, expected_filtering: str
-    # ) -> None:
-    #     filter_ = Filter(Item.name, lookup_expr=lookup_expr, nullable=True)
-    #     self.assert_compile(
-    #         filter_.filter(select(Item.id), value),
-    #         f"SELECT item.id FROM item WHERE {expected_filtering}",
-    #         literal_binds=True,
-    #     )
+    @pytest.mark.parametrize(
+        "value, lookup_expr",
+        [
+            (None, op.le),
+            (None, op.lt),
+            (None, op.ge),
+            (None, op.gt),
+            (None, sa_op.in_op),
+            (None, sa_op.not_in_op),
+            (None, sa_op.like_op),
+            (None, sa_op.not_like_op),
+            (None, sa_op.ilike_op),
+            (None, sa_op.not_ilike_op),
+            (None, sa_op.startswith_op),
+            (None, sa_op.not_startswith_op),
+            (None, sa_op.not_startswith_op),
+            (None, sa_op.endswith_op),
+            (None, sa_op.not_endswith_op),
+            (None, sa_op.contains_op),
+            (None, sa_op.not_contains_op),
+        ],
+    )
+    def test_argument_error(self, value: Any, lookup_expr: Any) -> None:
+        filter_ = Filter(Item.id, lookup_expr=lookup_expr)
+        with pytest.raises(ArgumentError):
+            filter_.filter(select(Item.id), value)
