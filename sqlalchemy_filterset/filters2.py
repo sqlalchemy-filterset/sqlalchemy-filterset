@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import Select
 
-# from sqlalchemy.sql import operators as sa_op
+from sqlalchemy_filterset.types import LookupExpr
 
 if TYPE_CHECKING:
     from sqlalchemy_filterset.filtersets import BaseFilterSet  # pragma: no cover
@@ -33,12 +33,7 @@ class BaseFilter:
 class Filter(BaseFilter):
     """Filter results by field, value and lookup_expr."""
 
-    def __init__(
-        self,
-        field: QueryableAttribute,
-        *,
-        lookup_expr: Callable[[Any, Any], Any] = op.eq,
-    ) -> None:
+    def __init__(self, field: QueryableAttribute, *, lookup_expr: LookupExpr = op.eq) -> None:
         """
         :param field: Model filed for filtration
         :param lookup_expr: Comparison operator from modules:
@@ -62,24 +57,24 @@ class RangeFilter(BaseFilter):
         self,
         field: QueryableAttribute,
         *,
-        left_op: Callable[[Any, Any], Any] = op.ge,
-        right_op: Callable[[Any, Any], Any] = op.le,
-        logic_op: Callable = sa.and_,
+        left_expr: LookupExpr = op.ge,
+        right_expr: LookupExpr = op.le,
+        logic_expr: Callable = sa.and_,
     ) -> None:
         """
         :param field: Filed of Model for filtration
-        :param left_op: Comparsion operator for the left border of the range.
+        :param left_expr: Comparsion operator for the left border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
-        :param right_op: Comparsion operator for the right border of the range.
+        :param right_expr: Comparsion operator for the right border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
-        :param logic_op: and/or operator to produce a conjunction of border expressions
+        :param logic_expr: and/or operator to produce a conjunction of border expressions
         """
         super().__init__()
 
         self.field = field
-        self.left_op = left_op
-        self.right_op = right_op
-        self.logic_op = logic_op
+        self.left_expr = left_expr
+        self.right_expr = right_expr
+        self.logic_expr = logic_expr
 
     def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
         """Apply filtering by range to a query instance.
@@ -96,7 +91,7 @@ class RangeFilter(BaseFilter):
         left_value, right_value = value
         expressions = []
         if left_value is not None:
-            expressions.append(self.left_op(self.field, left_value))
+            expressions.append(self.left_expr(self.field, left_value))
         if right_value is not None:
-            expressions.append(self.right_op(self.field, right_value))
-        return query.where(self.logic_op(*expressions))
+            expressions.append(self.right_expr(self.field, right_value))
+        return query.where(self.logic_expr(*expressions))

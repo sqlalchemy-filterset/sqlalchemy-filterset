@@ -14,7 +14,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     @pytest.mark.parametrize(
-        "field, left_op, right_op, logic_op, value, expected",
+        "field, left_expr, right_expr, logic_expr, value, expected",
         [
             (Item.area, op.ge, op.le, and_, (0, 10), "item.area >= 0 AND item.area <= 10"),
             (Item.area, op.ge, op.le, and_, (None, 10), "item.area <= 10"),
@@ -31,13 +31,15 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_filtering(
         self,
         field: QueryableAttribute,
-        left_op: Any,
-        right_op: Any,
-        logic_op: Any,
+        left_expr: Any,
+        right_expr: Any,
+        logic_expr: Any,
         value: Any,
         expected: str,
     ) -> None:
-        filter_ = RangeFilter(field, left_op=left_op, right_op=right_op, logic_op=logic_op)
+        filter_ = RangeFilter(
+            field, left_expr=left_expr, right_expr=right_expr, logic_expr=logic_expr
+        )
         self.assert_compile(
             filter_.filter(select(Item.id), value),
             f"SELECT item.id FROM item WHERE {expected}",
