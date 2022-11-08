@@ -53,7 +53,7 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
         self.__base_query = query
         self.filters = self.get_filters()
         for filter_ in self.filters.values():
-            filter_.parent = self
+            filter_.filter_set = self
 
     def get_base_query(self) -> Select:
         return copy.copy(self.__base_query)
