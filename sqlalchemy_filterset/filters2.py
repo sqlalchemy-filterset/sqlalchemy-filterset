@@ -57,23 +57,23 @@ class RangeFilter(BaseFilter):
         self,
         field: QueryableAttribute,
         *,
-        left_expr: LookupExpr = op.ge,
-        right_expr: LookupExpr = op.le,
+        left_lookup_expr: LookupExpr = op.ge,
+        right_lookup_expr: LookupExpr = op.le,
         logic_expr: Callable = sa.and_,
     ) -> None:
         """
         :param field: Filed of Model for filtration
-        :param left_expr: Comparsion operator for the left border of the range.
+        :param left_lookup_expr: Comparsion operator for the left border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
-        :param right_expr: Comparsion operator for the right border of the range.
+        :param right_lookup_expr: Comparsion operator for the right border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
         :param logic_expr: and/or operator to produce a conjunction of border expressions
         """
         super().__init__()
 
         self.field = field
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+        self.left_lookup_expr = left_lookup_expr
+        self.right_lookup_expr = right_lookup_expr
         self.logic_expr = logic_expr
 
     def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
@@ -91,7 +91,7 @@ class RangeFilter(BaseFilter):
         left_value, right_value = value
         expressions = []
         if left_value is not None:
-            expressions.append(self.left_expr(self.field, left_value))
+            expressions.append(self.left_lookup_expr(self.field, left_value))
         if right_value is not None:
-            expressions.append(self.right_expr(self.field, right_value))
+            expressions.append(self.right_lookup_expr(self.field, right_value))
         return query.where(self.logic_expr(*expressions))
