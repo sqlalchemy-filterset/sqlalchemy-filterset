@@ -1,19 +1,26 @@
 import abc
+import operator as op
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
-from sqlalchemy import or_
+import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
 from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
+from sqlalchemy_filterset.types import LookupExpr
 
 if TYPE_CHECKING:
     from sqlalchemy_filterset.filtersets import BaseFilterSet  # pragma: no cover
 
 
 class BaseFilter:
+    """A Base class for all filters.
+
+    Attributes
+        field_name: Name of Filter in FilterSet. Set by FilterSet after creation.
+    """
+
     field_name: Optional[str] = None
-    "Name of Filter in FilterSet. Set by FilterSet after creation."
 
     def __init__(self) -> None:
         self._filter_set: Optional["BaseFilterSet"] = None
@@ -34,68 +41,70 @@ class BaseFilter:
 
 
 class Filter(BaseFilter):
-    """Base Filter by filed"""
+    """Filter results by field, value and lookup_expr."""
+
+    def __init__(self, field: QueryableAttribute, *, lookup_expr: LookupExpr = op.eq) -> None:
+        """
+        :param field: Model filed for filtration
+        :param lookup_expr: Comparison operator from modules:
+         operator, sqlalchemy.sql.operators or custom operator
+        """
+        super().__init__()
+
+        self.field = field
+        self.lookup_expr = lookup_expr
+
+    def filter(self, query: Select, value: Any) -> Select:
+        """Apply filtering by lookup_expr to a query instance."""
+
+        return query.where(self.lookup_expr(self.field, value))
+
+
+class RangeFilter(BaseFilter):
+    """Filter results by field within specified range."""
 
     def __init__(
         self,
         field: QueryableAttribute,
         *,
-        exclude: bool = False,
-        nullable: bool = False,
+        left_lookup_expr: LookupExpr = op.ge,
+        right_lookup_expr: LookupExpr = op.le,
+        logic_expr: Callable = sa.and_,
     ) -> None:
         """
         :param field: Filed of Model for filtration
-        :param exclude: Use inverted filtration
-        :param nullable: Allow empty values in filtration process
+        :param left_lookup_expr: Comparsion operator for the left border of the range.
+            default callable for comparison op: op.ge, op.gt, op.le, op.lt
+        :param right_lookup_expr: Comparsion operator for the right border of the range.
+            default callable for comparison op: op.ge, op.gt, op.le, op.lt
+        :param logic_expr: and/or operator to produce a conjunction of border expressions
         """
         super().__init__()
+
         self.field = field
-        self.exclude = exclude
-        self.nullable = nullable
+        self.left_lookup_expr = left_lookup_expr
+        self.right_lookup_expr = right_lookup_expr
+        self.logic_expr = logic_expr
 
-    def filter(self, query: Select, value: Any) -> Select:
-        if not self.nullable and value in EMPTY_VALUES:
-            return query
+    def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
+        """Apply filtering by range to a query instance.
 
-        expression = self.field == value
-        return query.where(~expression if self.exclude else expression)
+        :param query: query instance for filtering
+        :param value: A tuple with two values to filter left and right border of the range
 
-
-class InFilter(Filter):
-    def filter(self, query: Select, value: Sequence) -> Select:
-        if not self.nullable and value in EMPTY_VALUES:
-            return query
-
-        expression = self.field.in_(value)
-        return query.where(~expression if self.exclude else expression)
-
-
-class SearchFilter(BaseFilter):
-    """Filter by ILIKE"""
-
-    def __init__(
-        self,
-        *fields: QueryableAttribute,
-        exclude: bool = False,
-    ) -> None:
+        :returns: query instance after the provided filtering has been applied.
         """
-        :param fields: Fields of Model for filtration
-        :param exclude: Use inverted filtration
-        """
-        super().__init__()
-        self.fields = fields
-        self.exclude = exclude
 
-    def filter(self, query: Select, value: Any) -> Select:
-        if value in EMPTY_VALUES:
+        if not value:
             return query
 
-        if "*" in value or "_" in value:
-            looking_for = value.replace("_", "__").replace("*", "%").replace("?", "_")
-        else:
-            looking_for = "%{0}%".format(value)
-        expression = or_(*[field.ilike(looking_for) for field in self.fields])
-        return query.where(~expression if self.exclude else expression)
+        left_value, right_value = value
+        expressions = []
+        if left_value is not None:
+            expressions.append(self.left_lookup_expr(self.field, left_value))
+        if right_value is not None:
+            expressions.append(self.right_lookup_expr(self.field, right_value))
+        return query.where(self.logic_expr(*expressions))
 
 
 class OrderingField(NamedTuple):

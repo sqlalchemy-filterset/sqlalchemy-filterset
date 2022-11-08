@@ -6,7 +6,7 @@ from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.filters2 import RangeFilter
+from sqlalchemy_filterset.filters import RangeFilter
 from tests.models import Item
 
 
@@ -52,5 +52,4 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     @pytest.mark.parametrize("value", [None, [], [None, None]])
     def test_no_filtering(self, value: Any) -> None:
         filter_ = RangeFilter(Item.area)
-        stmt = filter_.filter(select(Item.id), value)
-        self.assert_compile(stmt, "SELECT item.id FROM item")
+        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")

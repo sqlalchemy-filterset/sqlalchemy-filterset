@@ -70,19 +70,22 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             title=OrderingField(Item.title, nulls=NullsPosition.last),
             is_active=OrderingField(Item.is_active, nulls=NullsPosition.first),
         )
-        stmt = filter_.filter(select(Item.id), fields)
-        self.assert_compile(stmt, f"SELECT item.id FROM item ORDER BY {expected_ordering}")
+        self.assert_compile(
+            filter_.filter(select(Item.id), fields),
+            f"SELECT item.id FROM item ORDER BY {expected_ordering}",
+        )
 
     @pytest.mark.parametrize("value", [None, (), ["-"], ["error_value"], [""], ["", ""]])
     def test_no_ordering(self, value: Any) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
-        stmt = filter_.filter(select(Item.id), value)
-        self.assert_compile(stmt, "SELECT item.id FROM item")
+        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
 
     def test_with_additional_non_defined_field(self) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
-        stmt = filter_.filter(select(Item.id), ["area", "test"])
-        self.assert_compile(stmt, "SELECT item.id FROM item ORDER BY item.area ASC")
+        self.assert_compile(
+            filter_.filter(select(Item.id), ["area", "test"]),
+            "SELECT item.id FROM item ORDER BY item.area ASC",
+        )
 
     def test_in_which_order_apply(self) -> None:
         filter_ = OrderingFilter(
@@ -90,7 +93,7 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             date=OrderingField(Item.date),
             title=OrderingField(Item.title),
         )
-        stmt = filter_.filter(select(Item.id), ["date", "title", "area"])
         self.assert_compile(
-            stmt, "SELECT item.id FROM item ORDER BY item.date ASC, item.title ASC, item.area ASC"
+            filter_.filter(select(Item.id), ["date", "title", "area"]),
+            "SELECT item.id FROM item ORDER BY item.date ASC, item.title ASC, item.area ASC",
         )

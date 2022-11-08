@@ -10,7 +10,7 @@ from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.filters2 import Filter
+from sqlalchemy_filterset.filters import Filter
 from tests.models import Item
 from tests.models.base import ItemType
 
@@ -26,7 +26,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             (Item.area, op.eq, "", "item.area = ''"),
             (Item.type, op.eq, "foo", "item.type = 'foo'"),
             (Item.type, op.eq, ItemType.foo, "item.type = 'foo'"),
-            (Item.name, op.eq, ItemType.foo.value, "item.name = 'foo'"),  # todo: strenum?
+            (Item.name, op.eq, ItemType.foo.value, "item.name = 'foo'"),
             (Item.area, op.eq, 0, "item.area = 0"),
             (Item.area, op.eq, None, "item.area IS NULL"),
             (Item.area, op.ne, 1000, "item.area != 1000"),
@@ -40,7 +40,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             (Item.name, sa_op.in_op, ["foo"], "item.name IN ('foo')"),
             (Item.name, sa_op.in_op, [""], "item.name IN ('')"),
             (Item.type, sa_op.in_op, [ItemType.foo], "item.type IN ('foo')"),
-            (Item.name, sa_op.in_op, [ItemType.foo.value], "item.name IN ('foo')"),  # todo: strenum
+            (Item.name, sa_op.in_op, [ItemType.foo.value], "item.name IN ('foo')"),
             (Item.name, sa_op.in_op, ["foo", "bar"], "item.name IN ('foo', 'bar')"),
             (Item.name, sa_op.in_op, [], "item.name IN (NULL) AND (1 != 1)"),
             (Item.name, sa_op.in_op, (), "item.name IN (NULL) AND (1 != 1)"),
