@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
-from sqlalchemy_filterset.constants import EMPTY_VALUES, NullsPosition
+from sqlalchemy_filterset.constants import NullsPosition
 from sqlalchemy_filterset.types import LookupExpr
 
 if TYPE_CHECKING:
@@ -234,8 +234,4 @@ class MethodFilter(BaseFilter):
 
     def filter(self, query: Select, value: Any) -> Select:
         assert self._filter
-
-        if value in EMPTY_VALUES:
-            return query
-
         return self._filter(query, value)

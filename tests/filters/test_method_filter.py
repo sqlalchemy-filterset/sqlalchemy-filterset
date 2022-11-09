@@ -13,6 +13,7 @@ from tests.models import Item
 class FilterSetClass(BaseFilterSet):
     name = MethodFilter(method="filter_name")
     area = MethodFilter(method="filter_area")
+    type = MethodFilter(method="filter_type")
 
     @staticmethod
     def filter_area(query: Select, value: int) -> Select:
@@ -21,6 +22,10 @@ class FilterSetClass(BaseFilterSet):
     @staticmethod
     def filter_name(query: Select, value: str) -> Select:
         return query.where(Item.name == value)
+
+    @staticmethod
+    def filter_type(query: Select, value: list) -> Select:
+        return query.where(Item.type.in_(value))
 
 
 class TestInitMethodFilterInFilterSet:
@@ -57,7 +62,6 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
             stmt, f"SELECT item.id FROM item WHERE item.area = {value}", literal_binds=True
         )
 
-    # todo: y.mezentsev how to handle EMPTY_VALUES method filter for ""
     @pytest.mark.parametrize("value", ["foo", ""])
     def test_filtering_text(self, value: Any) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
@@ -67,10 +71,19 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
             stmt, f"SELECT item.id FROM item WHERE item.name = '{value}'", literal_binds=True
         )
 
-    # todo: y.mezentsev how to handle EMPTY_VALUES method filter for None, [], (), {}
-    @pytest.mark.parametrize("value", [None, [], (), {}])
-    def test_no_filtering(self, value: Any) -> None:
+    def test_filtering_by_null(self) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
-        filter_ = filter_set.filters["area"]
+        filter_ = filter_set.filters["name"]
+        stmt = filter_.filter(filter_set.get_base_query(), None)
+        self.assert_compile(stmt, "SELECT item.id FROM item WHERE item.name IS NULL")
+
+    @pytest.mark.parametrize("value", [[], (), {}])
+    def test_filtering_empty_sequence(self, value: Any) -> None:
+        filter_set = FilterSetClass(query=select(Item.id))
+        filter_ = filter_set.filters["type"]
         stmt = filter_.filter(filter_set.get_base_query(), value)
-        self.assert_compile(stmt, "SELECT item.id FROM item", literal_binds=True)
+        self.assert_compile(
+            stmt,
+            "SELECT item.id FROM item WHERE item.type IN (NULL) AND (1 != 1)",
+            literal_binds=True,
+        )
