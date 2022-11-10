@@ -11,6 +11,7 @@ from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset.operators import ilike_contains
 from tests.models import Item
 from tests.models.base import ItemType
 
@@ -82,6 +83,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
                 "foo/%bar",
                 "(item.name LIKE '%' || 'foo/^%bar' || '%' ESCAPE '^')",
             ),
+            (Item.name, ilike_contains, "foo", "lower(item.name) LIKE lower('%foo%')"),
         ],
     )
     def test_op_filtering(
