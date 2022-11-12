@@ -1,12 +1,24 @@
 import abc
 import operator as op
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+)
 
 import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 
 from sqlalchemy_filterset.constants import NullsPosition
+from sqlalchemy_filterset.strategies import BaseStrategy
 from sqlalchemy_filterset.types import LookupExpr
 
 if TYPE_CHECKING:
@@ -43,7 +55,14 @@ class BaseFilter:
 class Filter(BaseFilter):
     """Filter results by field, value and lookup_expr."""
 
-    def __init__(self, field: QueryableAttribute, *, lookup_expr: LookupExpr = op.eq) -> None:
+    def __init__(
+        self,
+        field: QueryableAttribute,
+        *,
+        lookup_expr: LookupExpr = op.eq,
+        strategy: Type[BaseStrategy] = BaseStrategy,
+        target_foreign_key: Optional[QueryableAttribute] = None,
+    ) -> None:
         """
         :param field: Model filed for filtration
         :param lookup_expr: Comparison operator from modules:
@@ -53,11 +72,12 @@ class Filter(BaseFilter):
 
         self.field = field
         self.lookup_expr = lookup_expr
+        self.strategy = strategy(self.field, target_foreign_key)
 
     def filter(self, query: Select, value: Any) -> Select:
         """Apply filtering by lookup_expr to a query instance."""
 
-        return query.where(self.lookup_expr(self.field, value))
+        return self.strategy.filter(query, self.lookup_expr(self.field, value))
 
 
 class RangeFilter(BaseFilter):
@@ -70,6 +90,8 @@ class RangeFilter(BaseFilter):
         left_lookup_expr: LookupExpr = op.ge,
         right_lookup_expr: LookupExpr = op.le,
         logic_expr: Callable = sa.and_,
+        strategy: Type[BaseStrategy] = BaseStrategy,
+        target_foreign_key: Optional[QueryableAttribute] = None,
     ) -> None:
         """
         :param field: Filed of Model for filtration
@@ -85,6 +107,7 @@ class RangeFilter(BaseFilter):
         self.left_lookup_expr = left_lookup_expr
         self.right_lookup_expr = right_lookup_expr
         self.logic_expr = logic_expr
+        self.strategy = strategy(self.field, target_foreign_key)
 
     def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
         """Apply filtering by range to a query instance.
@@ -104,7 +127,7 @@ class RangeFilter(BaseFilter):
             expressions.append(self.left_lookup_expr(self.field, left_value))
         if right_value is not None:
             expressions.append(self.right_lookup_expr(self.field, right_value))
-        return query.where(self.logic_expr(*expressions))
+        return self.strategy.filter(query, self.logic_expr(*expressions))
 
 
 class OrderingField(NamedTuple):
