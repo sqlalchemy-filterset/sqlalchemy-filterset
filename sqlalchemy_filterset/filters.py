@@ -44,7 +44,11 @@ class BaseFilter:
 class Filter(BaseFilter):
     """Filter results by field, value and lookup_expr."""
 
-    def __init__(self, field: QueryableAttribute, *, lookup_expr: LookupExpr = op.eq) -> None:
+    lookup_expr: LookupExpr = op.eq
+
+    def __init__(
+        self, field: QueryableAttribute, *, lookup_expr: Optional[LookupExpr] = None
+    ) -> None:
         """
         :param field: Model filed for filtration
         :param lookup_expr: Comparison operator from modules:
@@ -53,7 +57,7 @@ class Filter(BaseFilter):
         super().__init__()
 
         self.field = field
-        self.lookup_expr = lookup_expr
+        self.lookup_expr = lookup_expr if lookup_expr else self.__class__.lookup_expr
 
     def filter(self, query: Select, value: Any) -> Select:
         """Apply filtering by lookup_expr to a query instance."""
@@ -62,18 +66,15 @@ class Filter(BaseFilter):
 
 
 class InFilter(Filter):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
+    lookup_expr: LookupExpr = sa_op.in_op
 
 
 class NotInFilter(Filter):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs, lookup_expr=sa_op.not_in_op)
+    lookup_expr: LookupExpr = sa_op.not_in_op
 
 
 class BooleanFilter(Filter):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
+    lookup_expr: LookupExpr = sa_op.is_
 
 
 class RangeFilter(BaseFilter):
