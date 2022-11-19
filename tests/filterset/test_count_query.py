@@ -2,17 +2,16 @@ import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
 from tests.models.factories import Item
 
 
 class ItemFilterSet(BaseFilterSet[Item]):
     id = Filter(Item.id)
-    ids = Filter(Item.id, lookup_expr=sa_op.in_op)
+    ids = InFilter(Item.id)
 
 
 class TestFilterSetCountQuery(AssertsCompiledSQL):
@@ -51,6 +50,7 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
         )
 
     # todo: y.mezentsev investigate hot to cope with unhandled empty values
+    # todo: most likely remove test
     # @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
     # @pytest.mark.parametrize("field", ["id", "ids"])
     # async def test_empty_values(self, empty_value: Any, field: str) -> None:

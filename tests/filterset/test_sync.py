@@ -2,9 +2,8 @@ import typing
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import operators as sa_op
 
-from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import FilterSet
 from tests.models import Item
 from tests.models.factories import ItemFactory
@@ -12,7 +11,7 @@ from tests.models.factories import ItemFactory
 
 class ItemFilterSet(FilterSet[Item]):
     id = Filter(Item.id)
-    ids = Filter(Item.id, lookup_expr=sa_op.in_op)
+    ids = InFilter(Item.id)
 
 
 class TestSyncFilterSet:

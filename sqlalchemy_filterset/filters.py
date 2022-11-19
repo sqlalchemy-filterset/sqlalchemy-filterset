@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optiona
 import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
+from sqlalchemy.sql import operators as sa_op
 
 from sqlalchemy_filterset.constants import NullsPosition
 from sqlalchemy_filterset.types import LookupExpr
@@ -58,6 +59,21 @@ class Filter(BaseFilter):
         """Apply filtering by lookup_expr to a query instance."""
 
         return query.where(self.lookup_expr(self.field, value))
+
+
+class InFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
+
+
+class NotInFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.not_in_op)
+
+
+class BooleanFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
 
 
 class RangeFilter(BaseFilter):
