@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
@@ -17,6 +18,10 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
             "(SELECT 1 FROM parent WHERE item.parent_id = parent.id AND parent.name = 'test')",
             literal_binds=True,
         )
+
+    def test_onclause_assert(self) -> None:
+        with pytest.raises(AssertionError):
+            RelationSubqueryExistsStrategy(Parent.name, None)
 
     def test_with_filter(self) -> None:
         filter_ = Filter(
