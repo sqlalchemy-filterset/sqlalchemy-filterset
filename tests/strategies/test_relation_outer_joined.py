@@ -9,7 +9,7 @@ from tests.models import Item, Parent
 class TestRelationOuterJoinedStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
-    def test_build(self) -> None:
+    def test_filter(self) -> None:
         strategy = RelationOuterJoinedStrategy(Parent.name)
         self.assert_compile(
             strategy.filter(select(Item.id), Parent.name == "test"),
@@ -27,7 +27,7 @@ class TestRelationOuterJoinedStrategy(AssertsCompiledSQL):
             literal_binds=True,
         )
 
-    def test_building_in_filter(self) -> None:
+    def test_with_filter(self) -> None:
         filter_ = Filter(Parent.name, strategy=RelationOuterJoinedStrategy)
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
