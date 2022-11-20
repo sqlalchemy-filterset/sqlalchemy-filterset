@@ -1,7 +1,6 @@
 import uuid
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter, InFilter
@@ -17,18 +16,18 @@ class ItemFilterSet(BaseFilterSet[Item]):
 class TestFilterSetCountQuery(AssertsCompiledSQL):
     __dialect__: str = "default"
 
-    async def test_count(self, async_session: AsyncSession) -> None:
+    def test_count(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(filter_set.count_query({}), "SELECT count(1) AS count_1 FROM item")
 
-    async def test_with_filter(self, async_session: AsyncSession) -> None:
+    def test_with_filter(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.count_query({"id": uuid.uuid4()}),
             "SELECT count(1) AS count_1 FROM item WHERE item.id = :id_1",
         )
 
-    async def test_with_distinct(self, async_session: AsyncSession) -> None:
+    def test_with_distinct(self) -> None:
         filter_set = ItemFilterSet(select(Item.id, Item.date).distinct())
         self.assert_compile(
             filter_set.count_query({}),
@@ -36,7 +35,7 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
             "FROM item) AS anon_1",
         )
 
-    async def test_with_distinct_on(self, async_session: AsyncSession) -> None:
+    def test_with_distinct_on(self) -> None:
         query = (
             select(Item.id, Item.title).distinct(Item.title).order_by(Item.title, Item.date.desc())
         )
@@ -53,14 +52,14 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
     # todo: most likely remove test
     # @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
     # @pytest.mark.parametrize("field", ["id", "ids"])
-    # async def test_empty_values(self, empty_value: Any, field: str) -> None:
+    # def test_empty_values(self, empty_value: Any, field: str) -> None:
     #     filter_set = ItemFilterSet(select(Item.id))
     #     self.assert_compile(
     #         filter_set.count_query({field: empty_value}),
     #         "SELECT count(1) AS count_1 FROM item",
     #     )
 
-    async def test_wrong_field(self) -> None:
+    def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.count_query({"test": "test"}),
