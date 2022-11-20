@@ -196,7 +196,7 @@ class OrderingFilter(BaseFilter):
         return param.startswith("-"), param.lstrip("-")
 
 
-class LimitOffsetPagination(BaseFilter):
+class LimitOffsetFilter(BaseFilter):
     """Filter for managing limit and offset"""
 
     def filter(self, query: Select, value: Optional[Tuple[Optional[int], Optional[int]]]) -> Select:
@@ -208,7 +208,7 @@ class LimitOffsetPagination(BaseFilter):
 
         Example::
 
-            LimitOffsetPagination(select(Item), value=(100, 0))
+            LimitOffsetFilter(select(Item), value=(100, 0))
         """
 
         if not value:
