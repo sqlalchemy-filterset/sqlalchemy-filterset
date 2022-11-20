@@ -34,7 +34,7 @@ class RelationBaseJoinedStrategy(ABC, BaseStrategy):
 
     @abc.abstractmethod
     def _build_join(self, query: Select, onclause: Any) -> Select:
-        ...
+        ...  # pragma: no cover
 
 
 class RelationInnerJoinedStrategy(RelationBaseJoinedStrategy):
