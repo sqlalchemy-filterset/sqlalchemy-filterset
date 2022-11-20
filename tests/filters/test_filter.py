@@ -11,8 +11,14 @@ from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset.strategies import (
+    BaseStrategy,
+    RelationInnerJoinedStrategy,
+    RelationOuterJoinedStrategy,
+    RelationSubqueryExistsStrategy,
+)
 from tests.models import Item
-from tests.models.base import ItemType
+from tests.models.base import ItemType, Parent
 
 
 class TestFilterBuildSelect(AssertsCompiledSQL):
@@ -120,3 +126,42 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         filter_ = Filter(Item.id, lookup_expr=lookup_expr)
         with pytest.raises(ArgumentError):
             filter_.filter(select(Item.id), value)
+
+    def test_base_strategy(self) -> None:
+        filter_ = Filter(Item.area, strategy=BaseStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), 1000),
+            "SELECT item.id FROM item WHERE item.area = 1000",
+            literal_binds=True,
+        )
+
+    def test_subquery_exists_strategy(self) -> None:
+        filter_ = Filter(
+            Parent.name,
+            strategy=RelationSubqueryExistsStrategy,
+            strategy_onclause=Item.parent_id == Parent.id,
+        )
+        self.assert_compile(
+            filter_.filter(select(Item.id), "test"),
+            "SELECT item.id FROM item WHERE EXISTS "
+            "(SELECT 1 FROM parent WHERE item.parent_id = parent.id AND parent.name = 'test')",
+            literal_binds=True,
+        )
+
+    def test_inner_join_strategy(self) -> None:
+        filter_ = Filter(Parent.name, strategy=RelationInnerJoinedStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), "test"),
+            "SELECT item.id FROM item JOIN parent "
+            "ON parent.id = item.parent_id WHERE parent.name = 'test'",
+            literal_binds=True,
+        )
+
+    def test_outer_join_strategy(self) -> None:
+        filter_ = Filter(Parent.name, strategy=RelationOuterJoinedStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), "test"),
+            "SELECT item.id FROM item LEFT OUTER JOIN parent "
+            "ON parent.id = item.parent_id WHERE parent.name = 'test'",
+            literal_binds=True,
+        )

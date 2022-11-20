@@ -1,4 +1,5 @@
 import operator as op
+from datetime import datetime
 from typing import Any
 
 import pytest
@@ -7,7 +8,13 @@ from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import RangeFilter
-from tests.models import Item
+from sqlalchemy_filterset.strategies import (
+    BaseStrategy,
+    RelationInnerJoinedStrategy,
+    RelationOuterJoinedStrategy,
+    RelationSubqueryExistsStrategy,
+)
+from tests.models import Item, Parent
 
 
 class TestRangeFilterBuildSelect(AssertsCompiledSQL):
@@ -53,3 +60,43 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_no_filtering(self, value: Any) -> None:
         filter_ = RangeFilter(Item.area)
         self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
+
+    def test_base_strategy(self) -> None:
+        filter_ = RangeFilter(Item.area, strategy=BaseStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), (0, 10)),
+            "SELECT item.id FROM item WHERE item.area >= 0 AND item.area <= 10",
+            literal_binds=True,
+        )
+
+    def test_subquery_exists_strategy(self) -> None:
+        filter_ = RangeFilter(
+            Parent.date,
+            strategy=RelationSubqueryExistsStrategy,
+            strategy_onclause=Item.parent_id == Parent.id,
+        )
+        self.assert_compile(
+            filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
+            "SELECT item.id FROM item WHERE EXISTS "
+            "(SELECT 1 FROM parent WHERE item.parent_id = parent.id "
+            "AND parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00')",
+            literal_binds=True,
+        )
+
+    def test_inner_join_strategy(self) -> None:
+        filter_ = RangeFilter(Parent.date, strategy=RelationInnerJoinedStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
+            "SELECT item.id FROM item JOIN parent ON parent.id = item.parent_id "
+            "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",
+            literal_binds=True,
+        )
+
+    def test_outer_join_strategy(self) -> None:
+        filter_ = RangeFilter(Parent.date, strategy=RelationOuterJoinedStrategy)
+        self.assert_compile(
+            filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
+            "SELECT item.id FROM item LEFT OUTER JOIN parent ON parent.id = item.parent_id "
+            "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",
+            literal_binds=True,
+        )
