@@ -16,7 +16,7 @@ class BaseStrategy:
         return query.where(expression)
 
 
-class RelationBaseJoinedStrategy(ABC, BaseStrategy):
+class RelationBaseJoinStrategy(ABC, BaseStrategy):
     def filter(self, query: Select, expression: Any) -> Select:
         query = self._join_if_necessary(query)
         return query.where(expression)
@@ -37,12 +37,12 @@ class RelationBaseJoinedStrategy(ABC, BaseStrategy):
         ...  # pragma: no cover
 
 
-class RelationInnerJoinedStrategy(RelationBaseJoinedStrategy):
+class RelationInnerJoinStrategy(RelationBaseJoinStrategy):
     def _build_join(self, query: Select, onclause: Any) -> Select:
         return query.join(self.field.class_, onclause=onclause)
 
 
-class RelationOuterJoinedStrategy(RelationBaseJoinedStrategy):
+class RelationOuterJoinStrategy(RelationBaseJoinStrategy):
     def _build_join(self, query: Select, onclause: Any) -> Select:
         return query.outerjoin(self.field.class_, onclause=onclause)
 

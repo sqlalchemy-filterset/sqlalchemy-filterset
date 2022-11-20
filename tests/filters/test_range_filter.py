@@ -10,8 +10,8 @@ from sqlalchemy.testing import AssertsCompiledSQL
 from sqlalchemy_filterset.filters import RangeFilter
 from sqlalchemy_filterset.strategies import (
     BaseStrategy,
-    RelationInnerJoinedStrategy,
-    RelationOuterJoinedStrategy,
+    RelationInnerJoinStrategy,
+    RelationOuterJoinStrategy,
     RelationSubqueryExistsStrategy,
 )
 from tests.models import Item, Parent
@@ -84,7 +84,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_inner_join_strategy(self) -> None:
-        filter_ = RangeFilter(Parent.date, strategy=RelationInnerJoinedStrategy)
+        filter_ = RangeFilter(Parent.date, strategy=RelationInnerJoinStrategy)
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
             "SELECT item.id FROM item JOIN parent ON parent.id = item.parent_id "
@@ -93,7 +93,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_outer_join_strategy(self) -> None:
-        filter_ = RangeFilter(Parent.date, strategy=RelationOuterJoinedStrategy)
+        filter_ = RangeFilter(Parent.date, strategy=RelationOuterJoinStrategy)
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
             "SELECT item.id FROM item LEFT OUTER JOIN parent ON parent.id = item.parent_id "

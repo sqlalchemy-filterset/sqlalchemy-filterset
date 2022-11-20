@@ -13,8 +13,8 @@ from sqlalchemy.testing import AssertsCompiledSQL
 from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.strategies import (
     BaseStrategy,
-    RelationInnerJoinedStrategy,
-    RelationOuterJoinedStrategy,
+    RelationInnerJoinStrategy,
+    RelationOuterJoinStrategy,
     RelationSubqueryExistsStrategy,
 )
 from tests.models import Item
@@ -149,7 +149,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_inner_join_strategy(self) -> None:
-        filter_ = Filter(Parent.name, strategy=RelationInnerJoinedStrategy)
+        filter_ = Filter(Parent.name, strategy=RelationInnerJoinStrategy)
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -158,7 +158,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_outer_join_strategy(self) -> None:
-        filter_ = Filter(Parent.name, strategy=RelationOuterJoinedStrategy)
+        filter_ = Filter(Parent.name, strategy=RelationOuterJoinStrategy)
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
             "SELECT item.id FROM item LEFT OUTER JOIN parent "
