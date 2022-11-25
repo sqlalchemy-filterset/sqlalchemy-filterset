@@ -11,7 +11,7 @@ from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter
-from sqlalchemy_filterset.operators import ilike_contains
+from sqlalchemy_filterset.operators import icontains
 from tests.models import Item
 from tests.models.base import ItemType
 
@@ -83,7 +83,14 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
                 "foo/%bar",
                 "(item.name LIKE '%' || 'foo/^%bar' || '%' ESCAPE '^')",
             ),
-            (Item.name, ilike_contains, "foo", "lower(item.name) LIKE lower('%foo%')"),
+            (Item.name, icontains, "foo", "lower(item.name) LIKE lower('%foo%')"),
+            (Item.name, sa_op.match_op, "foo", "item.name MATCH 'foo'"),
+            (
+                Item.name,
+                sa_op.not_match_op,
+                "foo",
+                "NOT item.name MATCH :name_1",
+            ),  # todo why :name_1?
         ],
     )
     def test_op_filtering(
@@ -122,3 +129,29 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         filter_ = Filter(Item.id, lookup_expr=lookup_expr)
         with pytest.raises(ArgumentError):
             filter_.filter(select(Item.id), value)
+
+
+class TestFilterBuildSelectPostgres(AssertsCompiledSQL):
+
+    __dialect__: str = "postgresql"
+
+    @pytest.mark.parametrize(
+        "field, lookup_expr, value, expected",
+        [
+            (Item.name, sa_op.regexp_match_op, "foo", "item.name ~ 'foo'"),
+            (Item.name, sa_op.not_regexp_match_op, "foo", "item.name !~ 'foo'"),
+        ],
+    )
+    def test_op_filtering(
+        self,
+        field: QueryableAttribute,
+        lookup_expr: Any,
+        value: Any,
+        expected: str,
+    ) -> None:
+        filter_ = Filter(field, lookup_expr=lookup_expr)
+        self.assert_compile(
+            filter_.filter(select(Item.id), value),
+            f"SELECT item.id FROM item WHERE {expected}",
+            literal_binds=True,
+        )
