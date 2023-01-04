@@ -1,11 +1,13 @@
 import abc
+import copy
 import logging
 from abc import ABC
-from typing import Any
+from typing import Any, List, Union
 
 from sqlalchemy import literal_column, select
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import Select
+from sqlalchemy.sql.selectable import Exists, SelectStatementGrouping
 
 logger = logging.getLogger(__name__)
 
@@ -65,42 +67,50 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         super().__init__(field, onclause)
 
     def filter(self, query: Select, expression: Any) -> Select:
-        from sqlalchemy.sql.elements import BooleanClauseList
-        from sqlalchemy.sql.selectable import Exists, SelectStatementGrouping
-
-        new_where_criteria = list(query._where_criteria)
-        table_match = False
-        clause_match = False
-        for i in range(len(new_where_criteria)):
-            clause = new_where_criteria[i]
-            if (
-                isinstance(clause, Exists)
-                and isinstance(clause.element, SelectStatementGrouping)
-                and isinstance(clause.element.element, Select)
-            ):
-                table_match = False
-                clause_match = False
-                for from_table in clause.element.element._from_obj:  # type: ignore
-                    if from_table == self.field.class_.__table__:
-                        table_match = True
-                        break
-                if isinstance(clause.element.element.whereclause, BooleanClauseList):
-                    for onclouse in clause.element.element.whereclause.clauses:
-                        if self.onclause.compare(onclouse):
-                            clause_match = True
-                            break
-
-                if clause_match and table_match:
-                    new_where_criteria[i] = clause.where(expression)
-                    break
-
-        query._where_criteria = tuple(new_where_criteria)
-        if clause_match and table_match:
-            return query
-        else:
+        existed_subquery_index = self._get_where_criteria_index_of_subquery_with_same_onclause(
+            query
+        )
+        if existed_subquery_index is None:
             return query.where(
                 select(literal_column("1"))
                 .select_from(self.field.class_)
                 .where(self.onclause, expression)
                 .exists()
             )
+
+        # Create new query and change where criteria to new subquery with expression
+        query = copy.copy(query)
+        new_where_criteria: List = list(query._where_criteria)  # type: ignore
+        new_where_criteria[existed_subquery_index] = new_where_criteria[
+            existed_subquery_index
+        ].where(expression)
+        query._where_criteria = tuple(new_where_criteria)  # type: ignore
+        return query
+
+    def _get_where_criteria_index_of_subquery_with_same_onclause(
+        self, query: Select
+    ) -> Union[int, None]:
+        """
+        Get index of _where_criteria element which is the same subquery as we need for filtering
+        """
+        where_criteria = query._where_criteria  # type: ignore
+        for index, clause in enumerate(where_criteria):
+            if (
+                isinstance(clause, Exists)
+                and isinstance(clause.element, SelectStatementGrouping)
+                and isinstance(clause.element.element, Select)
+            ):
+                base_query_of_exists = clause.element.element
+                # Check base_query_of_exists is selecting from target table
+                if self.field.class_.__table__ not in base_query_of_exists.froms:
+                    continue
+                if self.__is_query_contains_onclause(base_query_of_exists, self.onclause):
+                    return index
+        return None
+
+    @staticmethod
+    def __is_query_contains_onclause(query: Select, onclause: Any) -> bool:
+        for onclouse in query.whereclause.clauses:
+            if onclause.compare(onclouse):
+                return True
+        return False
