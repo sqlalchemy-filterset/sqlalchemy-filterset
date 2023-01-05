@@ -2,18 +2,21 @@ import abc
 import copy
 import logging
 from abc import ABC
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
-from sqlalchemy import literal_column, select
+from sqlalchemy import Boolean, literal_column, select
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import Select
+from sqlalchemy.sql.elements import ColumnElement
 from sqlalchemy.sql.selectable import Exists, SelectStatementGrouping
 
 logger = logging.getLogger(__name__)
 
 
 class BaseStrategy:
-    def __init__(self, field: QueryableAttribute, onclause: Any = None) -> None:
+    def __init__(
+        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
+    ) -> None:
         self.field = field
         self.onclause = onclause
 
@@ -22,6 +25,13 @@ class BaseStrategy:
 
 
 class RelationBaseJoinStrategy(ABC, BaseStrategy):
+    def __init__(
+        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
+    ) -> None:
+        assert onclause is not None, f"onclause is required for {self.__class__.__name__}"
+        super().__init__(field, onclause)
+        self.onclause: ColumnElement[Boolean]
+
     def filter(self, query: Select, expression: Any) -> Select:
         query = self._join_if_necessary(query)
         return query.where(expression)
@@ -31,13 +41,6 @@ class RelationBaseJoinStrategy(ABC, BaseStrategy):
         for join in query.froms:
             if hasattr(join, "right") and hasattr(join, "onclause"):
                 if join.right == self.field.class_.__table__:
-                    if self.onclause is None:
-                        # todo: make onclause required?
-                        logger.warning(
-                            "Can't compare onclause of joins, "
-                            "double join preventing doesn't work"
-                        )
-                        continue
                     if join.onclause.compare(self.onclause):
                         joined_before = True
                         break
@@ -52,19 +55,22 @@ class RelationBaseJoinStrategy(ABC, BaseStrategy):
 
 
 class RelationInnerJoinStrategy(RelationBaseJoinStrategy):
-    def _build_join(self, query: Select, onclause: Any) -> Select:
+    def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
         return query.join(self.field.class_, onclause=onclause)
 
 
 class RelationOuterJoinStrategy(RelationBaseJoinStrategy):
-    def _build_join(self, query: Select, onclause: Any) -> Select:
+    def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
         return query.outerjoin(self.field.class_, onclause=onclause)
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):
-    def __init__(self, field: QueryableAttribute, onclause: Any) -> None:
+    def __init__(
+        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
+    ) -> None:
         assert onclause is not None, f"onclause is required for {self.__class__.__name__}"
         super().__init__(field, onclause)
+        self.onclause: ColumnElement[Boolean]
 
     def filter(self, query: Select, expression: Any) -> Select:
         existed_subquery_index = self._get_where_criteria_index_of_subquery_with_same_onclause(
@@ -109,7 +115,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         return None
 
     @staticmethod
-    def __is_query_contains_onclause(query: Select, onclause: Any) -> bool:
+    def __is_query_contains_onclause(query: Select, onclause: ColumnElement[Boolean]) -> bool:
         for onclouse in query.whereclause.clauses:
             if onclause.compare(onclouse):
                 return True
