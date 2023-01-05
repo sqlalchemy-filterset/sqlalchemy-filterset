@@ -111,7 +111,7 @@ class TestSearchFilterBuildSelect(AssertsCompiledSQL):
     ) -> None:
         filter_ = SearchFilter(*fields, lookup_expr=lookup_expr, logic_expr=logic_expr)
         self.assert_compile(
-            filter_.filter(select(Item.id), value),
+            filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected.format(expected_logic)}",
             literal_binds=True,
         )
@@ -120,7 +120,7 @@ class TestSearchFilterBuildSelect(AssertsCompiledSQL):
     def test_no_filtering(self, value: Any) -> None:
         filter_ = SearchFilter(Item.name, Item.description)
         self.assert_compile(
-            filter_.filter(select(Item.id), value),
+            filter_.filter(select(Item.id), value, {}),
             "SELECT item.id FROM item",
             literal_binds=True,
         )

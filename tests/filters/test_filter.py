@@ -104,7 +104,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     ) -> None:
         filter_ = Filter(field, lookup_expr=lookup_expr)
         self.assert_compile(
-            filter_.filter(select(Item.id), value),
+            filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
         )
@@ -134,12 +134,12 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_argument_error(self, value: Any, lookup_expr: Any) -> None:
         filter_ = Filter(Item.id, lookup_expr=lookup_expr)
         with pytest.raises(ArgumentError):
-            filter_.filter(select(Item.id), value)
+            filter_.filter(select(Item.id), value, {})
 
     def test_base_strategy(self) -> None:
         filter_ = Filter(Item.area, strategy=BaseStrategy())
         self.assert_compile(
-            filter_.filter(select(Item.id), 1000),
+            filter_.filter(select(Item.id), 1000, {}),
             "SELECT item.id FROM item WHERE item.area = 1000",
             literal_binds=True,
         )
@@ -150,7 +150,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(
-            filter_.filter(select(Item.id), "test"),
+            filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item WHERE EXISTS "
             "(SELECT 1 FROM parent WHERE item.parent_id = parent.id AND parent.name = 'test')",
             literal_binds=True,
@@ -162,7 +162,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             strategy=RelationInnerJoinStrategy(Parent, Parent.id == Item.parent_id),
         )
         self.assert_compile(
-            filter_.filter(select(Item.id), "test"),
+            filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item JOIN parent "
             "ON parent.id = item.parent_id WHERE parent.name = 'test'",
             literal_binds=True,
@@ -173,7 +173,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             Parent.name, strategy=RelationOuterJoinStrategy(Parent, Parent.id == Item.parent_id)
         )
         self.assert_compile(
-            filter_.filter(select(Item.id), "test"),
+            filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item LEFT OUTER JOIN parent "
             "ON parent.id = item.parent_id WHERE parent.name = 'test'",
             literal_binds=True,
@@ -200,7 +200,7 @@ class TestFilterBuildSelectPostgres(AssertsCompiledSQL):
     ) -> None:
         filter_ = Filter(field, lookup_expr=lookup_expr)
         self.assert_compile(
-            filter_.filter(select(Item.id), value),
+            filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
         )

@@ -57,7 +57,7 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
     def test_filtering(self, value: Any) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
         filter_ = filter_set.filters["area"]
-        stmt = filter_.filter(filter_set.get_base_query(), value)
+        stmt = filter_.filter(filter_set.get_base_query(), value, {})
         self.assert_compile(
             stmt, f"SELECT item.id FROM item WHERE item.area = {value}", literal_binds=True
         )
@@ -66,7 +66,7 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
     def test_filtering_text(self, value: Any) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
         filter_ = filter_set.filters["name"]
-        stmt = filter_.filter(filter_set.get_base_query(), value)
+        stmt = filter_.filter(filter_set.get_base_query(), value, {})
         self.assert_compile(
             stmt, f"SELECT item.id FROM item WHERE item.name = '{value}'", literal_binds=True
         )
@@ -74,14 +74,14 @@ class TestMethodFilterBuildSelect(AssertsCompiledSQL):
     def test_filtering_by_null(self) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
         filter_ = filter_set.filters["name"]
-        stmt = filter_.filter(filter_set.get_base_query(), None)
+        stmt = filter_.filter(filter_set.get_base_query(), None, {})
         self.assert_compile(stmt, "SELECT item.id FROM item WHERE item.name IS NULL")
 
     @pytest.mark.parametrize("value", [[], (), {}])
     def test_filtering_empty_sequence(self, value: Any) -> None:
         filter_set = FilterSetClass(query=select(Item.id))
         filter_ = filter_set.filters["type"]
-        stmt = filter_.filter(filter_set.get_base_query(), value)
+        stmt = filter_.filter(filter_set.get_base_query(), value, {})
         self.assert_compile(
             stmt,
             "SELECT item.id FROM item WHERE item.type IN (NULL) AND (1 != 1)",

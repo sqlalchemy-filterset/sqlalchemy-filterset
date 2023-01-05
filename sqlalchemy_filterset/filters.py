@@ -1,4 +1,5 @@
 import abc
+import inspect
 import operator as op
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
@@ -38,7 +39,7 @@ class BaseFilter:
         self._filter_set = value
 
     @abc.abstractmethod
-    def filter(self, query: Select, value: Any) -> Select:
+    def filter(self, query: Select, value: Any, values: Dict[str, Any]) -> Select:
         """Implementation of query build for this Filter"""
         ...  # pragma: no cover
 
@@ -64,9 +65,8 @@ class Filter(BaseFilter):
         self.lookup_expr = lookup_expr
         self.strategy = strategy if strategy is not None else BaseStrategy()
 
-    def filter(self, query: Select, value: Any) -> Select:
+    def filter(self, query: Select, value: Any, values: Dict[str, Any]) -> Select:
         """Apply filtering by lookup_expr to a query instance."""
-
         return self.strategy.filter(query, self.lookup_expr(self.field, value))
 
 
@@ -113,7 +113,9 @@ class RangeFilter(BaseFilter):
         self.logic_expr = logic_expr
         self.strategy = strategy if strategy is not None else BaseStrategy()
 
-    def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
+    def filter(
+        self, query: Select, value: Optional[Tuple[Any, Any]], values: Dict[str, Any]
+    ) -> Select:
         """Apply filtering by range to a query instance.
 
         :param query: query instance for filtering
@@ -166,7 +168,7 @@ class OrderingFilter(BaseFilter):
         super().__init__()
         self.fields: Dict[str, OrderingField] = fields
 
-    def filter(self, query: Select, value: Sequence[str]) -> Select:
+    def filter(self, query: Select, value: Sequence[str], values: Dict[str, Any]) -> Select:
         """Apply ordering to a query instance.
 
         :param query: query instance for ordering
@@ -210,7 +212,12 @@ class OrderingFilter(BaseFilter):
 class LimitOffsetFilter(BaseFilter):
     """Filter for managing limit and offset"""
 
-    def filter(self, query: Select, value: Optional[Tuple[Optional[int], Optional[int]]]) -> Select:
+    def filter(
+        self,
+        query: Select,
+        value: Optional[Tuple[Optional[int], Optional[int]]],
+        values: Dict[str, Any],
+    ) -> Select:
         """Apply limit offset pagination to a query instance.
 
         :param query: query instance for pagination
@@ -259,9 +266,12 @@ class MethodFilter(BaseFilter):
         assert hasattr(self.filter_set, self.method)
         self._filter = getattr(self.filter_set, self.method)
 
-    def filter(self, query: Select, value: Any) -> Select:
+    def filter(self, query: Select, value: Any, values: Dict[str, Any]) -> Select:
         assert self._filter
-        return self._filter(query, value)
+        params = {"query": query, "value": value, "values": values}
+        attrs = inspect.getfullargspec(self._filter).args
+        required_attrs = {k: v for k, v in params.items() if k in attrs}
+        return self._filter(**required_attrs)
 
 
 class SearchFilter(BaseFilter):
@@ -283,7 +293,7 @@ class SearchFilter(BaseFilter):
         self.lookup_expr = lookup_expr
         self.logic_expr = logic_expr
 
-    def filter(self, query: Select, value: Optional[str]) -> Select:
+    def filter(self, query: Select, value: Optional[str], values: Dict[str, Any]) -> Select:
         """Apply search to a query instance.
 
         :param query: query instance for search

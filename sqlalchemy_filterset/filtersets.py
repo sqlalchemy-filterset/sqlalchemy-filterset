@@ -71,7 +71,7 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
         for name, value in params.items():
             if name not in self.filters:
                 continue
-            query = self.filters[name].filter(query, value)
+            query = self.filters[name].filter(query, value, params)
         return query
 
     def count_query(self, params: Dict) -> Select:

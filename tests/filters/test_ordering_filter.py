@@ -71,19 +71,19 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             is_active=OrderingField(Item.is_active, nulls=NullsPosition.first),
         )
         self.assert_compile(
-            filter_.filter(select(Item.id), fields),
+            filter_.filter(select(Item.id), fields, {}),
             f"SELECT item.id FROM item ORDER BY {expected_ordering}",
         )
 
     @pytest.mark.parametrize("value", [None, (), ["-"], ["error_value"], [""], ["", ""]])
     def test_no_ordering(self, value: Any) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
-        self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
+        self.assert_compile(filter_.filter(select(Item.id), value, {}), "SELECT item.id FROM item")
 
     def test_with_additional_non_defined_field(self) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
         self.assert_compile(
-            filter_.filter(select(Item.id), ["area", "test"]),
+            filter_.filter(select(Item.id), ["area", "test"], {}),
             "SELECT item.id FROM item ORDER BY item.area ASC",
         )
 
@@ -94,6 +94,6 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             title=OrderingField(Item.title),
         )
         self.assert_compile(
-            filter_.filter(select(Item.id), ["date", "title", "area"]),
+            filter_.filter(select(Item.id), ["date", "title", "area"], {}),
             "SELECT item.id FROM item ORDER BY item.date ASC, item.title ASC, item.area ASC",
         )
