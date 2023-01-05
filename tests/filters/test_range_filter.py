@@ -62,7 +62,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
         self.assert_compile(filter_.filter(select(Item.id), value), "SELECT item.id FROM item")
 
     def test_base_strategy(self) -> None:
-        filter_ = RangeFilter(Item.area, strategy=BaseStrategy)
+        filter_ = RangeFilter(Item.area, strategy=BaseStrategy())
         self.assert_compile(
             filter_.filter(select(Item.id), (0, 10)),
             "SELECT item.id FROM item WHERE item.area >= 0 AND item.area <= 10",
@@ -72,8 +72,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_subquery_exists_strategy(self) -> None:
         filter_ = RangeFilter(
             Parent.date,
-            strategy=RelationSubqueryExistsStrategy,
-            strategy_onclause=Item.parent_id == Parent.id,
+            strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
@@ -86,12 +85,11 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = RangeFilter(
             Parent.date,
-            strategy=RelationInnerJoinStrategy,
-            strategy_onclause=Parent.id == Item.parent_id,
+            strategy=RelationInnerJoinStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
-            "SELECT item.id FROM item JOIN parent ON parent.id = item.parent_id "
+            "SELECT item.id FROM item JOIN parent ON item.parent_id = parent.id "
             "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",
             literal_binds=True,
         )
@@ -99,12 +97,11 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_outer_join_strategy(self) -> None:
         filter_ = RangeFilter(
             Parent.date,
-            strategy=RelationOuterJoinStrategy,
-            strategy_onclause=Parent.id == Item.parent_id,
+            strategy=RelationOuterJoinStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
-            "SELECT item.id FROM item LEFT OUTER JOIN parent ON parent.id = item.parent_id "
+            "SELECT item.id FROM item LEFT OUTER JOIN parent ON item.parent_id = parent.id "
             "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",
             literal_binds=True,
         )

@@ -9,7 +9,7 @@ class TestBaseStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = BaseStrategy(Item.area)
+        strategy = BaseStrategy()
         self.assert_compile(
             strategy.filter(select(Item.id), Item.area == 1000),
             "SELECT item.id FROM item WHERE item.area = 1000",

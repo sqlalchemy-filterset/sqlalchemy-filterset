@@ -1,36 +1,25 @@
 import abc
 import copy
-import logging
 from abc import ABC
-from typing import Any, List, Optional, Union
+from typing import Any, List, Type, Union
 
 from sqlalchemy import Boolean, literal_column, select
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import Select
 from sqlalchemy.sql.elements import ColumnElement
 from sqlalchemy.sql.selectable import Exists, SelectStatementGrouping
 
-logger = logging.getLogger(__name__)
+from sqlalchemy_filterset.types import Model
 
 
 class BaseStrategy:
-    def __init__(
-        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
-    ) -> None:
-        self.field = field
-        self.onclause = onclause
-
     def filter(self, query: Select, expression: Any) -> Select:
         return query.where(expression)
 
 
-class RelationBaseJoinStrategy(ABC, BaseStrategy):
-    def __init__(
-        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
-    ) -> None:
-        assert onclause is not None, f"onclause is required for {self.__class__.__name__}"
-        super().__init__(field, onclause)
-        self.onclause: ColumnElement[Boolean]
+class RelationBaseJoinStrategy(BaseStrategy, ABC):
+    def __init__(self, model: Type[Model], onclause: ColumnElement[Boolean]) -> None:
+        self.model = model
+        self.onclause = onclause
 
     def filter(self, query: Select, expression: Any) -> Select:
         query = self._join_if_necessary(query)
@@ -40,7 +29,7 @@ class RelationBaseJoinStrategy(ABC, BaseStrategy):
         joined_before = False
         for join in query.froms:
             if hasattr(join, "right") and hasattr(join, "onclause"):
-                if join.right == self.field.class_.__table__:
+                if join.right == self.model.__table__:
                     if join.onclause.compare(self.onclause):
                         joined_before = True
                         break
@@ -56,12 +45,12 @@ class RelationBaseJoinStrategy(ABC, BaseStrategy):
 
 class RelationInnerJoinStrategy(RelationBaseJoinStrategy):
     def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
-        return query.join(self.field.class_, onclause=onclause)
+        return query.join(self.model, onclause=onclause)
 
 
 class RelationOuterJoinStrategy(RelationBaseJoinStrategy):
     def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
-        return query.outerjoin(self.field.class_, onclause=onclause)
+        return query.outerjoin(self.model, onclause=onclause)
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):
@@ -72,12 +61,9 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
     it reuses similar subquery by adding new where expressions.
     """
 
-    def __init__(
-        self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
-    ) -> None:
-        assert onclause is not None, f"onclause is required for {self.__class__.__name__}"
-        super().__init__(field, onclause)
-        self.onclause: ColumnElement[Boolean]
+    def __init__(self, model: Type[Model], onclause: ColumnElement[Boolean]) -> None:
+        self.model = model
+        self.onclause = onclause
 
     def filter(self, query: Select, expression: Any) -> Select:
         existed_subquery_index = self._get_where_criteria_index_of_subquery_with_same_onclause(
@@ -86,7 +72,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         if existed_subquery_index is None:
             return query.where(
                 select(literal_column("1"))
-                .select_from(self.field.class_)
+                .select_from(self.model)
                 .where(self.onclause, expression)
                 .exists()
             )
@@ -115,7 +101,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
             ):
                 base_query_of_exists = clause.element.element
                 # Check base_query_of_exists is selecting from target table
-                if self.field.class_.__table__ not in base_query_of_exists.froms:
+                if self.model.__table__ not in base_query_of_exists.froms:
                     continue
                 if self.__is_query_contains_onclause(base_query_of_exists, self.onclause):
                     return index

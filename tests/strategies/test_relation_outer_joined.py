@@ -9,7 +9,7 @@ class TestRelationOuterJoinStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = RelationOuterJoinStrategy(Parent.name, Parent.id == Item.parent_id)
+        strategy = RelationOuterJoinStrategy(Parent, Parent.id == Item.parent_id)
         self.assert_compile(
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item LEFT OUTER JOIN parent "
@@ -18,7 +18,7 @@ class TestRelationOuterJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing(self) -> None:
-        strategy = RelationOuterJoinStrategy(Parent.name, Parent.id == Item.parent_id)
+        strategy = RelationOuterJoinStrategy(Parent, Parent.id == Item.parent_id)
         self.assert_compile(
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -27,7 +27,7 @@ class TestRelationOuterJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause(self) -> None:
-        strategy = RelationOuterJoinStrategy(Parent.name, onclause=Parent.id == Item.id)
+        strategy = RelationOuterJoinStrategy(Parent, onclause=Parent.id == Item.id)
         self.assert_compile(
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item "

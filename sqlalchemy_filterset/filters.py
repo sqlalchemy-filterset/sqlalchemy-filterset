@@ -1,17 +1,6 @@
 import abc
 import operator as op
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
-)
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
@@ -60,8 +49,7 @@ class Filter(BaseFilter):
         field: QueryableAttribute,
         *,
         lookup_expr: LookupExpr = op.eq,
-        strategy: Type[BaseStrategy] = BaseStrategy,
-        strategy_onclause: Any = None,
+        strategy: Optional[BaseStrategy] = None,
     ) -> None:
         """
         :param field: Model filed for filtration
@@ -72,7 +60,7 @@ class Filter(BaseFilter):
 
         self.field = field
         self.lookup_expr = lookup_expr
-        self.strategy = strategy(self.field, strategy_onclause)
+        self.strategy = strategy if strategy is not None else BaseStrategy()
 
     def filter(self, query: Select, value: Any) -> Select:
         """Apply filtering by lookup_expr to a query instance."""
@@ -90,8 +78,7 @@ class RangeFilter(BaseFilter):
         left_lookup_expr: LookupExpr = op.ge,
         right_lookup_expr: LookupExpr = op.le,
         logic_expr: Callable = sa.and_,
-        strategy: Type[BaseStrategy] = BaseStrategy,
-        strategy_onclause: Any = None,
+        strategy: Optional[BaseStrategy] = None,
     ) -> None:
         """
         :param field: Filed of Model for filtration
@@ -107,7 +94,7 @@ class RangeFilter(BaseFilter):
         self.left_lookup_expr = left_lookup_expr
         self.right_lookup_expr = right_lookup_expr
         self.logic_expr = logic_expr
-        self.strategy = strategy(self.field, strategy_onclause)
+        self.strategy = strategy if strategy is not None else BaseStrategy()
 
     def filter(self, query: Select, value: Optional[Tuple[Any, Any]]) -> Select:
         """Apply filtering by range to a query instance.

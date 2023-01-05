@@ -1,4 +1,3 @@
-import pytest
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
@@ -10,7 +9,7 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent.name, Item.parent_id == Parent.id)
+        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         self.assert_compile(
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item WHERE EXISTS "
@@ -19,7 +18,7 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_preventing(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id == Parent.id)
+        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
         res = strategy.filter(first, Parent.name != "test1")
         self.assert_compile(
@@ -31,9 +30,9 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_with_preventing_with_reversed_onclause(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id == Parent.id)
+        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
-        strategy1 = RelationSubqueryExistsStrategy(Parent.date, Parent.id == Item.parent_id)
+        strategy1 = RelationSubqueryExistsStrategy(Parent, Parent.id == Item.parent_id)
         res = strategy1.filter(first, Parent.name != "test1")
         self.assert_compile(
             res,
@@ -44,9 +43,9 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_with_different_onclause(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id == Parent.id)
+        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
-        strategy1 = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id != Parent.id)
+        strategy1 = RelationSubqueryExistsStrategy(Parent, Item.parent_id != Parent.id)
         res = strategy1.filter(first, Parent.name != "test1")
         self.assert_compile(
             res,
@@ -61,7 +60,7 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_exist_with_not_matched_exist(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id == Parent.id)
+        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         base_query = select(Item.id).where(
             select(GrandParent).where(GrandParent.id == Item.id).exists()
         )
@@ -76,7 +75,3 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
             "WHERE item.parent_id = parent.id AND parent.name = 'test'))",
             literal_binds=True,
         )
-
-    def test_onclause_assert(self) -> None:
-        with pytest.raises(AssertionError):
-            RelationSubqueryExistsStrategy(Parent.name, None)

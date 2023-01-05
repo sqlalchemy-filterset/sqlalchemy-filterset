@@ -128,7 +128,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             filter_.filter(select(Item.id), value)
 
     def test_base_strategy(self) -> None:
-        filter_ = Filter(Item.area, strategy=BaseStrategy)
+        filter_ = Filter(Item.area, strategy=BaseStrategy())
         self.assert_compile(
             filter_.filter(select(Item.id), 1000),
             "SELECT item.id FROM item WHERE item.area = 1000",
@@ -138,8 +138,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_subquery_exists_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationSubqueryExistsStrategy,
-            strategy_onclause=Item.parent_id == Parent.id,
+            strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
@@ -151,8 +150,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationInnerJoinStrategy,
-            strategy_onclause=Parent.id == Item.parent_id,
+            strategy=RelationInnerJoinStrategy(Parent, Parent.id == Item.parent_id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
@@ -163,9 +161,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
 
     def test_outer_join_strategy(self) -> None:
         filter_ = Filter(
-            Parent.name,
-            strategy=RelationOuterJoinStrategy,
-            strategy_onclause=Parent.id == Item.parent_id,
+            Parent.name, strategy=RelationOuterJoinStrategy(Parent, Parent.id == Item.parent_id)
         )
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
