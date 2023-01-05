@@ -3,17 +3,16 @@ from typing import Any, Dict
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
 from tests.models import Item
 
 
 class ItemFilterSet(BaseFilterSet[Item]):
     id = Filter(Item.id)
-    ids = Filter(Item.id, lookup_expr=sa_op.in_op)
+    ids = InFilter(Item.id)
 
 
 class TestFilterSetFilterQuery(AssertsCompiledSQL):
@@ -51,6 +50,7 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
         )
 
     # todo: y.mezentsev investigate hot to cope with unhandled empty values
+    # todo: most likely remove test
     # @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
     # @pytest.mark.parametrize("field", ["id", "ids"])
     # async def test_empty_values(

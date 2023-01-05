@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optiona
 import sqlalchemy as sa
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
+from sqlalchemy.sql import operators as sa_op
 
 from sqlalchemy_filterset.constants import NullsPosition
+from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.strategies import BaseStrategy
 from sqlalchemy_filterset.types import LookupExpr
 
@@ -66,6 +68,21 @@ class Filter(BaseFilter):
         """Apply filtering by lookup_expr to a query instance."""
 
         return self.strategy.filter(query, self.lookup_expr(self.field, value))
+
+
+class InFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
+
+
+class NotInFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.not_in_op)
+
+
+class BooleanFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
 
 
 class RangeFilter(BaseFilter):
@@ -190,7 +207,7 @@ class OrderingFilter(BaseFilter):
         return param.startswith("-"), param.lstrip("-")
 
 
-class LimitOffsetPagination(BaseFilter):
+class LimitOffsetFilter(BaseFilter):
     """Filter for managing limit and offset"""
 
     def filter(self, query: Select, value: Optional[Tuple[Optional[int], Optional[int]]]) -> Select:
@@ -202,7 +219,7 @@ class LimitOffsetPagination(BaseFilter):
 
         Example::
 
-            LimitOffsetPagination(select(Item), value=(100, 0))
+            LimitOffsetFilter(select(Item), value=(100, 0))
         """
 
         if not value:
@@ -245,3 +262,39 @@ class MethodFilter(BaseFilter):
     def filter(self, query: Select, value: Any) -> Select:
         assert self._filter
         return self._filter(query, value)
+
+
+class SearchFilter(BaseFilter):
+    """Filter for searching by a given search string"""
+
+    def __init__(
+        self,
+        *fields: Sequence[QueryableAttribute],
+        lookup_expr: LookupExpr = icontains,
+        logic_expr: Callable = sa.or_,
+    ) -> None:
+        """
+        :param fields: Fields for search
+        :param search_type: Type of search
+        :param search_expr: and/or operator to produce a conjunction of search expressions
+        """
+        super().__init__()
+        self.fields = fields
+        self.lookup_expr = lookup_expr
+        self.logic_expr = logic_expr
+
+    def filter(self, query: Select, value: Optional[str]) -> Select:
+        """Apply search to a query instance.
+
+        :param query: query instance for search
+        :param value: A string to search
+        :returns: query instance after the provided search has been applied.
+        """
+
+        if not value:
+            return query
+
+        expressions = []
+        for field in self.fields:
+            expressions.append(self.lookup_expr(field, value))
+        return query.where(self.logic_expr(*expressions))

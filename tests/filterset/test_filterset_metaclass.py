@@ -1,11 +1,9 @@
-import operator
 from typing import Dict, List, Type
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.sql import operators as sa_op
 
-from sqlalchemy_filterset.filters import BaseFilter, Filter, RangeFilter
+from sqlalchemy_filterset.filters import BaseFilter, Filter, InFilter, RangeFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
 from tests.models import Item
 
@@ -18,7 +16,7 @@ class FirstFilterSet(BaseFilterSet):
 
 
 class SecondInheritedFilterSet(FirstFilterSet):
-    ids = Filter(Item.id, lookup_expr=sa_op.in_op)
+    ids = InFilter(Item.id)
     area = RangeFilter(Item.area)
 
 
@@ -27,7 +25,7 @@ class ThirdInheritedFilterSet(SecondInheritedFilterSet):
 
 
 class OverrideInheritedFilterSet(FirstFilterSet):
-    id = Filter(Item.id, lookup_expr=sa_op.in_op)
+    id = InFilter(Item.id)
 
 
 @pytest.mark.parametrize(
@@ -36,13 +34,13 @@ class OverrideInheritedFilterSet(FirstFilterSet):
         (FirstFilterSet, {"id": Filter, "title": Filter}),
         (
             SecondInheritedFilterSet,
-            {"id": Filter, "title": Filter, "ids": Filter, "area": RangeFilter},
+            {"id": Filter, "title": Filter, "ids": InFilter, "area": RangeFilter},
         ),
         (
             ThirdInheritedFilterSet,
             {"id": Filter, "title": Filter, "ids": Filter, "area": RangeFilter, "other_id": Filter},
         ),
-        (OverrideInheritedFilterSet, {"id": Filter, "title": Filter}),
+        (OverrideInheritedFilterSet, {"id": InFilter, "title": Filter}),
     ],
 )
 def test_filters_detection(
@@ -97,8 +95,8 @@ async def test_filter_field_name_set(filter_set_class: Type[BaseFilterSet]) -> N
 
 
 async def test_lookup_expr_overwritten() -> None:
-    filter_ = FirstFilterSet(select(Item.id)).get_filters()["id"]
+    first_filter_ = FirstFilterSet(select(Item.id)).get_filters()["id"]
     overwritten_filter_ = OverrideInheritedFilterSet(select(Item.id)).get_filters()["id"]
-    # todo: y.mezentsev investigate better compare lookup_expr in tests
-    assert filter_.lookup_expr == operator.eq  # type: ignore
-    assert overwritten_filter_.lookup_expr == sa_op.in_op  # type: ignore
+    assert type(first_filter_) is Filter
+    assert type(overwritten_filter_) is not Filter
+    assert type(overwritten_filter_) is InFilter
