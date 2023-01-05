@@ -57,6 +57,7 @@ class Parent(Base):
 class Item(Base):
     id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
     name: str = sa.Column(sa.String, nullable=True)
+    description: str = sa.Column(sa.Text, nullable=True)
     date: datetime = sa.Column(TestDateTimeType(), nullable=False, server_default=sa.func.now())
     area: Decimal = sa.Column(sa.Numeric(precision=8, scale=3), nullable=True)
     is_active: bool = sa.Column(sa.Boolean, server_default="t", nullable=False)

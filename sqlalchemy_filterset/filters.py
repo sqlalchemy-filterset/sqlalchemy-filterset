@@ -8,6 +8,7 @@ from sqlalchemy.sql import ColumnElement, Select
 from sqlalchemy.sql import operators as sa_op
 
 from sqlalchemy_filterset.constants import NullsPosition
+from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.types import LookupExpr
 
 if TYPE_CHECKING:
@@ -251,3 +252,39 @@ class MethodFilter(BaseFilter):
     def filter(self, query: Select, value: Any) -> Select:
         assert self._filter
         return self._filter(query, value)
+
+
+class SearchFilter(BaseFilter):
+    """Filter for searching by a given search string"""
+
+    def __init__(
+        self,
+        *fields: Sequence[QueryableAttribute],
+        lookup_expr: LookupExpr = icontains,
+        logic_expr: Callable = sa.or_,
+    ) -> None:
+        """
+        :param fields: Fields for search
+        :param search_type: Type of search
+        :param search_expr: and/or operator to produce a conjunction of search expressions
+        """
+        super().__init__()
+        self.fields = fields
+        self.lookup_expr = lookup_expr
+        self.logic_expr = logic_expr
+
+    def filter(self, query: Select, value: Optional[str]) -> Select:
+        """Apply search to a query instance.
+
+        :param query: query instance for search
+        :param value: A string to search
+        :returns: query instance after the provided search has been applied.
+        """
+
+        if not value:
+            return query
+
+        expressions = []
+        for field in self.fields:
+            expressions.append(self.lookup_expr(field, value))
+        return query.where(self.logic_expr(*expressions))
