@@ -149,7 +149,11 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_inner_join_strategy(self) -> None:
-        filter_ = Filter(Parent.name, strategy=RelationInnerJoinStrategy)
+        filter_ = Filter(
+            Parent.name,
+            strategy=RelationInnerJoinStrategy,
+            strategy_onclause=Parent.id == Item.parent_id,
+        )
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -158,7 +162,11 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_outer_join_strategy(self) -> None:
-        filter_ = Filter(Parent.name, strategy=RelationOuterJoinStrategy)
+        filter_ = Filter(
+            Parent.name,
+            strategy=RelationOuterJoinStrategy,
+            strategy_onclause=Parent.id == Item.parent_id,
+        )
         self.assert_compile(
             filter_.filter(select(Item.id), "test"),
             "SELECT item.id FROM item LEFT OUTER JOIN parent "

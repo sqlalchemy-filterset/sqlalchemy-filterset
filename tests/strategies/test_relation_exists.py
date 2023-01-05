@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.strategies import RelationSubqueryExistsStrategy
-from tests.models import Item, Parent
+from tests.models import GrandParent, Item, Parent
 
 
 class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
@@ -57,6 +57,23 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
             "AND "
             "(EXISTS (SELECT 1 FROM parent "
             "WHERE item.parent_id != parent.id AND parent.name != 'test1'))",
+            literal_binds=True,
+        )
+
+    def test_exist_with_not_matched_exist(self) -> None:
+        strategy = RelationSubqueryExistsStrategy(Parent.date, Item.parent_id == Parent.id)
+        base_query = select(Item.id).where(
+            select(GrandParent).where(GrandParent.id == Item.id).exists()
+        )
+        self.assert_compile(
+            strategy.filter(base_query, Parent.name == "test"),
+            "SELECT item.id FROM item "
+            "WHERE "
+            "(EXISTS (SELECT grand_parent.id, grand_parent.parent_id, grand_parent.name "
+            "FROM grand_parent WHERE grand_parent.id = item.id)) "
+            "AND "
+            "(EXISTS (SELECT 1 FROM parent "
+            "WHERE item.parent_id = parent.id AND parent.name = 'test'))",
             literal_binds=True,
         )
 

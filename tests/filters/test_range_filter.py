@@ -84,7 +84,11 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_inner_join_strategy(self) -> None:
-        filter_ = RangeFilter(Parent.date, strategy=RelationInnerJoinStrategy)
+        filter_ = RangeFilter(
+            Parent.date,
+            strategy=RelationInnerJoinStrategy,
+            strategy_onclause=Parent.id == Item.parent_id,
+        )
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
             "SELECT item.id FROM item JOIN parent ON parent.id = item.parent_id "
@@ -93,7 +97,11 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
         )
 
     def test_outer_join_strategy(self) -> None:
-        filter_ = RangeFilter(Parent.date, strategy=RelationOuterJoinStrategy)
+        filter_ = RangeFilter(
+            Parent.date,
+            strategy=RelationOuterJoinStrategy,
+            strategy_onclause=Parent.id == Item.parent_id,
+        )
         self.assert_compile(
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2))),
             "SELECT item.id FROM item LEFT OUTER JOIN parent ON parent.id = item.parent_id "
