@@ -65,6 +65,13 @@ class RelationOuterJoinStrategy(RelationBaseJoinStrategy):
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):
+    """
+    This strategy makes exist subquery to a related model.
+    It also contains optimization:
+    if the query already has a similar subquery (has equal target table and onclause expression) -
+    it reuses similar subquery by adding new where expressions.
+    """
+
     def __init__(
         self, field: QueryableAttribute, onclause: Optional[ColumnElement[Boolean]] = None
     ) -> None:
