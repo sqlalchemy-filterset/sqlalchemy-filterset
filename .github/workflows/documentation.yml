@@ -1,0 +1,22 @@
+name: Update documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install mkdocs-material
+      - name: Build
+        run: mkdocs build
+      - name: Deploy
+        run: mkdocs gh-deploy --force
