@@ -1,5 +1,8 @@
 site_name: SQLAlchemy Filterset
 site_description: An easy way to filter SQLAlchemy queries
+repo_name: sqlalchemy-filterset
+repo_url: https://github.com/sqlalchemy-filterset/sqlalchemy-filterset
+edit_uri: ""
 
 theme:
   name: 'material'
@@ -18,50 +21,45 @@ theme:
           name: Switch to light mode
   icon:
     logo: material/filter
-  favicon: 'favicon.png'
+    repo: fontawesome/brands/github
+  favicon: img/favicon.png
   features:
     - navigation.instant
     - navigation.top
-    - navigation.sections
+    - navigation.tracking
     - search.suggest
     - search.highlight
     - content.code.annotate
-
-repo_name: idaproject/sqlalchemy-filterset
-repo_url: https://github.com/idaproject/sqlalchemy-filterset
-edit_uri: ""
-
-markdown_extensions:
-  - toc:
-      permalink: true
-  - admonition
-  - pymdownx.details
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-  - attr_list
-  - tables
-  - def_list
+  language: en
 
 plugins:
   - search
 
 nav:
-  - About: index.md
-  - Installation: installation.md
-  - Development: development.md
-  - Usage:
-    - usage/flow.md
-    - usage/filterset.md
-    - usage/filters.md
-    - usage/custom_filters.md
+  - Overview: index.md
+  - Filtersets: filtersets.md
+  - Filters: filters.md
   - Examples:
-    - FastAPI: examples/fastapi.md
+    - FastApi: examples/fastapi.md
+    - Custom filters: examples/custom_filters.md
+  - Contributing: contributing.md
+
+# Extensions / Plugins
+markdown_extensions:
+  - toc:
+      permalink: true # inserts an anchor
+  - admonition # notes make pretty
+  - pymdownx.highlight  # better code, instead of CodeHilite
+  - pymdownx.inlinehilite # like codehilite but inline
+  - pymdownx.superfences # nest code blocks under other blocks
+  - pymdownx.tabbed: # auto tabs
+      alternate_style: true
+  - pymdownx.magiclink # auto links
+  - pymdownx.mark # highlight text
+  - pymdownx.smartsymbols # special symbols
+  - pymdownx.snippets # insert other markdown or HTML
+  - pymdownx.details # details and summary; work with admonition
+  - pymdownx.tasklist: # better tasks lists
+      custom_checkbox: true
+  - attr_list  # adds a syntax to define attributes on the various HTML elements
+  - def_list  # create definition lists

@@ -9,7 +9,7 @@ description = ""
 authors = [
     "Arseny Sysolyatin <as@idaproject.com>",
     "Ivan Moiseev <imoiseev.work@gmail.com>",
-    "Yuri Mezentsev <y.mezentsev@idaproject.com>",
+    "Yuri Mezentsev <yurmezence@gmail.com>",
     "Artem Titorenko <ya.titorenko7@yandex.ru>"
 ]
 
@@ -20,7 +20,7 @@ greenlet = ">=1.1.2"
 
 [tool.poetry.dev-dependencies]
 # Documentation
-mkdocs-material = {version = "^8.4.3"}
+mkdocs-material = {version = "^9.0.2"}
 
 SQLAlchemy-Utils = "^0.38.3"
 commitizen = "^2.20.5"
