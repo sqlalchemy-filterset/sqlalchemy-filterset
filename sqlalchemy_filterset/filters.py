@@ -82,7 +82,7 @@ class NotInFilter(Filter):
 
 class BooleanFilter(Filter):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs, lookup_expr=sa_op.in_op)
+        super().__init__(*args, **kwargs, lookup_expr=sa_op.is_)
 
 
 class RangeFilter(BaseFilter):
