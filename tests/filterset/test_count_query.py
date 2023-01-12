@@ -3,6 +3,7 @@ from typing import Any
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import ArgumentError
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter, InFilter
@@ -50,15 +51,25 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
             dialect="postgresql",
         )
 
-    @pytest.mark.xfail(reason="Empty values not available in V2")
-    @pytest.mark.parametrize("empty_value", ([], (), {}, "", None))
+    @pytest.mark.parametrize("empty_value", ([], (), {}))
     @pytest.mark.parametrize("field", ["id", "ids"])
-    def test_empty_values(self, empty_value: Any, field: str) -> None:
+    def test_empty_values_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
-            filter_set.count_query({field: empty_value}),
-            "SELECT count(1) AS count_1 FROM item",
-        )
+        with pytest.raises(AssertionError):
+            self.assert_compile(
+                filter_set.count_query({field: empty_value}),
+                "SELECT count(1) AS count_1 FROM item",
+            )
+
+    @pytest.mark.parametrize("empty_value", ("", None))
+    @pytest.mark.parametrize("field", ["ids"])
+    def test_empty_values_list_v1_incompatibility(self, empty_value: Any, field: str) -> None:
+        filter_set = ItemFilterSet(select(Item.id))
+        with pytest.raises(ArgumentError):
+            self.assert_compile(
+                filter_set.count_query({field: empty_value}),
+                "SELECT count(1) AS count_1 FROM item",
+            )
 
     def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
