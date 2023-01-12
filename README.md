@@ -108,8 +108,8 @@ filter_set = ProductFilterSet(session, select(Product))
 
 # Define the filter parameters
 filter_params = ProductFilterSchema(
-    name="example", 
-    price=(10, 100), 
+    name="example",
+    price=(10, 100),
     is_active=True,
 )
 

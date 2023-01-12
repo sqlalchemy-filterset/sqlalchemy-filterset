@@ -1,12 +1,12 @@
 ## FastApi Example
 
-This is an example of an application built using FastAPI, a modern, 
-fast (high-performance) web framework for building APIs with `Python 3.7+` 
-based on standard Python type hints. It uses the `SQLAlchemy` library to 
-handle database operations and the `sqlalchemy_filterset` library for easy 
-filtering, ordering and pagination of data. The example defines several 
-data models for a simple e-commerce application, including Product and 
-Category models, as well as filterset classes and request query models 
+This is an example of an application built using FastAPI, a modern,
+fast (high-performance) web framework for building APIs with `Python 3.7+`
+based on standard Python type hints. It uses the `SQLAlchemy` library to
+handle database operations and the `sqlalchemy_filterset` library for easy
+filtering, ordering and pagination of data. The example defines several
+data models for a simple e-commerce application, including Product and
+Category models, as well as filterset classes and request query models
 for handling filtering and ordering of products.
 ```python
 import dataclasses
