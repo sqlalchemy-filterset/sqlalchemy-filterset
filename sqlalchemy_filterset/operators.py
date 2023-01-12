@@ -1,6 +1,7 @@
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement
 
+from sqlalchemy_filterset.types import ModelAttribute
 
-def icontains(field: QueryableAttribute, value: str) -> ColumnElement:
+
+def icontains(field: ModelAttribute, value: str) -> ColumnElement:
     return field.ilike(f"%{value}%")
