@@ -49,18 +49,15 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
             literal_binds=True,
         )
 
-    # todo: y.mezentsev investigate hot to cope with unhandled empty values
-    # todo: most likely remove test
-    # @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
-    # @pytest.mark.parametrize("field", ["id", "ids"])
-    # async def test_empty_values(
-    #     self, empty_value: Any, field: str, async_session: AsyncSession
-    # ) -> None:
-    #     filter_set = ItemFilterSet(select(Item.id))
-    #     self.assert_compile(
-    #         filter_set.filter_query({field: empty_value}),
-    #         "SELECT item.id FROM item",
-    #     )
+    @pytest.mark.xfail(reason="Empty values not available in V2")
+    @pytest.mark.parametrize("empty_value", ([], (), {}, "", None))
+    @pytest.mark.parametrize("field", ["id", "ids"])
+    async def test_empty_values(self, empty_value: Any, field: str) -> None:
+        filter_set = ItemFilterSet(select(Item.id))
+        self.assert_compile(
+            filter_set.filter_query({field: empty_value}),
+            "SELECT item.id FROM item",
+        )
 
     async def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))

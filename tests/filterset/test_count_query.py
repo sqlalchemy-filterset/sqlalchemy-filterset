@@ -1,5 +1,7 @@
 import uuid
+from typing import Any
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
@@ -48,16 +50,15 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
             dialect="postgresql",
         )
 
-    # todo: y.mezentsev investigate hot to cope with unhandled empty values
-    # todo: most likely remove test
-    # @pytest.mark.parametrize("empty_value", EMPTY_VALUES)
-    # @pytest.mark.parametrize("field", ["id", "ids"])
-    # def test_empty_values(self, empty_value: Any, field: str) -> None:
-    #     filter_set = ItemFilterSet(select(Item.id))
-    #     self.assert_compile(
-    #         filter_set.count_query({field: empty_value}),
-    #         "SELECT count(1) AS count_1 FROM item",
-    #     )
+    @pytest.mark.xfail(reason="Empty values not available in V2")
+    @pytest.mark.parametrize("empty_value", ([], (), {}, "", None))
+    @pytest.mark.parametrize("field", ["id", "ids"])
+    def test_empty_values(self, empty_value: Any, field: str) -> None:
+        filter_set = ItemFilterSet(select(Item.id))
+        self.assert_compile(
+            filter_set.count_query({field: empty_value}),
+            "SELECT count(1) AS count_1 FROM item",
+        )
 
     def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
