@@ -32,7 +32,6 @@ Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 ## Basic Usage
 
-<span style="color:red">todo: full example of a simple web application with description for each step.</span>
 
 In the example provided, a FilterSet called ProductFilterSet is defined to filter records from a Product database model.
 The ProductFilterSet class has several attributes, each of which is an instance of a Filter object.
@@ -59,7 +58,7 @@ Base = declarative_base()
 class Product(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    price = Column(Integer)
+    price = Column(Numeric)
     category = Column(Integer)
     is_active = Column(Boolean)
 
@@ -78,19 +77,48 @@ class ProductFilterSet(FilterSet):
     ids = InFilter(Product.id)
     title = Filter(Product.title)
     price = RangeFilter(Product.price)
-    category = InFilter(Product.category)
     is_active = BooleanFilter(Product.is_active)
 
 ```
-
+### Define a FilterSchema
 ```python
+import uuid
+from pydantic import BaseModel
+from typing import Optional, List, Tuple
 
-# Here full exmple
-# Define a filter schema
-# Write a base query
-# Filter query
+
+class ProductFilterSchema(BaseModel):
+    id: Optional[uuid.UUID]
+    ids: Optional[List[uuid.UUID]]
+    title: str
+    price: Tuple[float, float]
+    is_active: bool
 ```
 
+### Usage
+```python
+# Connect to the database
+engine = create_engine("postgresql://user:password@host/database")
+Base.metadata.create_all(bind=engine)
+SessionLocal = sessionmaker(bind=engine)
+session = SessionLocal()
+
+# Create the filterset object
+filter_set = ProductFilterSet(session, select(Product))
+
+# Define the filter parameters
+filter_params = ProductFilterSchema(
+    name="example", 
+    price=(10, 100), 
+    is_active=True,
+)
+
+# Apply the filters to the query
+filtered_products = filter_set.filter(filter_params)
+
+# The filtered_products variable now contains the filtered query result
+print(filtered_products)
+```
 
 
 ## License
