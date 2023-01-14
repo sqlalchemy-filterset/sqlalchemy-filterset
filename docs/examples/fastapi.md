@@ -52,7 +52,7 @@ Add simple schemas for `Product` model.
 ```
 
 ## Filters
-Add `FilterSet` for the `Product`.
+Add `FilterSet` and `FilterSchema` for the `Product` model.
 
 ```python title="webapp/filters.py"
 --8<-- "docs_src/examples/fastapi/filters.py"
@@ -78,4 +78,14 @@ Run application with `uvicorn`.
 uvicorn webapp.application:app --reload
 ```
 Go to http://127.0.0.1:8000/docs
-![FastApi docs](../../docs_src/examples/fastapi/docs.png)
+
+![FastApi docs](../img/docs.png)
+
+
+## Conclusion
+In conclusion, this example demonstrates how to use the `sqlalchemy-filterset` library
+with `FastAPI` and `SQLAlchemy`. It shows the structure of an application that uses this library,
+including the creation of a `FastAPI` application, models, schemas, and filters.
+The example also includes usage of various filters such as `InFilter`, `RangeFilter`,
+and `OrderingFilter` to filter data from the database. The example also demonstrates the use of
+`RelationOuterJoinStrategy` to filter data from related models.
