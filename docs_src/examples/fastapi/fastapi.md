@@ -32,7 +32,7 @@ Application has next structure:
 ## Create FastAPI application
 
 ```python title="webapp/application.py"
---8<-- "docs_src/examples/fastapi/application.py"
+--8<-- "docs/examples/fastapi/application.py"
 ```
 
 ## Models
@@ -41,41 +41,41 @@ More information about the models can be found in the
 [official sqlalchemy documentation](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)
 
 ```python title="webapp/models.py"
---8<-- "docs_src/examples/fastapi/models.py"
+--8<-- "docs/examples/fastapi/models.py"
 ```
 
 ## Schemas
 Add simple schemas for `Product` model.
 
 ```python title="webapp/schemas.py"
---8<-- "docs_src/examples/fastapi/schemas.py"
+--8<-- "docs/examples/fastapi/schemas.py"
 ```
 
 ## Filters
 Add `FilterSet` for the `Product`.
 
 ```python title="webapp/filters.py"
---8<-- "docs_src/examples/fastapi/filters.py"
+--8<-- "docs/examples/fastapi/filters.py"
 ```
 
 ## Queries
 Add queries for api endpoints.
 ```python title="webapp/queries.py"
---8<-- "docs_src/examples/fastapi/queries.py"
+--8<-- "docs/examples/fastapi/queries.py"
 ```
 
 ## Endpoints
 Add endpoints for the application.
 
 ```python title="webapp/endpoints.py"
---8<-- "docs_src/examples/fastapi/endpoints.py"
+--8<-- "docs/examples/fastapi/endpoints.py"
 ```
 
 ## Usage
-Run application with `uvicorn`.
+Run application with uvicorn.
 
 ```bash
 uvicorn webapp.application:app --reload
 ```
 Go to http://127.0.0.1:8000/docs
-![FastApi docs](../../docs_src/examples/fastapi/docs.png)
+![FastApi docs](./docs.png)
