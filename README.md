@@ -21,6 +21,7 @@ The key features are:
 * [X] Construct complex filtering conditions by combining multiple simple filters.
 * [X] It offers a standard approach to writing database queries.
 * [X] Reduce code duplication by allowing you to reuse the same filters in multiple places in your code.
+* [X] Sync and Async support of modern SQLAlchemy.
 
 ## Installation
 
