@@ -4,14 +4,13 @@ import operator as op
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import ColumnElement, Select
 from sqlalchemy.sql import operators as sa_op
 
 from sqlalchemy_filterset.constants import NullsPosition
 from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.strategies import BaseStrategy
-from sqlalchemy_filterset.types import LookupExpr
+from sqlalchemy_filterset.types import LookupExpr, ModelAttribute
 
 if TYPE_CHECKING:
     from sqlalchemy_filterset.filtersets import BaseFilterSet  # pragma: no cover
@@ -49,7 +48,7 @@ class Filter(BaseFilter):
 
     def __init__(
         self,
-        field: QueryableAttribute,
+        field: ModelAttribute,
         *,
         lookup_expr: LookupExpr = op.eq,
         strategy: Optional[BaseStrategy] = None,
@@ -90,7 +89,7 @@ class RangeFilter(BaseFilter):
 
     def __init__(
         self,
-        field: QueryableAttribute,
+        field: ModelAttribute,
         *,
         left_lookup_expr: LookupExpr = op.ge,
         right_lookup_expr: LookupExpr = op.le,
@@ -137,7 +136,7 @@ class RangeFilter(BaseFilter):
 
 
 class OrderingField(NamedTuple):
-    field: QueryableAttribute
+    field: ModelAttribute
     nulls: Optional[NullsPosition] = None
 
     def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
@@ -279,7 +278,7 @@ class SearchFilter(BaseFilter):
 
     def __init__(
         self,
-        *fields: Sequence[QueryableAttribute],
+        *fields: Sequence[ModelAttribute],
         lookup_expr: LookupExpr = icontains,
         logic_expr: Callable = sa.or_,
     ) -> None:

@@ -4,7 +4,6 @@ from typing import Any
 
 import pytest
 from sqlalchemy import and_, or_, select
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import RangeFilter
@@ -14,6 +13,7 @@ from sqlalchemy_filterset.strategies import (
     RelationOuterJoinStrategy,
     RelationSubqueryExistsStrategy,
 )
+from sqlalchemy_filterset.types import ModelAttribute
 from tests.models import Item, Parent
 
 
@@ -37,7 +37,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     )
     def test_filtering(
         self,
-        field: QueryableAttribute,
+        field: ModelAttribute,
         left_lookup_expr: Any,
         right_lookup_expr: Any,
         logic_expr: Any,

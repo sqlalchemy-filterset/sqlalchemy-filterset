@@ -3,13 +3,12 @@ from typing import Any, Sequence
 import pytest
 import sqlalchemy as sa
 from sqlalchemy import select
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import SearchFilter
 from sqlalchemy_filterset.operators import icontains
-from sqlalchemy_filterset.types import LookupExpr
+from sqlalchemy_filterset.types import LookupExpr, ModelAttribute
 from tests.models import Item
 
 
@@ -102,7 +101,7 @@ class TestSearchFilterBuildSelect(AssertsCompiledSQL):
     )
     def test_filtering(
         self,
-        fields: Sequence[QueryableAttribute],
+        fields: Sequence[ModelAttribute],
         lookup_expr: LookupExpr,
         logic_expr: LookupExpr,
         value: str,

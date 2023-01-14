@@ -6,7 +6,6 @@ from typing import Any
 import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import ArgumentError
-from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.sql import operators as sa_op
 from sqlalchemy.testing import AssertsCompiledSQL
 
@@ -18,6 +17,7 @@ from sqlalchemy_filterset.strategies import (
     RelationOuterJoinStrategy,
     RelationSubqueryExistsStrategy,
 )
+from sqlalchemy_filterset.types import ModelAttribute
 from tests.models import Item
 from tests.models.base import ItemType, Parent
 
@@ -100,7 +100,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         ],
     )
     def test_op_filtering(
-        self, field: QueryableAttribute, lookup_expr: Any, value: Any, expected: str
+        self, field: ModelAttribute, lookup_expr: Any, value: Any, expected: str
     ) -> None:
         filter_ = Filter(field, lookup_expr=lookup_expr)
         self.assert_compile(
@@ -193,7 +193,7 @@ class TestFilterBuildSelectPostgres(AssertsCompiledSQL):
     )
     def test_op_filtering(
         self,
-        field: QueryableAttribute,
+        field: ModelAttribute,
         lookup_expr: Any,
         value: Any,
         expected: str,
