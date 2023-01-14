@@ -484,6 +484,81 @@ result = filter_set.filter(filter_params)
 ```
 
 ## Filter strategy
-### Base
-### Joined
-### Exists
+
+Strategy is part of a `Filter` that controls how to connect the `Filter` expression with a query.
+The main target of it is filtering by related models in the most optimized way.
+
+### BaseStrategy
+`BaseStrategy` is the simplest strategy. It just connects the expression built by Filter to query
+by `query.where` method.  It's the default value of filters.
+
+
+```python
+# The same result
+id = Filter(Product.id)
+id = Filter(Product.id, strategy=BaseStrategy())
+```
+
+### RelationInnerJoinStrategy / RelationOuterJoinStrategy
+
+Join strategies is good for filtering by one-to-many or one-to-one relations.
+It joins relation table by given `onclause`.
+If a relation with the same onclause already joined it will not be joined twice.
+
+- `model` - a model or table which you want to join.
+- `oncaluse` - an onclause expression that will use for the join.
+
+#### Usage
+
+- RelationInnerJoinStrategy:
+    ```python
+    category_title = Filter(
+        Category.title,
+        strategy=RelationInnerJoinStrategy(Category, onclause=Product.category_id == Category.id),
+    )
+    ```
+
+- RelationOuterJoinStrategy:
+    ```python
+    category_title = Filter(
+        Category.title,
+        strategy=RelationOuterJoinStrategy(Category, onclause=Product.category_id == Category.id),
+    )
+    ```
+
+Example of result query:
+```sql
+SELECT *
+FROM product
+         JOIN category ON category.id = product.category_id
+WHERE category.title = 'test'
+```
+
+
+### RelationSubqueryExistsStrategy
+
+Subquery exists strategy is good for many-to-one relations.
+It makes exist subquery with onclause and filter expression in `where`.
+If the query already has exist subquery with same onclause and relation
+it will add filter expression to the `where` clause.
+
+
+#### Usage
+
+```python
+product_title = Filter(
+    Product.title,
+    strategy=RelationSubqueryExistsStrategy(Product, onclause=Category.id == Product.category_id),
+)
+```
+
+Example of result query:
+
+```sql
+SELECT *
+FROM category
+WHERE EXISTS(SELECT 1
+             FROM product
+             WHERE category.id = product.category_id
+               AND product.title = 'test')
+```
