@@ -41,7 +41,6 @@ nav:
   - Filters: filters.md
   - Examples:
     - FastApi: examples/fastapi.md
-    - Custom filters: examples/custom_filters.md
   - Contributing: contributing.md
 
 # Extensions / Plugins
