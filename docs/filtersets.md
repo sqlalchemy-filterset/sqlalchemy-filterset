@@ -1,17 +1,24 @@
-
-<span style="color:red">todo: check and rewrite</span>
-
-<span style="color:red">todo: extend example, add example how to pass session</span>
-
-
 ## Overview
 
-FilterSet is a class that modifies a database query.
-When a FilterSet is applied to a query, it modifies the query by adding `WHERE` clauses to it based on the filters that have been specified.
-This allows you to specify criteria for filtering the records that are returned from the database.
-It is used by passing a session object and a query object.
-The session object is used to execute the modified query, while the query object is the base query that the FilterSet modifies.
+FilterSet is a class that modifies a database query by adding `where` clauses to it based on specified filters.
+To use it, create an instance of FilterSet class and define filters.
+To apply the filtering to a query, pass the session and query to the filter method of the FilterSet instance.
 
+## Workflow
+
+``` mermaid
+sequenceDiagram
+    participant User
+    participant App
+    participant Database
+    User->>App: Send request with filter parameters
+    App->>App: Retrieve User Filter Parameters.<br> Apply Parameters to FilterSet and Construct Query
+    App->>Database: Execute Query
+    Database-->>App: Send Results
+    App-->>User: Display Results
+```
+
+Example FilterSet:
 ```python
 from sqlalchemy_filterset.filtersets import FilterSet
 from sqlalchemy_filterset.filters import Filter, InFilter, RangeFilter, BooleanFilter
@@ -28,30 +35,37 @@ class ProductFilterSet(FilterSet):
 ```
 
 ## Filter schema
-The filter_schema is a dictionary that define which filters to apply to a FilterSet.
-It has the following format: `{filter_name1: value1, filter_name2: value2}`, where field is the name of the field in the FilterSet and value is the value to use for filtering.
+Filter schema is a dictionary that defines the parameters for filtering a database query using a FilterSet.
+It has the format of `{filter_name: value}`, where filter_name is the name of the field in the FilterSet and value is the value to use for filtering.
+However, different filters may have different formats ([see the filters description](/sqlalchemy-filterset/filters/)).
 
-For example, to filter a ProductFilterSet by a minimum price of 1000, a maximum price of 5000, and only active products, you would use the following filter_schema:
-
-```python
-filter_params = {"price": (1000, 5000), "is_active": True}
-```
-It is convenient to use pydantic to define filter schema:
-```python
-from pydantic import BaseModel
+Using pydantic to define the filter schema is a convenient way to ensure the proper format and validation of the filter parameters.
 
 
-class ProductFilterSchema(BaseModel):
-    id: set[int] | None
-    ids: set[int] | None
-    title: str | None
-    price: tuple[Price | None, Price | None] | None
-    category: set[ProductCategory] | None
-    is_active: bool | None
 
-filter_schema = ProductFilterSchema(price=(1000, 5000), is_active=True)
-filter_params = filter_schema.dict(exclude_unset=True)
-```
+
+For example, to filter the ProductFilterSet by active products, a minimum price of 1000, a maximum price of 5000, use the following filter_schema:
+=== "dict"
+    ```python
+    filter_params = {"price": (1000, 5000), "is_active": True}
+    ```
+
+=== "pydantic"
+    ```python
+    from pydantic import BaseModel
+
+
+    class ProductFilterSchema(BaseModel):
+        id: int | None
+        ids: set[int] | None
+        title: str | None
+        price: tuple[Price | None, Price | None] | None
+        category: set[ProductCategory] | None
+        is_active: bool | None
+
+    filter_schema = ProductFilterSchema(price=(1000, 5000), is_active=True)
+    filter_params = filter_schema.dict(exclude_unset=True)
+    ```
 
 ## Filtering
 To apply filtering, you can pass filter_params to the filter method of the FilterSet.

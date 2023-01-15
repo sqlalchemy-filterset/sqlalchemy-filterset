@@ -187,9 +187,9 @@ Filter schema pattern:
 
 Resulting sql expressions:
 
-| filter_params                       | SQL expression                                                                                          |
-|-------------------------------------|---------------------------------------------------------------------------------------------------------|
-| ``` {"search": "string"}```       | ```select * from product where lower(name) like '%string%' or lower(description) like '%string%';``` |
+| filter_params               | SQL expression                                                                                                  |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------|
+| ``` {"search": "string"}``` | ```select * from product ```<br>``` where lower(name) like '%string%' or lower(description) like '%string%';``` |
 
 
 ## Sorting
@@ -249,11 +249,11 @@ Filter schema pattern:
 
 Resulting sql expressions:
 
-| filter_params                                 | SQL expression                                                         |
-|-----------------------------------------------|------------------------------------------------------------------------|
-| ```{"ordering": ["price"]}```                 | ```select * from product order by price; ```                           |
-| ```{"ordering": ["-price", "id"]}```          | ```select * from product order by price desc, id; ```                  |
-| ```{"ordering": ["name", "-price", "id"]} ``` | ```select * from product order by name nulls last, price desc, id; ``` |
+| filter_params                                 | SQL expression                                                                   |
+|-----------------------------------------------|----------------------------------------------------------------------------------|
+| ```{"ordering": ["price"]}```                 | ```select * from product order by price; ```                                     |
+| ```{"ordering": ["-price", "id"]}```          | ```select * from product order by price desc, id; ```                            |
+| ```{"ordering": ["name", "-price", "id"]} ``` | ```select * from product ```<br>```order by name nulls last, price desc, id; ``` |
 
 
 ## Pagination
@@ -274,7 +274,8 @@ class ProductFilterSet(FilterSet):
     pagination = LimitOffsetFilter()
 
 
-# of the 100 records received in total, only 10 records should be returned, starting from the 20th
+# Out of the 100 records received in total,
+# only 10 records should be returned, starting from the 20th record.
 filter_params = {"pagination": (10, 20)}
 filter_set = ProductFilterSet(session, select(Product))
 query = filter_set.filter(filter_params)
@@ -491,7 +492,7 @@ Strategy is part of a `Filter` that controls how to connect the `Filter` express
 The main target of it is filtering by related models in the most optimized way.
 
 ### BaseStrategy
-`BaseStrategy` is the simplest strategy. It just connects the expression built by Filter to query
+`BaseStrategy` is the simplest and default strategy. It just connects the expression built by Filter to query
 by `query.where` method.  It's the default value of filters.
 
 
@@ -530,18 +531,18 @@ If a relation with the same onclause already joined it will not be joined twice.
 
 Example of result query:
 ```sql
-SELECT *
-FROM product
-         JOIN category ON category.id = product.category_id
-WHERE category.title = 'test'
+select *
+  from product
+  join category on category.id = product.category_id
+ where category.title = 'test';
 ```
 
 
 ### RelationSubqueryExistsStrategy
 
 Subquery exists strategy is good for many-to-one relations.
-It makes exist subquery with onclause and filter expression in `where`.
-If the query already has exist subquery with same onclause and relation
+It makes exists subquery with onclause and filter expression in `where`.
+If the query already has exists subquery with same onclause and relation
 it will add filter expression to the `where` clause.
 
 
@@ -557,10 +558,18 @@ product_title = Filter(
 Example of result query:
 
 ```sql
-SELECT *
-FROM category
-WHERE EXISTS(SELECT 1
-             FROM product
-             WHERE category.id = product.category_id
-               AND product.title = 'test')
+-- select all categories for which there is a product with the name 'test'
+
+select *
+from category
+where exists(select 1
+               from product
+              where category.id = product.category_id
+                and product.title = 'test');
 ```
+??? info "Why exists:"
+    The `exists` keyword is used in the above query to optimize the performance of the query by only returning the categories that have at least one product that meets the specified criteria (in this case, a product with the title of "test").
+
+    The subquery within the `exists` clause only needs to return one column, in this case the constant `1`, to check whether there is at least one row that meets the criteria specified in the subquery's `where` clause. Since it only needs to check for the existence of one row, this approach is more efficient than using a traditional `join` and `where` clause to filter the data.
+
+    Additionally, using `exists` allows you to check for the existence of related data without actually retrieving the related data, which makes it more efficient when you don't need to retrieve the related data but just check if it exist or not.

@@ -13,9 +13,9 @@
 **Source Code**: <a href="https://github.com/sqlalchemy-filterset/sqlalchemy-filterset" target="_blank">https://github.com/sqlalchemy-filterset/sqlalchemy-filterset</a>
 
 ---
-This library offers a way to declaratively define filters on your database queries by creating a class that represents the filters you want to apply.
-This class, called a FilterSet, can be used to filter a set of records in the database using SQLAlchemy.
-It is typically used to allow users to search, filter, sort, paginate data in a web application.
+The library provides a convenient and organized way to filter your database records.
+By creating a `FilterSet` class, you can declaratively define the filters you want to apply to your `SQLAlchemy` queries.
+This library is particularly useful in web applications, as it allows users to easily search, filter, sort and paginate data.
 
 The key features are:
 
@@ -23,7 +23,7 @@ The key features are:
 * [X] Keep all of your filters in one place, making it easier to maintain and change them as needed.
 * [X] Construct complex filtering conditions by combining multiple simple filters.
 * [X] It offers a standard approach to writing database queries.
-* [X] Reduce code duplication by allowing you to reuse the same filters in multiple places in your code.
+* [X] Reduce code duplication by reusing the same filters in multiple places in your code.
 * [X] Sync and Async support of modern SQLAlchemy.
 
 ## Installation
@@ -35,8 +35,6 @@ Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 
 ## Basic Usage
-
-<span style="color:red">todo: full example of a simple web application with description for each step.</span>
 
 In the example provided, a FilterSet called ProductFilterSet is defined to filter records from a Product database model.
 The ProductFilterSet class has several attributes, each of which is an instance of a Filter object.
