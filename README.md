@@ -4,10 +4,13 @@
     <em>An easy way to filter, sort, paginate SQLAlchemy queries</em>
 </p>
 
----
-**Documentation**: <a href="https://idaproject.github.io/sqlalchemy-filterset/" target="_blank">https://sqlalchemy-filterset.github.io/sqlalchemy-filterset</a>
+[![CodeQL](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml/badge.svg)](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml)
 
-**Source Code**: <a href="https://github.com/idaproject/sqlalchemy-filterset" target="_blank">https://github.com/sqlalchemy-filterset/sqlalchemy-filterset</a>
+
+---
+**Documentation**: <a href="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/" target="_blank">https://sqlalchemy-filterset.github.io/sqlalchemy-filterset</a>
+
+**Source Code**: <a href="https://github.com/sqlalchemy-filterset/sqlalchemy-filterset" target="_blank">https://github.com/sqlalchemy-filterset/sqlalchemy-filterset</a>
 
 ---
 This library offers a way to declaratively define filters on your database queries by creating a class that represents the filters you want to apply.

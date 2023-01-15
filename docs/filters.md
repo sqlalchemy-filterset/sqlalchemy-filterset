@@ -203,7 +203,7 @@ OrderingField
 - `field` - a field in a database model that the OrderingFilter will be applied to.
 - `nulls` - specifies whether null values should be sorted first or last.
 
-To apply the OrderingFilter to a query, pass it a sequence of field names and the direction of the ordering (ascending or descending).
+To apply the OrderingFilter to a query, pass it a sequence of field names and the direction of the ordering (ascending or descending by prefixing with "-").
 
 Here's an example:
 
