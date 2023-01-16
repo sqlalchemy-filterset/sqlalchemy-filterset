@@ -13,8 +13,7 @@ from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.strategies import (
     BaseStrategy,
-    RelationInnerJoinStrategy,
-    RelationOuterJoinStrategy,
+    RelationJoinStrategy,
     RelationSubqueryExistsStrategy,
 )
 from sqlalchemy_filterset.types import ModelAttribute
@@ -159,22 +158,11 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationInnerJoinStrategy(Parent, Parent.id == Item.parent_id),
+            strategy=RelationJoinStrategy(Parent, Parent.id == Item.parent_id),
         )
         self.assert_compile(
             filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item JOIN parent "
-            "ON parent.id = item.parent_id WHERE parent.name = 'test'",
-            literal_binds=True,
-        )
-
-    def test_outer_join_strategy(self) -> None:
-        filter_ = Filter(
-            Parent.name, strategy=RelationOuterJoinStrategy(Parent, Parent.id == Item.parent_id)
-        )
-        self.assert_compile(
-            filter_.filter(select(Item.id), "test", {}),
-            "SELECT item.id FROM item LEFT OUTER JOIN parent "
             "ON parent.id = item.parent_id WHERE parent.name = 'test'",
             literal_binds=True,
         )

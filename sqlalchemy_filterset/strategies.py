@@ -1,4 +1,3 @@
-import abc
 import copy
 from abc import ABC
 from typing import Any, List, Type, Union
@@ -16,7 +15,7 @@ class BaseStrategy:
         return query.where(expression)
 
 
-class RelationBaseJoinStrategy(BaseStrategy, ABC):
+class RelationJoinStrategy(BaseStrategy, ABC):
     def __init__(self, model: Type[Model], onclause: ColumnElement[Boolean]) -> None:
         self.model = model
         self.onclause = onclause
@@ -38,19 +37,8 @@ class RelationBaseJoinStrategy(BaseStrategy, ABC):
             query = self._build_join(query, onclause=self.onclause)
         return query
 
-    @abc.abstractmethod
-    def _build_join(self, query: Select, onclause: Any) -> Select:
-        ...  # pragma: no cover
-
-
-class RelationInnerJoinStrategy(RelationBaseJoinStrategy):
     def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
         return query.join(self.model, onclause=onclause)
-
-
-class RelationOuterJoinStrategy(RelationBaseJoinStrategy):
-    def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
-        return query.outerjoin(self.model, onclause=onclause)
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):

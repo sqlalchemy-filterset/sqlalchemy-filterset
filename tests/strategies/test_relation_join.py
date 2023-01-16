@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import RelationInnerJoinStrategy
+from sqlalchemy_filterset.strategies import RelationJoinStrategy
 from tests.models import Item, Parent
 
 
@@ -9,7 +9,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = RelationInnerJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
+        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
         self.assert_compile(
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -18,7 +18,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing(self) -> None:
-        strategy = RelationInnerJoinStrategy(Parent, onclause=Item.parent_id == Parent.id)
+        strategy = RelationJoinStrategy(Parent, onclause=Item.parent_id == Parent.id)
         self.assert_compile(
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -27,7 +27,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause(self) -> None:
-        strategy = RelationInnerJoinStrategy(Parent, onclause=Parent.id == Item.id)
+        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.id)
         self.assert_compile(
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item "
