@@ -26,5 +26,9 @@ class Product(Base):
     name = Column(String)
     price = Column(Numeric)
     is_active = Column(Boolean)
-    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True)
+    category_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("categories.id"),
+        nullable=True,
+    )
     category: Category = relationship("Category", backref="products")

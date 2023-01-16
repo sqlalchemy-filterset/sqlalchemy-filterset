@@ -1,5 +1,4 @@
 import uuid
-from typing import List, Optional, Tuple
 
 from pydantic import BaseModel
 from webapp.models import Category, CategoryType, Product
@@ -14,7 +13,7 @@ from sqlalchemy_filterset.filters import (
     SearchFilter,
 )
 from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.strategies import RelationOuterJoinStrategy
+from sqlalchemy_filterset.strategies import RelationJoinStrategy
 
 
 class ProductFilterSet(FilterSet):
@@ -25,21 +24,27 @@ class ProductFilterSet(FilterSet):
     is_active = Filter(Product.is_active)
     category_type = Filter(
         Category.type,
-        strategy=RelationOuterJoinStrategy(Category, Product.category_id == Category.id),
+        strategy=RelationJoinStrategy(
+            Category,
+            Product.category_id == Category.id,
+        ),
     )
-    ordering = OrderingFilter(name=OrderingField(Product.name), price=OrderingField(Product.price))
+    ordering = OrderingFilter(
+        name=OrderingField(Product.name),
+        price=OrderingField(Product.price),
+    )
     limit_offset = LimitOffsetFilter()
 
 
 class ProductFilterSchema(BaseModel):
-    id: Optional[uuid.UUID]
-    ids: Optional[List[uuid.UUID]]
-    name: Optional[str]
-    price: Optional[Tuple[float, float]]
-    is_active: Optional[bool]
-    category_type: Optional[CategoryType]
-    ordering: Optional[List[str]]
-    limit_offset: Optional[Tuple[Optional[int], Optional[int]]]
+    id: uuid.UUID | None
+    ids: list[uuid.UUID] | None
+    name: str | None
+    price: tuple[float, float] | None
+    is_active: bool | None
+    category_type: CategoryType | None
+    ordering: list[str] | None
+    limit_offset: tuple[int | None, int | None] | None
 
     class Config:
         orm_mode = True
