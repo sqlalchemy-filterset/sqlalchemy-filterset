@@ -41,7 +41,6 @@ nav:
   - Filters: filters.md
   - Examples:
     - FastApi: examples/fastapi.md
-    - Custom filters: examples/custom_filters.md
   - Contributing: contributing.md
 
 # Extensions / Plugins
@@ -51,7 +50,11 @@ markdown_extensions:
   - admonition # notes make pretty
   - pymdownx.highlight  # better code, instead of CodeHilite
   - pymdownx.inlinehilite # like codehilite but inline
-  - pymdownx.superfences # nest code blocks under other blocks
+  - pymdownx.superfences: # nest code blocks under other blocks
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed: # auto tabs
       alternate_style: true
   - pymdownx.magiclink # auto links
