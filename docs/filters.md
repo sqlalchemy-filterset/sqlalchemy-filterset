@@ -506,7 +506,7 @@ id = Filter(Product.id)
 id = Filter(Product.id, strategy=BaseStrategy())
 ```
 
-### RelationInnerJoinStrategy / RelationOuterJoinStrategy
+### RelationJoinStrategy
 
 Join strategies is good for filtering by one-to-many or one-to-one relations.
 It joins relation table by given `onclause`.
@@ -517,19 +517,11 @@ If a relation with the same onclause already joined it will not be joined twice.
 
 #### Usage
 
-- RelationInnerJoinStrategy:
+- RelationJoinStrategy:
     ```python
     category_title = Filter(
         Category.title,
-        strategy=RelationInnerJoinStrategy(Category, onclause=Product.category_id == Category.id),
-    )
-    ```
-
-- RelationOuterJoinStrategy:
-    ```python
-    category_title = Filter(
-        Category.title,
-        strategy=RelationOuterJoinStrategy(Category, onclause=Product.category_id == Category.id),
+        strategy=RelationJoinStrategy(Category, onclause=Product.category_id == Category.id),
     )
     ```
 
