@@ -191,6 +191,10 @@ Resulting sql expressions:
 |-----------------------------|-----------------------------------------------------------------------------------------------------------------|
 | ``` {"search": "string"}``` | ```select * from product ```<br>``` where lower(name) like '%string%' or lower(description) like '%string%';``` |
 
+!!! warning
+    - Sql expression depends on the database engine. For example, the `lower()` function is not supported by the Oracle database. For more information, see the [official documentation sqlalchemy](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.ColumnElement.ilike).
+
+
 
 ## Sorting
 ### OrderingFilter
