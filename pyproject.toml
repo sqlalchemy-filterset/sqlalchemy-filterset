@@ -10,7 +10,8 @@ authors = [
     "Arseny Sysolyatin <as@idaproject.com>",
     "Ivan Moiseev <imoiseev.work@gmail.com>",
     "Yuri Mezentsev <yurmezence@gmail.com>",
-    "Artem Titorenko <ya.titorenko7@yandex.ru>"
+    "Artem Titorenko <ya.titorenko7@yandex.ru>",
+    "Andrey Matveev <ra1ze.matveev@yandex.ru>"
 ]
 
 [tool.poetry.dependencies]
@@ -84,7 +85,9 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-
+exclude = [
+    "^docs_src.*",
+]
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 
 [[tool.mypy.overrides]]
@@ -93,7 +96,7 @@ module = [
     "sqlalchemy_utils.*",
     "sqlalchemy.testing.*",
     "itsdangerous.*",
-    "pytest_async_sqlalchemy.*"
+    "pytest_async_sqlalchemy.*",
 ]
 ignore_missing_imports = true
 
