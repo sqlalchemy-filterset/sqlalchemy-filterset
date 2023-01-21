@@ -233,6 +233,7 @@ class LimitOffsetFilter(BaseFilter):
 
         :param query: Query instance for pagination
         :param value: A tuple of positive integers (limit, offset)
+
         :returns: Query instance after the provided pagination has been applied
 
         Example::
