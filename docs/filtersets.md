@@ -20,8 +20,13 @@ sequenceDiagram
 
 Example FilterSet:
 ```python
+from sqlalchemy_filterset.filters import (
+    BooleanFilter,
+    Filter,
+    InFilter,
+    RangeFilter,
+)
 from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import Filter, InFilter, RangeFilter, BooleanFilter
 
 
 class ProductFilterSet(FilterSet):

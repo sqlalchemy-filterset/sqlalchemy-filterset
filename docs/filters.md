@@ -46,10 +46,11 @@ Filter schema pattern:
         field1: int | None
         field2: str | None
 
+
     value1 = 123
     value2 = "some string"
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
     ```
 
 Resulting sql expressions:
@@ -126,10 +127,11 @@ Filter schema pattern:
     class ProductFilterSchema(BaseModel):
         price: tuple[int | None, int | None] | None
 
+
     start_value1 = 1000
     end_value1 = 5000
 
-    filter_params = ProductFilterSchema(field1=(start_value1, end_value1)).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(field1=(start_value1, end_value1)).dict()
     ```
 
 Resulting sql expressions:
@@ -179,10 +181,11 @@ Filter schema pattern:
         field1: str | None
         field2: str | None
 
+
     value1 = "string1"
     value2 = "string2"
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
     ```
 
 Resulting sql expressions:
@@ -244,11 +247,14 @@ Filter schema pattern:
     class ProductFilterSchema(BaseModel):
         ordering: list[str] | None
 
+
     ordering_field1 = "field1"
     ordering_field2 = "-field2"
     ordering_field3 = "field3"
 
-    filter_params = ProductFilterSchema(ordering=[ordering_field1, ordering_field2, ordering_field3]).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(
+        ordering=[ordering_field1, ordering_field2, ordering_field3]
+    ).dict()
     ```
 
 Resulting sql expressions:
@@ -302,7 +308,7 @@ Filter schema pattern:
     limit_value = 0
     offset_value = 10
 
-    filter_params = ProductFilterSchema(pagination=(limit_value, offset_value)).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(pagination=(limit_value, offset_value)).dict()
     ```
 
 Resulting sql expressions:
@@ -353,7 +359,7 @@ Filter schema pattern:
     value1 = [1, 2, 3]
     value2 = ["4", "5", "6"]
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
     ```
 
 Resulting sql expressions:
@@ -408,7 +414,7 @@ Filter schema pattern:
     value1 = True
     value2 = False
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(exclude_unset=True)
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
     ```
 
 Resulting sql expressions:
@@ -438,10 +444,15 @@ class ProductFilterSet(FilterSet):
     @staticmethod
     def filter_available(query: Select, value: bool) -> Select:
         if value is True:
-            return query.where(and_(Product.is_active.is_(True), Product.price > 100))
+            return query.where(
+                and_(Product.is_active.is_(True), Product.price > 100)
+            )
         elif value is False:
-            return query.where(or_(Product.is_active.is_(False), Product.price <= 100))
+            return query.where(
+                or_(Product.is_active.is_(False), Product.price <= 100)
+            )
         return query
+
 
 
 filter_params = {"available": True}
@@ -475,10 +486,15 @@ from sqlalchemy_filterset.filters import BaseFilter
 class AvailableFilter(BaseFilter):
     def filter(self, query: Select, value: Any, values: Any) -> Select:
         if value is True:
-            return query.where(and_(Product.is_active.is_(True), Product.price > 100))
+            return query.where(
+                and_(Product.is_active.is_(True), Product.price > 100)
+            )
         elif value is False:
-            return query.where(or_(Product.is_active.is_(False), Product.price <= 100))
+            return query.where(
+                or_(Product.is_active.is_(False), Product.price <= 100)
+            )
         return query
+
 
 
 class ProductFilterSet(FilterSet):
@@ -517,20 +533,21 @@ If a relation with the same onclause already joined it will not be joined twice.
 
 #### Usage
 
-- RelationJoinStrategy:
-    ```python
-    category_title = Filter(
-        Category.title,
-        strategy=RelationJoinStrategy(Category, onclause=Product.category_id == Category.id),
-    )
-    ```
+```python
+category_title = Filter(
+    Category.title,
+    strategy=RelationJoinStrategy(
+        Category, onclause=Product.category_id == Category.id
+    ),
+)
+```
 
 Example of result query:
 ```sql
 select *
   from product
   join category on category.id = product.category_id
- where category.title = 'test';
+where category.title = 'test';
 ```
 
 
@@ -547,7 +564,9 @@ it will add filter expression to the `where` clause.
 ```python
 product_title = Filter(
     Product.title,
-    strategy=RelationSubqueryExistsStrategy(Product, onclause=Category.id == Product.category_id),
+    strategy=RelationSubqueryExistsStrategy(
+        Product, onclause=Category.id == Product.category_id
+    ),
 )
 ```
 
@@ -559,9 +578,9 @@ Example of result query:
 select *
 from category
 where exists(select 1
-               from product
-              where category.id = product.category_id
-                and product.title = 'test');
+             from product
+             where category.id = product.category_id
+               and product.title = 'test');
 ```
 ??? info "Why exists:"
     The `exists` keyword is used in the above query to optimize the performance of the query by only returning the categories that have at least one product that meets the specified criteria (in this case, a product with the title of "test").
