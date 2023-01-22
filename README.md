@@ -48,7 +48,7 @@ in the `Product` model.
 
 When the `ProductFilterSet` is applied to a query, it modifies the query by adding
 WHERE clauses to it based on the filters that have been specified.
-For example, if the `is_active` attribute is specified as `True`, the query would be modified to only
+For example, if an `is_active` attribute is specified as `True`, the query would be modified to only
 return records where the `is_active` field is `True`.
 
 The declarative style allows users to easily specify criteria for filtering the records that are

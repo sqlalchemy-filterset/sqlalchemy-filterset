@@ -1,15 +1,15 @@
 ## Overview
-The Filter class is used to filter records in a database.
+The `Filter` class is used to filter records in a database.
 When we filter a query using a `FilterSet`, each filter sequentially takes a query object and a value argument.
-The query object is the base query that the Filter will modify with the specified filter, while the value argument is the value to use for filtering.
+The query object is the base query that the `Filter` will modify with the specified filter, while the value argument is the value to use for filtering.
 
 
 ## Base filters
 ### Filter
-The Filter filter records in a database by field and lookup_expr.
+The Filter filter records in a database by field and `lookup_expr`.
 
-- `field` - a field in a database model that the Filter will be applied to.
-- `lookup_expr` - a function that represents a lookup expression, such as an operator from the operator or sqlalchemy.sql.operators modules.
+- `field` - a field in a database model that the `Filter` will be applied to.
+- `lookup_expr` - a function that represents a lookup expression, such as an operator from the operator or `sqlalchemy.sql.operators` modules.
 
 For example:
 ```python
@@ -50,7 +50,9 @@ Filter schema pattern:
     value1 = 123
     value2 = "some string"
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(
+        exclude_unset=True
+    )
     ```
 
 Resulting sql expressions:
@@ -85,10 +87,10 @@ All available operators can be found in the following modules: <br>
 
 
 ### RangeFilter
-The RangeFilter class is used to filter records in a database by a specific field within a specified range from start to end values.
+The `RangeFilter` class is used to filter records in a database by a specific field within a specified range from start to end values.
 
 - `field` - a field in a database model that the RangeFilter will be applied to.
-- `left_lookup_expr/right_lookup_expr` - lookup expressions, such as operators from the operator module (op.ge, op.gt, op.le, op.lt).
+- `left_lookup_expr/right_lookup_expr` - lookup expressions, such as operators from the operator module (`op.ge`, `op.gt`, `op.le`, `op.lt`).
 - `logic_expr` - logical operator, such as and_ or or_, that is used to produce a conjunction of the border expressions.
 
 For example:
@@ -131,7 +133,9 @@ Filter schema pattern:
     start_value1 = 1000
     end_value1 = 5000
 
-    filter_params = ProductFilterSchema(field1=(start_value1, end_value1)).dict()
+    filter_params = ProductFilterSchema(field1=(start_value1, end_value1)).dict(
+        exclude_unset=True
+    )
     ```
 
 Resulting sql expressions:
@@ -143,11 +147,11 @@ Resulting sql expressions:
 
 
 ### SearchFilter
-SearchFilter allows you to search for a given string in specified fields.
+`SearchFilter` allows you to search for a given string in specified fields.
 
-- `*fields` - one or several fields in a database model that the SearchFilter will be applied to.
+- `*fields` - one or several fields in a database model that the `SearchFilter` will be applied to.
 - `lookup_expr` - lookup expression, default - `lower(field) like '%{value}%'`.
-- `logic_expr` - logical operator, such as and_ or or_, to produce a conjunction of search expressions.
+- `logic_expr` - logical operator, such as `and_` or `or_`, to produce a conjunction of search expressions.
 
 For example:
 
@@ -185,7 +189,9 @@ Filter schema pattern:
     value1 = "string1"
     value2 = "string2"
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(
+        exclude_unset=True
+    )
     ```
 
 Resulting sql expressions:
@@ -201,16 +207,16 @@ Resulting sql expressions:
 
 ## Sorting
 ### OrderingFilter
-OrderingFilter allows you to specify the order in which the results of a query should be returned by adding an ORDER BY clause to the query based on specified fields.
+`OrderingFilter` allows you to specify the order in which the results of a query should be returned by adding an `ORDER BY` clause to the query based on specified fields.
 
 - `**fields` - one or several OrderingField that define possible sorting options.
 
-OrderingField
+`OrderingField`
 
-- `field` - a field in a database model that the OrderingFilter will be applied to.
+- `field` - a field in a database model that the `OrderingFilter` will be applied to.
 - `nulls` - specifies whether null values should be sorted first or last.
 
-To apply the OrderingFilter to a query, pass it a sequence of field names and the direction of the ordering (ascending or descending by prefixing with "-").
+To apply the `OrderingFilter` to a query, pass it a sequence of field names and the direction of the ordering (ascending or descending by prefixing with "-").
 
 Here's an example:
 
@@ -254,7 +260,7 @@ Filter schema pattern:
 
     filter_params = ProductFilterSchema(
         ordering=[ordering_field1, ordering_field2, ordering_field3]
-    ).dict()
+    ).dict(exclude_unset=True)
     ```
 
 Resulting sql expressions:
@@ -268,13 +274,13 @@ Resulting sql expressions:
 
 ## Pagination
 ### LimitOffsetFilter
-LimitOffsetFilter applies limit and offset pagination to a query.
+`LimitOffsetFilter` applies limit and offset pagination to a query.
 It is used to limit the number of results returned by the query and to specify a starting point (offset) in the results.
 
 This is useful for paginating results when displaying them to the user,
 as it allows you to retrieve a specific page of results rather than retrieving all results at once.
 
-To use LimitOffsetFilter, you pass it a query instance and a tuple containing the limit and offset values. Here is an example:
+To use `LimitOffsetFilter`, you pass it a query instance and a tuple containing the limit and offset values. Here is an example:
 ```python
 from sqlalchemy_filterset.filtersets import FilterSet
 from sqlalchemy_filterset.filters import LimitOffsetFilter
@@ -308,7 +314,9 @@ Filter schema pattern:
     limit_value = 0
     offset_value = 10
 
-    filter_params = ProductFilterSchema(pagination=(limit_value, offset_value)).dict()
+    filter_params = ProductFilterSchema(
+        pagination=(limit_value, offset_value)
+    ).dict(exclude_unset=True)
     ```
 
 Resulting sql expressions:
@@ -321,10 +329,10 @@ Resulting sql expressions:
 
 ## Custom filters
 ### InFilter/NotInFilter
-InFilter and NotInFilter are subclasses of the Filter class and allow you to filter a field based on a list using the IN and NOT IN SQL operators, respectively.
-Under the hood it is a Filter with special `in`/`not_in` lookup expressions.
+`InFilter` and `NotInFilter` are subclasses of the Filter class and allow you to filter a field based on a list using the `IN` and `NOT IN` SQL operators, respectively.
+Under the hood it is a `Filter` with special `in`/`not_in` lookup expressions.
 
-To use these filters, you can specify them in your `FilterSet`class like any other Filter and pass them a list of values to filter by. For example:
+To use these filters, you can specify them in your `FilterSet`class like any other `Filter` and pass them a list of values to filter by. For example:
 
 ```python
 from sqlalchemy_filterset.filtersets import FilterSet
@@ -359,7 +367,9 @@ Filter schema pattern:
     value1 = [1, 2, 3]
     value2 = ["4", "5", "6"]
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(
+        exclude_unset=True
+    )
     ```
 
 Resulting sql expressions:
@@ -371,14 +381,14 @@ Resulting sql expressions:
 | ```{"ids": []}```                 | ```select * from product where id IN (NULL) AND (1 != 1); ``` |
 
 !!! warning
-    - Filtering by None value not is not possible for sqlalchemy in_ operator.
+    - Filtering by `None` value not is not possible for sqlalchemy `in_` operator.
 
     - By passing an empty list, filtering will work according to the standard sqlalchemy rules: [Empty IN Expressions](https://docs.sqlalchemy.org/en/20/core/operators.html).
 
 
 ### BooleanFilter
-BooleanFilter is a subclass of the Filter class that allows you to filter a field based on a boolean value using the `=`/`!=` SQL operators.
-Under the hood it is a Filter with special operator.eq and operator.ne lookup expressions.
+`BooleanFilter` is a subclass of the `Filter` class that allows you to filter a field based on a boolean value using the `=`/`!=` SQL operators.
+Under the hood it is a `Filter` with special `operator.eq` and `operator.ne` lookup expressions.
 
 Example:
 ```python
@@ -414,7 +424,9 @@ Filter schema pattern:
     value1 = True
     value2 = False
 
-    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict()
+    filter_params = ProductFilterSchema(field1=value1, field2=value2).dict(
+        exclude_unset=True
+    )
     ```
 
 Resulting sql expressions:
@@ -428,7 +440,7 @@ Resulting sql expressions:
 
 ### MethodFilter
 
-MethodFilter allows to define a custom filtering behavior for a particular field.
+`MethodFilter` allows to define a custom filtering behavior for a particular field.
 
 Here's an example:
 
@@ -460,7 +472,7 @@ filter_set = ProductFilterSet(session, select(Product))
 result = filter_set.filter(filter_params)
 ```
 
-Filter schema pattern is custom and depends on the `value` attribute expected in the "MethodFilter" filter method.
+Filter schema pattern is custom and depends on the `value` attribute expected in the `MethodFilter` filter method.
 
 Resulting sql expressions:
 
@@ -473,7 +485,7 @@ Resulting sql expressions:
 
 ### Custom filter
 An alternative way to add custom filter behavior is to create a separate filter.
-To achieve this, a CustomFilter must extend the base filter class and override its filter method.
+To achieve this, a `CustomFilter` must extend the base filter class and override its filter method.
 
 For example, the behavior of the filter method example above can be achieved as follows:
 ```python
@@ -512,7 +524,7 @@ Strategy is part of a `Filter` that controls how to connect the `Filter` express
 The main target of it is filtering by related models in the most optimized way.
 
 ### BaseStrategy
-`BaseStrategy` is the simplest and default strategy. It just connects the expression built by Filter to query
+`BaseStrategy` is the simplest and default strategy. It just connects the expression built by `Filter` to query
 by `query.where` method.  It's the default value of filters.
 
 

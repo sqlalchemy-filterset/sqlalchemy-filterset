@@ -1,8 +1,8 @@
 ## Overview
 
 `FilterSet` is a class that modifies a database query by adding `where` clauses to it based on specified filters.
-To use it, create an instance of `FilterSet`class and define filters.
-To apply the filtering to a query, pass the session and query to the filter method of the `FilterSet`instance.
+To use it, create an instance of `FilterSet` class and define filters.
+To apply the filtering to a query, pass the session and query to the filter method of the `FilterSet` instance.
 
 ## Workflow
 
@@ -40,8 +40,9 @@ class ProductFilterSet(FilterSet):
 ```
 
 ## Filter schema
-Filter schema is a dictionary that defines the parameters for filtering a database query using a FilterSet.
-It has the format of `{filter_name: value}`, where filter_name is the name of the field in the `FilterSet`and value is the value to use for filtering.
+Filter schema is a dictionary that defines the parameters for filtering a database query using a `FilterSet`.
+It has the format of `{filter_name: value}`, where `filter_name` is the name of the field in
+the `FilterSet` and value is the value to use for filtering.
 However, different filters may have different formats ([see the filters description](/sqlalchemy-filterset/filters/)).
 
 Using pydantic to define the filter schema is a convenient way to ensure the proper format and validation of the filter parameters.
@@ -73,7 +74,7 @@ For example, to filter the `ProductFilterSet` by active products, a minimum pric
     ```
 
 ## Filtering
-To apply filtering, you can pass filter_params to the filter method of the `FilterSet`.
+To apply filtering, you can pass `filter_params` to the filter method of the `FilterSet`.
 
 For example:
 ```python
@@ -94,7 +95,7 @@ select *
 ```
 
 ## Counting
-The count function of `FilterSet`is used to count the number of records in a database that match a set of filters.
+The count function of `FilterSet` is used to count the number of records in a database that match a set of filters.
 The result will be an integer representing the count of the number of matching records.
 
 For example:
@@ -118,9 +119,10 @@ select count(1)
 ## Sync/Async support
 
 There are two classes: `FilterSet` and `AsyncFilterSet`.
-They both have the same `filter` and `count` methods that are used the same way, except that `AsyncFilterSet` is designed to be used in an asynchronous environment.
+They both have the same `filter` and `count` methods that are used the same way, except that
+`AsyncFilterSet` is designed to be used in an asynchronous environment.
 
-For example, the same ProductFilterSet with `AsyncFilterSet`:
+For example, the same `ProductFilterSet` with `AsyncFilterSet`:
 ```python
 
 class ProductFilterSet(AsyncFilterSet):
