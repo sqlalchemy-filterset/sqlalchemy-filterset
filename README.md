@@ -15,7 +15,7 @@
 ---
 The library provides a convenient and organized way to filter your database records.
 By creating a `FilterSet` class, you can declaratively define the filters you want to apply to your `SQLAlchemy` queries.
-This library is particularly useful in web applications, as it allows users to easily search, filter, sort and paginate data.
+This library is particularly useful in web applications, as it allows users to easily search, filter, sort, and paginate data.
 
 The key features are:
 
