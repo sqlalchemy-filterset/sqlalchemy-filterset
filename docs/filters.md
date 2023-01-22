@@ -327,6 +327,27 @@ Resulting sql expressions:
 | ```{"pagination": (10, 10)}``` | ```select * from product limit 10 offset 20; ``` |
 
 
+!!! warning "LimitOffsetFilter and Joined Tables: Getting Accurate Pagination Results"
+    - When using this filter with joined tables, be aware that the join may modify
+    the resulting set of records, which can affect the accuracy of pagination.
+    This may include issues such as duplicate records or excluded records.
+    It is important to take this into consideration and ensure
+    that the join is properly set up to avoid these issues when using the LimitOffsetFilter.
+
+    - If we use the query:
+    ```sql
+    select users.*, roles.*
+    from users
+    left join user_roles on users.id = user_roles.user_id
+    left join roles on user_roles.role_id = roles.id;
+    ```
+    and apply LimitOffsetFilter,
+    we may end up with duplicate records, for example, if user with id 1 have 2 roles,
+    we will get duplicate records of user 1 with different roles, that may affect the pagination results.
+    We need to be attentive and use `RelationSubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
+    that the join statement is set up correctly and it will not cause any issues with the pagination results.
+
+
 ## Custom filters
 ### InFilter/NotInFilter
 `InFilter` and `NotInFilter` are subclasses of the Filter class and allow you to filter a field based on a list using the `IN` and `NOT IN` SQL operators, respectively.
@@ -594,7 +615,7 @@ where exists(select 1
              where category.id = product.category_id
                and product.title = 'test');
 ```
-??? info "Why exists:"
+??? info "Efficient Data Filtering: Using the EXISTS Clause in SQL"
     The `exists` keyword is used in the above query to optimize the performance of the query by only returning the categories that have at least one product that meets the specified criteria (in this case, a product with the title of "test").
 
     The subquery within the `exists` clause only needs to return one column, in this case the constant `1`, to check whether there is at least one row that meets the criteria specified in the subquery's `where` clause. Since it only needs to check for the existence of one row, this approach is more efficient than using a traditional `join` and `where` clause to filter the data.
