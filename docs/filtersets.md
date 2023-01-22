@@ -75,15 +75,15 @@ For example, to filter the `ProductFilterSet` by active products, a minimum pric
 
     !!! info "Note: Using exclude_unset=True"
 
-        - When the exclude_unset=True parameter is used in the dict() method,
+        - When the `exclude_unset=True` parameter is used in the `dict()` method,
         fields that were not explicitly set when creating the model
         are excluded from the returned dictionary.
         This is useful in this example because it means that only the attributes
-        that have been set in the filter_schema object are included in the filter_params dictionary.
-        In this case, the filter_schema object only has three attributes set: price,
-        is_active, and category, so when exclude_unset=True,
-        only these three attributes are included in the filter_params dictionary,
-        and the other attributes with None value (id, ids, title) are excluded.
+        that have been set in the `filter_schema` object are included in the `filter_params` dictionary.
+        In this case, the `filter_schema` object only has three attributes set: `price`,
+        `is_active`, and `category`, so when `exclude_unset=True`,
+        only these three attributes are included in the `filter_params` dictionary,
+        and the other attributes with `None` value (`id`, `ids`, `title`) are excluded.
         This way, the query only filters by the passed parameters,
         and the None parameters will not affect it.
 
