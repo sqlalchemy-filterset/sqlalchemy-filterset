@@ -302,7 +302,6 @@ class SearchFilter(BaseFilter):
 
         if not value:
             return query
-
         expressions = []
         for field in self.fields:
             expressions.append(self.lookup_expr(field, value))
