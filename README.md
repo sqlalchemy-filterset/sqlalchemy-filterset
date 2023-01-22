@@ -75,13 +75,12 @@ class ProductFilterSet(FilterSet):
 ```python
 import uuid
 from pydantic import BaseModel
-from typing import Optional, List, Tuple
 
 
 class ProductFilterSchema(BaseModel):
-    id: Optional[uuid.UUID]
-    price: Optional[Tuple[float, float]]
-    is_active: Optional[bool]
+    id: uuid.UUID | None
+    price: tuple[float, float] | None
+    is_active: bool | None
 ```
 
 ### Usage
