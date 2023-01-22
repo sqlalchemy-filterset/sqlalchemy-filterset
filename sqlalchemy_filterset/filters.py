@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class BaseFilter:
-    """A Base class for all filters.
+    """A Base class for all filters
 
     Attributes
         field_name: Name of Filter in FilterSet. Set by FilterSet after creation.
@@ -44,7 +44,7 @@ class BaseFilter:
 
 
 class Filter(BaseFilter):
-    """Filter results by field, value and lookup_expr."""
+    """Filter results by field, value and lookup_expr"""
 
     def __init__(
         self,
@@ -65,7 +65,14 @@ class Filter(BaseFilter):
         self.strategy = strategy if strategy is not None else BaseStrategy()
 
     def filter(self, query: Select, value: Any, values: Dict[str, Any]) -> Select:
-        """Apply filtering by lookup_expr to a query instance."""
+        """Apply filtering by lookup_expr to a query instance
+
+        :param query: Query instance
+        :param value: Value for filtering
+        :param values: Dict of all values for filtering
+
+        :return: Query instance after the provided filtering has been applied
+        """
         return self.strategy.filter(query, self.lookup_expr(self.field, value))
 
 
@@ -85,7 +92,7 @@ class BooleanFilter(Filter):
 
 
 class RangeFilter(BaseFilter):
-    """Filter results by field within specified range."""
+    """Filter results by field within specified range"""
 
     def __init__(
         self,
@@ -98,9 +105,9 @@ class RangeFilter(BaseFilter):
     ) -> None:
         """
         :param field: Filed of Model for filtration
-        :param left_lookup_expr: Comparsion operator for the left border of the range.
+        :param left_lookup_expr: Comparison operator for the left border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
-        :param right_lookup_expr: Comparsion operator for the right border of the range.
+        :param right_lookup_expr: Comparison operator for the right border of the range.
             default callable for comparison op: op.ge, op.gt, op.le, op.lt
         :param logic_expr: and/or operator to produce a conjunction of border expressions
         """
@@ -115,12 +122,12 @@ class RangeFilter(BaseFilter):
     def filter(
         self, query: Select, value: Optional[Tuple[Any, Any]], values: Dict[str, Any]
     ) -> Select:
-        """Apply filtering by range to a query instance.
+        """Apply filtering by range to a query instance
 
-        :param query: query instance for filtering
+        :param query: Query instance for filtering
         :param value: A tuple with two values to filter left and right border of the range
 
-        :returns: query instance after the provided filtering has been applied.
+        :returns: Query instance after the provided filtering has been applied
         """
 
         if not value:
@@ -141,7 +148,12 @@ class OrderingField(NamedTuple):
 
     def build_sqlalchemy_field(self, reverse: bool) -> ColumnElement:
         """Build sqlalchemy ordering field
-        based on predefined parameters and passed ordering direction"""
+        based on predefined parameters and passed ordering direction
+
+        :param reverse: Ordering direction
+
+        :returns: sqlalchemy ordering field
+        """
         field = self.field.asc() if not reverse else self.field.desc()
 
         if self.nulls == NullsPosition.first:
@@ -168,15 +180,15 @@ class OrderingFilter(BaseFilter):
         self.fields: Dict[str, OrderingField] = fields
 
     def filter(self, query: Select, value: Sequence[str], values: Dict[str, Any]) -> Select:
-        """Apply ordering to a query instance.
+        """Apply ordering to a query instance
 
-        :param query: query instance for ordering
+        :param query: Query instance for ordering
         :param value:
             A sequence of strings, where each one specify
-            which ordering field from available self.fields should be applied
+            which ordering field from available `self.fields` should be applied
             Also specify ordering direction
 
-        :returns: query instance after the provided ordering has been applied.
+        :returns: Query instance after the provided ordering has been applied
 
         Example::
 
@@ -217,11 +229,12 @@ class LimitOffsetFilter(BaseFilter):
         value: Optional[Tuple[Optional[int], Optional[int]]],
         values: Dict[str, Any],
     ) -> Select:
-        """Apply limit offset pagination to a query instance.
+        """Apply limit offset pagination to a query instance
 
-        :param query: query instance for pagination
+        :param query: Query instance for pagination
         :param value: A tuple of positive integers (limit, offset)
-        :returns: query instance after the provided pagination has been applied.
+
+        :returns: Query instance after the provided pagination has been applied
 
         Example::
 
@@ -293,11 +306,12 @@ class SearchFilter(BaseFilter):
         self.logic_expr = logic_expr
 
     def filter(self, query: Select, value: Optional[str], values: Dict[str, Any]) -> Select:
-        """Apply search to a query instance.
+        """Apply search to a query instance
 
-        :param query: query instance for search
+        :param query: Query instance for search
         :param value: A string to search
-        :returns: query instance after the provided search has been applied.
+
+        :returns: Query instance after the provided search has been applied
         """
 
         if not value:
