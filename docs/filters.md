@@ -332,7 +332,7 @@ Resulting sql expressions:
 `InFilter` and `NotInFilter` are subclasses of the Filter class and allow you to filter a field based on a list using the `IN` and `NOT IN` SQL operators, respectively.
 Under the hood it is a `Filter` with special `in`/`not_in` lookup expressions.
 
-To use these filters, you can specify them in your `FilterSet`class like any other `Filter` and pass them a list of values to filter by. For example:
+To use these filters, you can specify them in your `FilterSet` class like any other `Filter` and pass them a list of values to filter by. For example:
 
 ```python
 from sqlalchemy_filterset.filtersets import FilterSet
