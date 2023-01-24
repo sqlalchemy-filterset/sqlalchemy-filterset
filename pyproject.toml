@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy-filterset"
-version = "1.0.0"
+version = "1.0.1"
 description = "An easy way to filter, sort, paginate SQLAlchemy queries"
 readme = "README.md"
 license = "MIT"
@@ -58,7 +58,7 @@ pytest-dotenv = "^0.5.2"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "1.0.0"
+version = "1.0.1"
 version_files = [
     "sqlalchemy_filterset/__init__.py",
     "pyproject.toml:version"
