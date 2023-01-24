@@ -15,8 +15,7 @@ For example:
 ```python
 import operator as op
 from sqlalchemy.sql import operators as sa_op
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import Filter
+from sqlalchemy_filterset import FilterSet, Filter
 
 
 class ProductFilterSet(FilterSet):
@@ -95,8 +94,7 @@ The `RangeFilter` class is used to filter records in a database by a specific fi
 
 For example:
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import RangeFilter
+from sqlalchemy_filterset import FilterSet, RangeFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -156,8 +154,7 @@ Resulting sql expressions:
 For example:
 
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import SearchFilter
+from sqlalchemy_filterset import FilterSet, SearchFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -221,8 +218,8 @@ To apply the `OrderingFilter` to a query, pass it a sequence of field names and 
 Here's an example:
 
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import OrderingFilter, OrderingField
+from sqlalchemy_filterset import FilterSet, OrderingFilter, OrderingField
+
 
 class ProductFilterSet(FilterSet):
     ordering = OrderingFilter(
@@ -282,8 +279,7 @@ as it allows you to retrieve a specific page of results rather than retrieving a
 
 To use `LimitOffsetFilter`, you pass it a query instance and a tuple containing the limit and offset values. Here is an example:
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import LimitOffsetFilter
+from sqlalchemy_filterset import FilterSet, LimitOffsetFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -356,8 +352,7 @@ Under the hood it is a `Filter` with special `in`/`not_in` lookup expressions.
 To use these filters, you can specify them in your `FilterSet` class like any other `Filter` and pass them a list of values to filter by. For example:
 
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import InFilter, NotInFilter
+from sqlalchemy_filterset import FilterSet, InFilter, NotInFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -413,8 +408,7 @@ Under the hood it is a `Filter` with special `operator.eq` and `operator.ne` loo
 
 Example:
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import BooleanFilter
+from sqlalchemy_filterset import FilterSet, BooleanFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -467,8 +461,7 @@ Here's an example:
 
 ```python
 from sqlalchemy.sql import Select, and_, or_
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import MethodFilter
+from sqlalchemy_filterset import FilterSet, MethodFilter
 
 
 class ProductFilterSet(FilterSet):
@@ -512,8 +505,7 @@ For example, the behavior of the filter method example above can be achieved as 
 ```python
 from typing import Any
 from sqlalchemy.sql import Select, and_, or_
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import BaseFilter
+from sqlalchemy_filterset import FilterSet, BaseFilter
 
 
 class AvailableFilter(BaseFilter):

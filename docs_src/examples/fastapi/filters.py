@@ -3,17 +3,17 @@ import uuid
 from pydantic import BaseModel
 from webapp.models import Category, CategoryType, Product
 
-from sqlalchemy_filterset.filters import (
+from sqlalchemy_filterset import (
     Filter,
+    FilterSet,
     InFilter,
     LimitOffsetFilter,
     OrderingField,
     OrderingFilter,
     RangeFilter,
+    RelationJoinStrategy,
     SearchFilter,
 )
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.strategies import RelationJoinStrategy
 
 
 class ProductFilterSet(FilterSet):

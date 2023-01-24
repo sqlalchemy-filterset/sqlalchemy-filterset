@@ -20,13 +20,13 @@ sequenceDiagram
 
 Example `FilterSet`:
 ```python
-from sqlalchemy_filterset.filters import (
+from sqlalchemy_filterset import (
+    FilterSet,
     BooleanFilter,
     Filter,
     InFilter,
     RangeFilter,
 )
-from sqlalchemy_filterset.filtersets import FilterSet
 
 
 class ProductFilterSet(FilterSet):
@@ -137,8 +137,8 @@ They both have the same `filter` and `count` methods that are used the same way,
 `AsyncFilterSet` is designed to be used in an asynchronous environment.
 
 For example, the same `ProductFilterSet` with `AsyncFilterSet`:
-```python
 
+```python
 class ProductFilterSet(AsyncFilterSet):
     id = Filter(Product.id)
 

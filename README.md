@@ -37,21 +37,6 @@ Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 ## Basic Usage
 
-
-In the example provided, a `FilterSet` called `ProductFilterSet` is defined to filter records from a
-`Product` database model. The `ProductFilterSet` class has several attributes, each of which
-is an instance of a `Filter` object. Each `Filter` object is associated with a field in the `Product`
-model and a lookup expression function, which specifies how the filter should be applied to the query.
-
-For example, the id attribute is a `Filter` object that is associated with the id field in the
-`Product` model. The title attribute is a `Filter` object that is associated with the title field
-in the `Product` model.
-
-When the `ProductFilterSet` is applied to a query, it modifies the query by adding
-WHERE clauses to it based on the filters that have been specified.
-For example, if an `is_active` attribute is specified as `True`, the query would be modified to only
-return records where the `is_active` field is `True`.
-
 The declarative style allows users to easily specify criteria for filtering the records that are
 returned from the database by simply setting the attributes of the `ProductFilterSet` class.
 This can be more convenient and easier to understand than writing raw SQL queries, which
@@ -61,8 +46,7 @@ can be more error-prone and difficult to maintain.
 
 In a declarative style, we describe the attributes that will participate in filtering the query in the database:
 ```python
-from sqlalchemy_filterset.filtersets import FilterSet
-from sqlalchemy_filterset.filters import Filter, RangeFilter, BooleanFilter
+from sqlalchemy_filterset import FilterSet, Filter, RangeFilter, BooleanFilter
 
 from myapp.models import Product
 
