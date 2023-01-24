@@ -5,14 +5,20 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "sqlalchemy-filterset"
 version = "1.0.0"
-description = ""
+description = "An easy way to filter, sort, paginate SQLAlchemy queries"
+readme = "README.md"
+license = "MIT"
 authors = [
+    "Andrey Matveev <ra1ze.matveev@yandex.ru>",
+    "Artem Titorenko <ya.titorenko7@yandex.ru>",
     "Arseny Sysolyatin <as@idaproject.com>",
     "Ivan Moiseev <imoiseev.work@gmail.com>",
-    "Yuri Mezentsev <yurmezence@gmail.com>",
-    "Artem Titorenko <ya.titorenko7@yandex.ru>",
-    "Andrey Matveev <ra1ze.matveev@yandex.ru>"
+    "Yuri Mezentsev <yurmezence@gmail.com>"
 ]
+
+[project.urls]
+Homepage = "https://github.com/sqlalchemy-filterset/sqlalchemy-filterset"
+Documentation = "https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
