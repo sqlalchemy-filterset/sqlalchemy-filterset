@@ -33,27 +33,22 @@ Documentation was built using mkdocs-material.
 mkdocs serve
 ```
 
-## Other
+## Update package version
+Run commitizen
 
-??? summary "Updating the library version"
-    ```bash
-    git add .
-    ```
+```bash
+poetry run cz bump --increment <MAJOR|MINOR|PATCH>
+```
 
-    Commit with commitizen
+Push tag
 
-    ```bash
-    poetry run cz commit
-    ```
+```bash
+git push && git push origin <tag_name>
+```
 
-    Update project version and create new git-tag with commitizen
+Publish to pypi
+```bash
+POETRY_PYPI_TOKEN_PYPI=<TOKEN> poetry publish --build
+```
 
-    ```bash
-    poetry run cz bump
-    ```
-
-    Push tags
-
-    ```bash
-    git push --tags
-    ```
+Create release on Github
