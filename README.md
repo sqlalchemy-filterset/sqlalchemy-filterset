@@ -86,7 +86,8 @@ filter_params = ProductFilterSchema(price=(10, 100), is_active=True)
 # Apply the filters to the query
 filtered_products = filter_set.filter(filter_params.dict())
 ```
-#### This example will generate the following query:
+
+This example will generate the following query:
 ```sql
 select product.id, product.title, product.price, product.is_active
 from product
