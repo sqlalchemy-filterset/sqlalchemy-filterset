@@ -198,13 +198,13 @@ Resulting sql expressions:
 | ``` {"search": "string"}``` | ```select * from product ```<br>``` where lower(name) like '%string%' or lower(description) like '%string%';``` |
 
 !!! warning
-    - Sql expression depends on the database engine. For example, the `lower()` function is not supported by the Oracle database. For more information, see the [official documentation sqlalchemy](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.ColumnElement.ilike).
+    - Sql expression depends on the database engine. For more information, see the [official documentation sqlalchemy](https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.ColumnElement.ilike).
 
 
 
 ## Sorting
 ### OrderingFilter
-`OrderingFilter` allows you to specify the order in which the results of a query should be returned by adding an `ORDER BY` clause to the query based on specified fields.
+`OrderingFilter` allows you to specify the order in which the results of a query should be returned by adding an `order by` clause to the query based on specified fields.
 
 - `**fields` - one or several OrderingField that define possible sorting options.
 

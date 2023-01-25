@@ -85,7 +85,7 @@ For example, to filter the `ProductFilterSet` by active products, a minimum pric
         only these three attributes are included in the `filter_params` dictionary,
         and the other attributes with `None` value (`id`, `ids`, `title`) are excluded.
         This way, the query only filters by the passed parameters,
-        and the None parameters will not affect it.
+        and the `None` parameters will not affect it.
 
 ## Filtering
 To apply filtering, you can pass `filter_params` to the filter method of the `FilterSet`.

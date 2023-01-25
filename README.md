@@ -5,8 +5,10 @@
 </p>
 
 [![codecov](https://codecov.io/gh/sqlalchemy-filterset/sqlalchemy-filterset/branch/main/graph/badge.svg)](https://codecov.io/gh/sqlalchemy-filterset/sqlalchemy-filterset)
+[![PyPI version](https://badge.fury.io/py/sqlalchemy-filterset.svg)](https://badge.fury.io/py/sqlalchemy-filterset)
+[![Downloads](https://pepy.tech/badge/sqlalchemy-filterset)](https://pepy.tech/project/sqlalchemy-filterset)
 [![CodeQL](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml/badge.svg)](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml)
-
+<img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/sqlalchemy-filterset?color=%2334D058">
 
 ---
 **Documentation**: <a href="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/" target="_blank">https://sqlalchemy-filterset.github.io/sqlalchemy-filterset</a>
@@ -37,14 +39,13 @@ Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 ## Basic Usage
 
-The declarative style allows users to easily specify criteria for filtering the records that are
-returned from the database by simply setting the attributes of the `ProductFilterSet` class.
+In this example we specify criteria for filtering the database records
+by simply setting the attributes of the `ProductFilterSet` class.
 This can be more convenient and easier to understand than writing raw SQL queries, which
 can be more error-prone and difficult to maintain.
 
 ### Define a FilterSet
 
-In a declarative style, we describe the attributes that will participate in filtering the query in the database:
 ```python
 from sqlalchemy_filterset import FilterSet, Filter, RangeFilter, BooleanFilter
 
@@ -80,21 +81,18 @@ session = SessionLocal()
 filter_set = ProductFilterSet(session, select(Product))
 
 # Define the filter parameters
-filter_params = ProductFilterSchema(
-    price=(10, 100),
-    is_active=True,
-)
+filter_params = ProductFilterSchema(price=(10, 100), is_active=True)
 
 # Apply the filters to the query
-filtered_products = filter_set.filter(filter_params)
+filtered_products = filter_set.filter(filter_params.dict())
 ```
 #### This example will generate the following query:
 ```sql
-SELECT product.id, product.title, product.price, product.is_active
-FROM product
-WHERE product.price >= 10
-  AND product.price <= 100
-  AND product.is_active = true
+select product.id, product.title, product.price, product.is_active
+from product
+where product.price >= 10
+  and product.price <= 100
+  and product.is_active = true;
 ```
 
 
