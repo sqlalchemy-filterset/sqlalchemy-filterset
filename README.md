@@ -100,3 +100,7 @@ where product.price >= 10
 ## License
 
 This project is licensed under the terms of the MIT license.
+
+
+## Supported by
+<a href="https://idaproject.com/" target="_blank" title="idaproject"><img width=150 src="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/img/idaproject.png"></a>
