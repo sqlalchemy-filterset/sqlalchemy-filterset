@@ -36,7 +36,7 @@ Application has next structure:
 ```
 
 ## Models
-For example create models for e-commerce application.
+Here is an example of creating models for e-commerce application.
 More information about the models can be found in the
 [official sqlalchemy documentation](https://docs.sqlalchemy.org/en/14/orm/quickstart.html)
 
@@ -86,6 +86,6 @@ Go to http://127.0.0.1:8000/docs
 In conclusion, this example demonstrates how to use the `sqlalchemy-filterset` library
 with `FastAPI` and `SQLAlchemy`. It shows the structure of an application that uses this library,
 including the creation of a `FastAPI` application, models, schemas, and filters.
-The example also includes usage of various filters such as `InFilter`, `RangeFilter`,
+The example also includes the usage of various filters such as `InFilter`, `RangeFilter`,
 and `OrderingFilter` to filter data from the database. The example also demonstrates the use of
 `RelationJoinStrategy` to filter data from related models.

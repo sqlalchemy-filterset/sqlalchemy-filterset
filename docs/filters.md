@@ -6,7 +6,7 @@ The query object is the base query that the `Filter` will modify with the specif
 
 ## Base filters
 ### Filter
-The Filter filter records in a database by field and `lookup_expr`.
+The Filter filters records in a database by field and `lookup_expr`.
 
 - `field` - a field in a database model that the `Filter` will be applied to.
 - `lookup_expr` - a function that represents a lookup expression, such as an operator from the operator or `sqlalchemy.sql.operators` modules.
@@ -338,8 +338,8 @@ Resulting sql expressions:
     left join roles on user_roles.role_id = roles.id;
     ```
     and apply `LimitOffsetFilter`,
-    we may end up with duplicate records, for example, if user with id 1 have 2 roles,
-    we will get duplicate records of user 1 with different roles, that may affect the pagination results.
+    we may end up with duplicate records. For example, if user with id 1 has 2 roles,
+    we will get duplicate records of user 1 with different roles, which may affect the pagination results.
     We need to be attentive and use `RelationSubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
     that the join statement is set up correctly and it will not cause any issues with the pagination results.
 
@@ -397,7 +397,7 @@ Resulting sql expressions:
 | ```{"ids": []}```                 | ```select * from product where id IN (NULL) AND (1 != 1); ``` |
 
 !!! warning
-    - Filtering by `None` value not is not possible for sqlalchemy `in_` operator.
+    - Filtering by `None` value is not possible for sqlalchemy `in_` operator.
 
     - By passing an empty list, filtering will work according to the standard sqlalchemy rules: [Empty IN Expressions](https://docs.sqlalchemy.org/en/20/core/operators.html).
 
@@ -537,7 +537,7 @@ Strategy is part of a `Filter` that controls how to connect the `Filter` express
 The main target of it is filtering by related models in the most optimized way.
 
 ### BaseStrategy
-`BaseStrategy` is the simplest and default strategy. It just connects the expression built by `Filter` to query
+`BaseStrategy` is the simplest and default strategy. It simply connects the expression built by `Filter` to query
 by `query.where` method.  It's the default value of filters.
 
 
@@ -549,12 +549,12 @@ id = Filter(Product.id, strategy=BaseStrategy())
 
 ### RelationJoinStrategy
 
-Join strategies is good for filtering by one-to-many or one-to-one relations.
+Join strategies are good for filtering by one-to-many or one-to-one relations.
 It joins relation table by given `onclause`.
-If a relation with the same onclause already joined it will not be joined twice.
+If a relation with the same `onclause` has already been joined it will not be joined twice.
 
 - `model` - a model or table which you want to join.
-- `oncaluse` - an onclause expression that will use for the join.
+- `oncaluse` - an onclause expression that will be used for the join.
 
 #### Usage
 
@@ -578,9 +578,9 @@ where category.title = 'test';
 
 ### RelationSubqueryExistsStrategy
 
-Subquery exists strategy is good for many-to-one relations.
+This strategy is good for many-to-one relations.
 It makes exists subquery with onclause and filter expression in `where`.
-If the query already has exists subquery with same onclause and relation
+If the query already has exists subquery with same onclause and relation,
 it will add filter expression to the `where` clause.
 
 

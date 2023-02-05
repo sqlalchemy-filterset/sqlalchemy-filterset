@@ -133,10 +133,10 @@ select count(1)
 ## Sync/Async support
 
 There are two classes: `FilterSet` and `AsyncFilterSet`.
-They both have the same `filter` and `count` methods that are used the same way, except that
+They both have the same `filter` and `count` methods that are used in the same way, except that
 `AsyncFilterSet` is designed to be used in an asynchronous environment.
 
-For example, the same `ProductFilterSet` with `AsyncFilterSet`:
+For example, the same `ProductFilterSet` can be used with `AsyncFilterSet`:
 
 ```python
 class ProductFilterSet(AsyncFilterSet):

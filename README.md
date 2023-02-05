@@ -22,11 +22,11 @@ This library is particularly useful in web applications, as it allows users to e
 
 The key features are:
 
-* [X] Declaratively define filters.
-* [X] Keep all of your filters in one place, making it easier to maintain and change them as needed.
-* [X] Construct complex filtering conditions by combining multiple simple filters.
-* [X] It offers a standard approach to writing database queries.
-* [X] Reduce code duplication by reusing the same filters in multiple places in your code.
+* [X] Declarative definition of filters.
+* [X] Keeping all of your filters in one place, making it easier to maintain and change them as needed.
+* [X] Constructing complex filtering conditions by combining multiple simple filters.
+* [X] Offer of a standard approach to writing database queries.
+* [X] Reduction of code duplication by reusing the same filters in multiple places in your code.
 * [X] Sync and Async support of modern SQLAlchemy.
 
 ## Installation
@@ -41,7 +41,7 @@ Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 In this example we specify criteria for filtering the database records
 by simply setting the attributes of the `ProductFilterSet` class.
-This can be more convenient and easier to understand than writing raw SQL queries, which
+This is more convenient and easier to understand than writing raw SQL queries, which
 can be more error-prone and difficult to maintain.
 
 ### Define a FilterSet

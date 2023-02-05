@@ -5,7 +5,7 @@ Please create an issue to report a bug, request a feature or to simply ask a que
 ### Pull Requests
 Unless the pull request is a simple bugfix, please try to create an issue before starting on the implementation of your pull request.
 This ensures that the potential feature is in alignment with project goals.
-This also allows for feedback on the feature and potential help on where to start implementation wise.
+This also allows for feedback on the feature and potential help on where to start implementation wisely.
 
 ## Development
 ### Install dependencies
@@ -18,7 +18,7 @@ pre-commit install
 ```
 
 ### Tests
-When adding additional features, please try to add additional tests that prove that your implementation works and is bug free.
+When adding additional features, please try to add tests that prove that your implementation works and is bug free.
 
 Tests require a postgres database.
 
