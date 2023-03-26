@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/sitemap.xml
