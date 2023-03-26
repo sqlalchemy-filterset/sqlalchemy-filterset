@@ -1,4 +1,8 @@
-<span style="font-size: 65px; color: #7e56c2">**SQLAlchemy Filterset**</span>
+<h1>
+  <span style="font-size: 65px; color: #7e56c2; font-weight: 600">
+    <strong>SQLAlchemy Filterset</strong>
+  </span>
+</h1>
 
 <p align="left">
     <em>An easy way to filter, sort, paginate SQLAlchemy queries</em>
@@ -37,7 +41,7 @@ pip install sqlalchemy-filterset
 Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
 
 
-## Basic Usage
+## Basic FilterSet and Filters Usage
 
 In this example we specify criteria for filtering the database records
 by simply setting the attributes of the `ProductFilterSet` class.

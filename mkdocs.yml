@@ -1,5 +1,5 @@
 site_name: SQLAlchemy Filterset
-site_description: An easy way to filter SQLAlchemy queries
+site_description: SQLAlchemy Filterset - an easy way to create adaptive filters and filter SQLAlchemy queries
 repo_name: sqlalchemy-filterset
 repo_url: https://github.com/sqlalchemy-filterset/sqlalchemy-filterset
 edit_uri: ""
