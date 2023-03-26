@@ -5,7 +5,7 @@ from typing import Any, List, Type, Union
 from sqlalchemy import Boolean, literal_column, select
 from sqlalchemy.sql import Select
 from sqlalchemy.sql.elements import ColumnElement
-from sqlalchemy.sql.selectable import Exists, SelectStatementGrouping
+from sqlalchemy.sql.selectable import Exists, ScalarSelect
 
 from sqlalchemy_filterset.types import Model
 
@@ -84,7 +84,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         for index, clause in enumerate(where_criteria):
             if (
                 isinstance(clause, Exists)
-                and isinstance(clause.element, SelectStatementGrouping)
+                and isinstance(clause.element, ScalarSelect)
                 and isinstance(clause.element.element, Select)
             ):
                 base_query_of_exists = clause.element.element
