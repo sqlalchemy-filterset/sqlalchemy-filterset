@@ -24,8 +24,8 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     @pytest.mark.parametrize(
         "field, value, expected_where",
         [
-            ("id", uuid_1, f"item.id = '{uuid_1}'"),
-            ("ids", [uuid_2], f"item.id IN ('{uuid_2}')"),
+            ("id", uuid_1, f"item.id = '{uuid_1.hex}'"),
+            ("ids", [uuid_2], f"item.id IN ('{uuid_2.hex}')"),
         ],
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
@@ -39,7 +39,10 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     @pytest.mark.parametrize(
         "params, expected_where",
         [
-            ({"id": uuid_1, "ids": [uuid_2]}, f"item.id = '{uuid_1}' AND item.id IN ('{uuid_2}')"),
+            (
+                {"id": uuid_1, "ids": [uuid_2]},
+                f"item.id = '{uuid_1.hex}' AND item.id IN ('{uuid_2.hex}')",
+            ),
         ],
     )
     def test_filter_multiple_param(self, params: Dict[str, Any], expected_where: str) -> None:

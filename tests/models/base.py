@@ -27,14 +27,14 @@ class TestDateTimeType(TypeDecorator):
 
 
 class GrandGrandParent(Base):
-    id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    id: uuid.UUID = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: str = sa.Column(sa.String, nullable=True)
 
 
 class GrandParent(Base):
-    id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    id: uuid.UUID = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     parent_id: uuid.UUID = sa.Column(
-        UUID(as_uuid=False),
+        UUID(as_uuid=True),
         sa.ForeignKey("grand_grand_parent.id", ondelete="CASCADE"),
         nullable=False,
     )
@@ -43,10 +43,10 @@ class GrandParent(Base):
 
 
 class Parent(Base):
-    id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    id: uuid.UUID = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     date: datetime = sa.Column(TestDateTimeType(), nullable=False, server_default=sa.func.now())
     parent_id: uuid.UUID = sa.Column(
-        UUID(as_uuid=False),
+        UUID(as_uuid=True),
         sa.ForeignKey("grand_parent.id", ondelete="CASCADE"),
         nullable=False,
     )
@@ -55,7 +55,7 @@ class Parent(Base):
 
 
 class Item(Base):
-    id: uuid.UUID = sa.Column(UUID(as_uuid=False), primary_key=True, default=uuid.uuid4)
+    id: uuid.UUID = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: str = sa.Column(sa.String, nullable=True)
     description: str = sa.Column(sa.Text, nullable=True)
     date: datetime = sa.Column(TestDateTimeType(), nullable=False, server_default=sa.func.now())
@@ -64,6 +64,6 @@ class Item(Base):
     title: str = sa.Column(sa.String, nullable=True)
     type: ItemType = sa.Column(AlchemyEnum(ItemType), nullable=True)
     parent_id: uuid.UUID = sa.Column(
-        UUID(as_uuid=False), sa.ForeignKey("parent.id", ondelete="CASCADE"), nullable=False
+        UUID(as_uuid=True), sa.ForeignKey("parent.id", ondelete="CASCADE"), nullable=False
     )
     parent: Parent = relationship("Parent", backref="childs")
