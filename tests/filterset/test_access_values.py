@@ -7,7 +7,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import BaseFilter, MethodFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models import Item
+from tests.models.base import Item
 
 
 class CustomFilter(BaseFilter):
@@ -46,6 +46,6 @@ class TestAccessValues(AssertsCompiledSQL):
         filter_set = ItemFilterSet(select(Item.id))
         self.assert_compile(
             filter_set.filter_query(params),
-            "SELECT item.id " f"FROM item WHERE {expected_where}",
+            f"SELECT item.id FROM item WHERE {expected_where}",
             literal_binds=True,
         )

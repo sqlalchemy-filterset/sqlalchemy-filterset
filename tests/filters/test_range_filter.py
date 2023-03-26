@@ -13,7 +13,7 @@ from sqlalchemy_filterset.strategies import (
     RelationSubqueryExistsStrategy,
 )
 from sqlalchemy_filterset.types import ModelAttribute
-from tests.models import Item, Parent
+from tests.models.base import Item, Parent
 
 
 class TestRangeFilterBuildSelect(AssertsCompiledSQL):

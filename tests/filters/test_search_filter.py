@@ -9,7 +9,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 from sqlalchemy_filterset.filters import SearchFilter
 from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.types import LookupExpr, ModelAttribute
-from tests.models import Item
+from tests.models.base import Item
 
 
 class TestSearchFilterBuildSelect(AssertsCompiledSQL):

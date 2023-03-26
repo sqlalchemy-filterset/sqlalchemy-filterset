@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.strategies import RelationJoinStrategy
-from tests.models import Item, Parent
+from tests.models.base import Item, Parent
 
 
 class TestRelationInnerJoinStrategy(AssertsCompiledSQL):

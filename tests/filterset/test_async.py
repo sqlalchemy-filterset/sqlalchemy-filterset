@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import AsyncFilterSet
-from tests.models import Item
+from tests.models.base import Item
 from tests.models.factories import ItemFactory
 
 

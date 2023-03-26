@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.strategies import BaseStrategy
-from tests.models import Item
+from tests.models.base import Item
 
 
 class TestBaseStrategy(AssertsCompiledSQL):

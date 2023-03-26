@@ -27,6 +27,6 @@ class TestFilterSetImperativeMappingFilterQuery(AssertsCompiledSQL):
         filter_set = PersonFilterSet(select(Person.id))
         self.assert_compile(
             filter_set.filter_query({field: value}),
-            "SELECT person.id " f"FROM person WHERE {expected_where}",
+            f"SELECT person.id FROM person WHERE {expected_where}",
             literal_binds=True,
         )

@@ -17,8 +17,7 @@ from sqlalchemy_filterset.strategies import (
     RelationSubqueryExistsStrategy,
 )
 from sqlalchemy_filterset.types import ModelAttribute
-from tests.models import Item
-from tests.models.base import ItemType, Parent
+from tests.models.base import Item, ItemType, Parent
 
 
 class TestFilterBuildSelect(AssertsCompiledSQL):

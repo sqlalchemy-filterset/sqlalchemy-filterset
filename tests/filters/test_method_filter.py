@@ -7,7 +7,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import MethodFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models import Item
+from tests.models.base import Item
 
 
 class FilterSetClass(BaseFilterSet):

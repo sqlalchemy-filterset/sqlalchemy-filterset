@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.strategies import RelationSubqueryExistsStrategy
-from tests.models import GrandParent, Item, Parent
+from tests.models.base import GrandParent, Item, Parent
 
 
 class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):

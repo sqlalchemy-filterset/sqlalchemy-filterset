@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from sqlalchemy_filterset.filters import BaseFilter, Filter, InFilter, RangeFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models import Item
+from tests.models.base import Item
 
 
 class FirstFilterSet(BaseFilterSet):

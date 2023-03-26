@@ -6,8 +6,7 @@ from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import InFilter, NotInFilter
-from tests.models import Item
-from tests.models.base import ItemType
+from tests.models.base import Item, ItemType
 
 
 class TestInFilterBuildSelect(AssertsCompiledSQL):

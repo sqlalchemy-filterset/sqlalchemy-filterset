@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import LimitOffsetFilter
-from tests.models import Item
+from tests.models.base import Item
 
 
 class TestRangeFilterBuildSelect(AssertsCompiledSQL):
