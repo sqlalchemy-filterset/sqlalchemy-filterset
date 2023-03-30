@@ -30,7 +30,7 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({field: value}),
             "SELECT item.id " f"FROM item WHERE {expected_where}",
             literal_binds=True,
@@ -47,7 +47,7 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     )
     def test_filter_multiple_param(self, params: Dict[str, Any], expected_where: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query(params),
             f"SELECT item.id FROM item WHERE {expected_where}",
             literal_binds=True,
@@ -58,7 +58,7 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     def test_empty_values_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(AssertionError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.filter_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
@@ -68,14 +68,14 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     def test_empty_values_list_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(ArgumentError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.filter_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
 
     async def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({"test": "test"}),
             "SELECT item.id FROM item",
         )

@@ -26,7 +26,7 @@ class TestInFilterBuildSelect(AssertsCompiledSQL):
     )
     def test_filtering(self, field: QueryableAttribute, value: Any, expected: str) -> None:
         filter_ = InFilter(field)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
@@ -50,7 +50,7 @@ class TestNotInFilterBuildSelect(AssertsCompiledSQL):
     )
     def test_filtering(self, field: QueryableAttribute, value: Any, expected: str) -> None:
         filter_ = NotInFilter(field)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,

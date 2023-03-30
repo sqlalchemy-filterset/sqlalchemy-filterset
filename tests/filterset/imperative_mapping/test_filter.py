@@ -25,7 +25,7 @@ class TestFilterSetImperativeMappingFilterQuery(AssertsCompiledSQL):
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
         filter_set = PersonFilterSet(select(Person.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({field: value}),
             f"SELECT person.id FROM person WHERE {expected_where}",
             literal_binds=True,

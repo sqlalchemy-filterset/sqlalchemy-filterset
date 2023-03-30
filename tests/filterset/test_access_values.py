@@ -44,7 +44,7 @@ class TestAccessValues(AssertsCompiledSQL):
     )
     def test_filtering(self, params: Dict, expected_where: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query(params),
             f"SELECT item.id FROM item WHERE {expected_where}",
             literal_binds=True,

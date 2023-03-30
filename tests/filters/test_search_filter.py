@@ -109,7 +109,7 @@ class TestSearchFilterBuildSelect(AssertsCompiledSQL):
         expected_logic: str,
     ) -> None:
         filter_ = SearchFilter(*fields, lookup_expr=lookup_expr, logic_expr=logic_expr)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected.format(expected_logic)}",
             literal_binds=True,
@@ -118,7 +118,7 @@ class TestSearchFilterBuildSelect(AssertsCompiledSQL):
     @pytest.mark.parametrize("value", [None, ""])
     def test_no_filtering(self, value: Any) -> None:
         filter_ = SearchFilter(Item.name, Item.description)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             "SELECT item.id FROM item",
             literal_binds=True,

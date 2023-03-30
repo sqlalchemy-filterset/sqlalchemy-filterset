@@ -101,7 +101,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
         self, field: ModelAttribute, lookup_expr: Any, value: Any, expected: str
     ) -> None:
         filter_ = Filter(field, lookup_expr=lookup_expr)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
@@ -136,7 +136,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
 
     def test_base_strategy(self) -> None:
         filter_ = Filter(Item.area, strategy=BaseStrategy())
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), 1000, {}),
             "SELECT item.id FROM item WHERE item.area = 1000",
             literal_binds=True,
@@ -147,7 +147,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             Parent.name,
             strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item WHERE EXISTS "
             "(SELECT 1 FROM parent WHERE item.parent_id = parent.id AND parent.name = 'test')",
@@ -159,7 +159,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             Parent.name,
             strategy=RelationJoinStrategy(Parent, Parent.id == Item.parent_id),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), "test", {}),
             "SELECT item.id FROM item JOIN parent "
             "ON parent.id = item.parent_id WHERE parent.name = 'test'",
@@ -186,7 +186,7 @@ class TestFilterBuildSelectPostgres(AssertsCompiledSQL):
         expected: str,
     ) -> None:
         filter_ = Filter(field, lookup_expr=lookup_expr)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,

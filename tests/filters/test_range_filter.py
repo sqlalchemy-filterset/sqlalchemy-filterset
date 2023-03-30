@@ -49,7 +49,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
             right_lookup_expr=right_lookup_expr,
             logic_expr=logic_expr,
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), value, {}),
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
@@ -58,11 +58,13 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     @pytest.mark.parametrize("value", [None, [], [None, None]])
     def test_no_filtering(self, value: Any) -> None:
         filter_ = RangeFilter(Item.area)
-        self.assert_compile(filter_.filter(select(Item.id), value, {}), "SELECT item.id FROM item")
+        self.assert_compile(  # type: ignore[no-untyped-call]
+            filter_.filter(select(Item.id), value, {}), "SELECT item.id FROM item"
+        )
 
     def test_base_strategy(self) -> None:
         filter_ = RangeFilter(Item.area, strategy=BaseStrategy())
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), (0, 10), {}),
             "SELECT item.id FROM item WHERE item.area >= 0 AND item.area <= 10",
             literal_binds=True,
@@ -73,7 +75,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
             Parent.date,
             strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),
             "SELECT item.id FROM item WHERE EXISTS "
             "(SELECT 1 FROM parent WHERE item.parent_id = parent.id "
@@ -86,7 +88,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
             Parent.date,
             strategy=RelationJoinStrategy(Parent, Item.parent_id == Parent.id),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),
             "SELECT item.id FROM item JOIN parent ON item.parent_id = parent.id "
             "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",

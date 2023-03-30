@@ -10,7 +10,7 @@ class TestBaseStrategy(AssertsCompiledSQL):
 
     def test_filter(self) -> None:
         strategy = BaseStrategy()
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), Item.area == 1000),
             "SELECT item.id FROM item WHERE item.area = 1000",
             literal_binds=True,
