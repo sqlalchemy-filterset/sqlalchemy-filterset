@@ -6,7 +6,7 @@ from typing import Any, AsyncIterator, Dict, Generator, Iterator, Optional
 import pytest
 from pydantic import BaseSettings, PostgresDsn, validator
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
@@ -98,7 +98,7 @@ def sync_session(sync_database_url: str) -> Iterator[Session]:
 async def async_session(async_database_url: str) -> AsyncIterator[AsyncSession]:
     engine = create_async_engine(async_database_url)
 
-    Session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    Session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     session: AsyncSession = Session()
 
     try:
