@@ -2,7 +2,7 @@ import copy
 from abc import ABC
 from typing import Any, List, Type, Union
 
-from sqlalchemy import Boolean, literal_column, select
+from sqlalchemy import literal_column, select
 from sqlalchemy.sql import Select
 from sqlalchemy.sql.elements import ColumnElement
 from sqlalchemy.sql.selectable import Exists, ScalarSelect
@@ -16,7 +16,7 @@ class BaseStrategy:
 
 
 class RelationJoinStrategy(BaseStrategy, ABC):
-    def __init__(self, model: Type[Model], onclause: ColumnElement[Boolean]) -> None:
+    def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
         self.model = model
         self.onclause = onclause
 
@@ -37,7 +37,7 @@ class RelationJoinStrategy(BaseStrategy, ABC):
             query = self._build_join(query, onclause=self.onclause)
         return query
 
-    def _build_join(self, query: Select, onclause: ColumnElement[Boolean]) -> Select:
+    def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
         return query.join(self.model, onclause=onclause)
 
 
@@ -49,7 +49,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
     it reuses similar subquery by adding new where expressions.
     """
 
-    def __init__(self, model: Type[Model], onclause: ColumnElement[Boolean]) -> None:
+    def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
         self.model = model
         self.onclause = onclause
 
@@ -67,11 +67,11 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
 
         # Create new query and change where criteria to new subquery with expression
         query = copy.copy(query)
-        new_where_criteria: List = list(query._where_criteria)  # type: ignore
+        new_where_criteria: List = list(query._where_criteria)
         new_where_criteria[existed_subquery_index] = new_where_criteria[
             existed_subquery_index
         ].where(expression)
-        query._where_criteria = tuple(new_where_criteria)  # type: ignore
+        query._where_criteria = tuple(new_where_criteria)
         return query
 
     def _get_where_criteria_index_of_subquery_with_same_onclause(
@@ -80,7 +80,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         """
         Get index of _where_criteria element which is the same subquery as we need for filtering
         """
-        where_criteria = query._where_criteria  # type: ignore
+        where_criteria = query._where_criteria
         for index, clause in enumerate(where_criteria):
             if (
                 isinstance(clause, Exists)
@@ -96,8 +96,8 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
         return None
 
     @staticmethod
-    def __is_query_contains_onclause(query: Select, onclause: ColumnElement[Boolean]) -> bool:
-        for onclouse in query.whereclause.clauses:
+    def __is_query_contains_onclause(query: Select, onclause: ColumnElement[bool]) -> bool:
+        for onclouse in query.whereclause.clauses:  # type: ignore
             if onclause.compare(onclouse):
                 return True
         return False

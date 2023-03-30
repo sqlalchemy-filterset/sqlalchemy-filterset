@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import MetaData, Table
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
+from sqlalchemy.orm import Mapped
 
 
 def camel_to_snake(came_str: str) -> str:
@@ -13,7 +14,7 @@ def camel_to_snake(came_str: str) -> str:
 
 @as_declarative()
 class Base:
-    id: Union[int, UUID]
+    id: Union[Mapped[int], Mapped[UUID]]
     metadata: MetaData
 
     __table__: Table
@@ -26,3 +27,4 @@ class Base:
         return camel_to_snake(cls.__name__)
 
     __mapper_args__ = {"eager_defaults": True}
+    __allow_unmapped__ = True

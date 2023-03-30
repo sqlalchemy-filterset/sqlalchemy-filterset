@@ -3,15 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from sqlalchemy import Column, Integer, String, Table
-from sqlalchemy.orm import registry
+from sqlalchemy.orm import Mapped, registry
 
 mapper_registry = registry()
 
 
 @dataclass
 class Person:
-    id: int = field(init=False)
-    name: str
+    id: Mapped[int] = field(init=False)
+    name: Mapped[str]
 
 
 person = Table(
