@@ -398,7 +398,7 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 name = "greenlet"
 version = "3.0.3"
 description = "Lightweight in-process concurrent programming"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -482,7 +482,7 @@ files = [
 name = "importlib-metadata"
 version = "5.2.0"
 description = "Read metadata from Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1397,7 +1397,7 @@ files = [
 name = "sqlalchemy"
 version = "2.0.29"
 description = "Database Abstraction Library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1455,7 +1455,6 @@ files = [
 [package.dependencies]
 greenlet = {version = "!=0.4.17", markers = "platform_machine == \"aarch64\" or platform_machine == \"ppc64le\" or platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"AMD64\" or platform_machine == \"win32\" or platform_machine == \"WIN32\""}
 importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
-mypy = {version = ">=0.910", optional = true, markers = "extra == \"mypy\""}
 typing-extensions = ">=4.6.0"
 
 [package.extras]
@@ -1607,7 +1606,7 @@ files = [
 name = "typing-extensions"
 version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1689,7 +1688,7 @@ files = [
 name = "zipp"
 version = "3.15.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1704,4 +1703,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<4.0.0"
-content-hash = "9d6eee9323e2f86d663a279726c34e57c198a8cc52b5b37072050e070f257391"
+content-hash = "941498af9953f95e7a5d4c00eb2836ef5caec2ad40cb7517afd83baa4088fd61"

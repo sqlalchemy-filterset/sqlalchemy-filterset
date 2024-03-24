@@ -11,7 +11,7 @@
 
 
 <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/sqlalchemy-filterset?color=%2334D058">
-<img alt="SqlAlchemy - Version" src="https://img.shields.io/badge/sqlalchemy-_1.4+%7C_2.0+-%2334D058">
+<img alt="SqlAlchemy - Version" src="https://img.shields.io/badge/sqlalchemy-2.0+-%2334D058">
 
 ---
 **Documentation**: <a href="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/" target="_blank">https://sqlalchemy-filterset.github.io/sqlalchemy-filterset</a>
@@ -37,7 +37,7 @@ The key features are:
 ```bash
 pip install sqlalchemy-filterset
 ```
-Requirements: `Python 3.7+` `SQLAlchemy 1.4+, 2+`
+Requirements: `Python 3.7+` `SQLAlchemy 2.0+`
 
 
 ## Basic Usage

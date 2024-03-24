@@ -21,10 +21,10 @@ Documentation = "https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
-SQLAlchemy = { version = ">=1.4,<3", extras = ["asyncio"] }
+SQLAlchemy = { version = ">=2,<3", extras = ["asyncio"] }
 
 [tool.poetry.dev-dependencies]
-SQLAlchemy = { version = ">=1.4,<3", extras = ["asyncio", "mypy"] }
+SQLAlchemy = { version = ">=2,<3", extras = ["asyncio", "mypy"] }
 greenlet = ">=1.1.2"
 
 # Documentation
