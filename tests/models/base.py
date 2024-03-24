@@ -4,10 +4,10 @@ from decimal import Decimal
 from enum import Enum
 
 import sqlalchemy as sa
-from sqlalchemy import DateTime
+from sqlalchemy import Column, DateTime
 from sqlalchemy import Enum as AlchemyEnum
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, relationship
 
 from tests.database.base import Base
 
@@ -18,43 +18,43 @@ class ItemType(Enum):
 
 
 class GrandGrandParent(Base):
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(sa.String, nullable=True)
+    id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid.uuid4)
+    name: Column[str] = Column(sa.String, nullable=True)
 
 
 class GrandParent(Base):
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
-    parent_id: Mapped[uuid.UUID] = mapped_column(
+    id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid.uuid4)
+    parent_id: Column[uuid.UUID] = Column(
         UUID,
         sa.ForeignKey("grand_grand_parent.id", ondelete="CASCADE"),
         nullable=False,
     )
-    parent: GrandGrandParent = relationship("GrandGrandParent", backref="childs")
-    name: Mapped[str] = mapped_column(sa.String, nullable=True)
+    parent: Mapped[GrandGrandParent] = relationship("GrandGrandParent", backref="childs")
+    name: Column[str] = Column(sa.String, nullable=True)
 
 
 class Parent(Base):
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
-    date: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=sa.func.now())
-    parent_id: Mapped[uuid.UUID] = mapped_column(
+    id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid.uuid4)
+    date: Column[datetime] = Column(DateTime(), nullable=False, server_default=sa.func.now())
+    parent_id: Column[uuid.UUID] = Column(
         UUID,
         sa.ForeignKey("grand_parent.id", ondelete="CASCADE"),
         nullable=False,
     )
-    parent: GrandParent = relationship("GrandParent", backref="childs")
-    name: Mapped[str] = mapped_column(sa.String, nullable=True)
+    parent: Mapped[GrandParent] = relationship("GrandParent", backref="childs")
+    name: Column[str] = Column(sa.String, nullable=True)
 
 
 class Item(Base):
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(sa.String, nullable=True)
-    description: Mapped[str] = mapped_column(sa.Text, nullable=True)
-    date: Mapped[datetime] = mapped_column(DateTime(), nullable=False, server_default=sa.func.now())
-    area: Mapped[Decimal] = mapped_column(sa.Numeric(precision=8, scale=3), nullable=True)
-    is_active: Mapped[bool] = mapped_column(sa.Boolean, server_default="t", nullable=False)
-    title: Mapped[str] = mapped_column(sa.String, nullable=True)
-    type: Mapped[ItemType] = mapped_column(AlchemyEnum(ItemType), nullable=True)
-    parent_id: Mapped[uuid.UUID] = mapped_column(
+    id: Column[uuid.UUID] = Column(UUID, primary_key=True, default=uuid.uuid4)
+    name: Column[str] = Column(sa.String, nullable=True)
+    description: Column[str] = Column(sa.Text, nullable=True)
+    date: Column[datetime] = Column(DateTime(), nullable=False, server_default=sa.func.now())
+    area: Column[Decimal] = Column(sa.Numeric(precision=8, scale=3), nullable=True)
+    is_active: Column[bool] = Column(sa.Boolean, server_default="t", nullable=False)
+    title: Column[str] = Column(sa.String, nullable=True)
+    type: Column[ItemType] = Column(AlchemyEnum(ItemType), nullable=True)
+    parent_id: Column[uuid.UUID] = Column(
         UUID, sa.ForeignKey("parent.id", ondelete="CASCADE"), nullable=False
     )
-    parent: Parent = relationship("Parent", backref="childs")
+    parent: Mapped[Parent] = relationship("Parent", backref="childs")

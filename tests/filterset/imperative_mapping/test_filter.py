@@ -6,12 +6,12 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.filterset.imperative_mapping.conftest import Person
+from tests.filterset.imperative_mapping.conftest import person_table
 
 
-class PersonFilterSet(BaseFilterSet[Person]):
-    id = Filter(Person.id)
-    name = Filter(Person.name)
+class PersonFilterSet(BaseFilterSet):
+    id = Filter(person_table.c.id)
+    name = Filter(person_table.c.name)
 
 
 class TestFilterSetImperativeMappingFilterQuery(AssertsCompiledSQL):
@@ -24,7 +24,7 @@ class TestFilterSetImperativeMappingFilterQuery(AssertsCompiledSQL):
         ],
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
-        filter_set = PersonFilterSet(select(Person.id))
+        filter_set = PersonFilterSet(select(person_table.c.id))
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({field: value}),
             f"SELECT person.id FROM person WHERE {expected_where}",
