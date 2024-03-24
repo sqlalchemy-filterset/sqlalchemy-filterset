@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import NullsPosition, OrderingField, OrderingFilter
-from tests.models import Item
+from tests.models.base import Item
 
 
 class TestOrderingField(AssertsCompiledSQL):
@@ -28,7 +28,7 @@ class TestOrderingField(AssertsCompiledSQL):
         self, ordering: OrderingField, reverse: bool, expected: str
     ) -> None:
         stmt = ordering.build_sqlalchemy_field(reverse)
-        self.assert_compile(stmt, expected)
+        self.assert_compile(stmt, expected, literal_binds=True)  # type: ignore[no-untyped-call]
 
 
 class TestOrderingBuildFields:
@@ -70,7 +70,7 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             title=OrderingField(Item.title, nulls=NullsPosition.last),
             is_active=OrderingField(Item.is_active, nulls=NullsPosition.first),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), fields, {}),
             f"SELECT item.id FROM item ORDER BY {expected_ordering}",
         )
@@ -78,11 +78,13 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
     @pytest.mark.parametrize("value", [None, (), ["-"], ["error_value"], [""], ["", ""]])
     def test_no_ordering(self, value: Any) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
-        self.assert_compile(filter_.filter(select(Item.id), value, {}), "SELECT item.id FROM item")
+        self.assert_compile(  # type: ignore[no-untyped-call]
+            filter_.filter(select(Item.id), value, {}), "SELECT item.id FROM item"
+        )
 
     def test_with_additional_non_defined_field(self) -> None:
         filter_ = OrderingFilter(area=OrderingField(Item.area))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), ["area", "test"], {}),
             "SELECT item.id FROM item ORDER BY item.area ASC",
         )
@@ -93,7 +95,7 @@ class TestOrderingBuildSelect(AssertsCompiledSQL):
             date=OrderingField(Item.date),
             title=OrderingField(Item.title),
         )
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), ["date", "title", "area"], {}),
             "SELECT item.id FROM item ORDER BY item.date ASC, item.title ASC, item.area ASC",
         )

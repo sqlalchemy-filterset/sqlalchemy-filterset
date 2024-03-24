@@ -78,14 +78,12 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
         """Build query for calculating the total number of filtration results"""
         query = self.filter_query(params).limit(None).offset(None)
         cnt = sa.func.count(sa.literal_column("1"))
-        if query._distinct and not query._distinct_on:  # type: ignore
+        if query._distinct and not query._distinct_on:
             query = sa.select(cnt).select_from(query.order_by(None).subquery())
-        elif query._distinct and query._distinct_on:  # type: ignore
+        elif query._distinct and query._distinct_on:
             query = sa.select(cnt).select_from(query.subquery())
         else:
-            query = query.order_by(None).with_only_columns(  # type: ignore
-                cnt, maintain_column_froms=True
-            )
+            query = query.order_by(None).with_only_columns(cnt, maintain_column_froms=True)
         return query
 
 

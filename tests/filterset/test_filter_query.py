@@ -8,7 +8,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models import Item
+from tests.models.base import Item
 
 
 class ItemFilterSet(BaseFilterSet[Item]):
@@ -24,13 +24,13 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     @pytest.mark.parametrize(
         "field, value, expected_where",
         [
-            ("id", uuid_1, f"item.id = '{uuid_1}'"),
-            ("ids", [uuid_2], f"item.id IN ('{uuid_2}')"),
+            ("id", uuid_1, f"item.id = '{uuid_1.hex}'"),
+            ("ids", [uuid_2], f"item.id IN ('{uuid_2.hex}')"),
         ],
     )
     def test_filter_one_param(self, field: str, value: Any, expected_where: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({field: value}),
             "SELECT item.id " f"FROM item WHERE {expected_where}",
             literal_binds=True,
@@ -39,12 +39,15 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     @pytest.mark.parametrize(
         "params, expected_where",
         [
-            ({"id": uuid_1, "ids": [uuid_2]}, f"item.id = '{uuid_1}' AND item.id IN ('{uuid_2}')"),
+            (
+                {"id": uuid_1, "ids": [uuid_2]},
+                f"item.id = '{uuid_1.hex}' AND item.id IN ('{uuid_2.hex}')",
+            ),
         ],
     )
     def test_filter_multiple_param(self, params: Dict[str, Any], expected_where: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query(params),
             f"SELECT item.id FROM item WHERE {expected_where}",
             literal_binds=True,
@@ -55,7 +58,7 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     def test_empty_values_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(AssertionError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.filter_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
@@ -65,14 +68,14 @@ class TestFilterSetFilterQuery(AssertsCompiledSQL):
     def test_empty_values_list_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(ArgumentError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.filter_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
 
     async def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.filter_query({"test": "test"}),
             "SELECT item.id FROM item",
         )

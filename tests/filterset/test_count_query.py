@@ -8,7 +8,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models.factories import Item
+from tests.models.base import Item
 
 
 class ItemFilterSet(BaseFilterSet[Item]):
@@ -21,18 +21,20 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
 
     def test_count(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(filter_set.count_query({}), "SELECT count(1) AS count_1 FROM item")
+        self.assert_compile(  # type: ignore[no-untyped-call]
+            filter_set.count_query({}), "SELECT count(1) AS count_1 FROM item"
+        )
 
     def test_with_filter(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.count_query({"id": uuid.uuid4()}),
             "SELECT count(1) AS count_1 FROM item WHERE item.id = :id_1",
         )
 
     def test_with_distinct(self) -> None:
         filter_set = ItemFilterSet(select(Item.id, Item.date).distinct())
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.count_query({}),
             "SELECT count(1) AS count_1 FROM (SELECT DISTINCT item.id AS id, item.date AS date "
             "FROM item) AS anon_1",
@@ -43,7 +45,7 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
             select(Item.id, Item.title).distinct(Item.title).order_by(Item.title, Item.date.desc())
         )
         filter_set = ItemFilterSet(query)
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.count_query({}),
             "SELECT count(1) AS count_1 FROM (SELECT DISTINCT ON (item.title) item.id AS id, "
             "item.title AS title FROM item "
@@ -56,7 +58,7 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
     def test_empty_values_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(AssertionError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.count_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
@@ -66,14 +68,14 @@ class TestFilterSetCountQuery(AssertsCompiledSQL):
     def test_empty_values_list_v1_incompatibility(self, empty_value: Any, field: str) -> None:
         filter_set = ItemFilterSet(select(Item.id))
         with pytest.raises(ArgumentError):
-            self.assert_compile(
+            self.assert_compile(  # type: ignore[no-untyped-call]
                 filter_set.count_query({field: empty_value}),
                 "SELECT count(1) AS count_1 FROM item",
             )
 
     def test_wrong_field(self) -> None:
         filter_set = ItemFilterSet(select(Item.id))
-        self.assert_compile(
+        self.assert_compile(  # type: ignore[no-untyped-call]
             filter_set.count_query({"test": "test"}),
             "SELECT count(1) AS count_1 FROM item",
         )

@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from sqlalchemy_filterset.filters import Filter, InFilter
 from sqlalchemy_filterset.filtersets import BaseFilterSet
-from tests.models import Item
+from tests.models.base import Item
 
 
 class AbstractFilterSetClass(BaseFilterSet):

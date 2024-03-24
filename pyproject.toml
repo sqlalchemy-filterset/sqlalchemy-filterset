@@ -21,16 +21,16 @@ Documentation = "https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0.0"
-SQLAlchemy = { version = ">=1.4,<2", extras = ["asyncio"] }
+SQLAlchemy = { version = ">=2,<3", extras = ["asyncio"] }
 
 [tool.poetry.dev-dependencies]
-SQLAlchemy = { version = ">=1.4,<2", extras = ["asyncio", "mypy"] }
+SQLAlchemy = { version = ">=2,<3", extras = ["asyncio", "mypy"] }
 greenlet = ">=1.1.2"
 
 # Documentation
 mkdocs-material = {version = "^9.0.2"}
 
-SQLAlchemy-Utils = "^0.38.3"
+SQLAlchemy-Utils = "^0.40.0"
 commitizen = "^2.20.5"
 asyncpg = ">=0.26.0"
 psycopg2-binary = ">=2.0.0"
@@ -52,7 +52,6 @@ black = "~22.8.0"
 isort = "~5.10.1"
 
 # Stubs
-sqlalchemy2-stubs = ">=0.0.2-alpha.25"
 pytest-dotenv = "^0.5.2"
 
 
@@ -95,7 +94,6 @@ warn_no_return = true
 exclude = [
     "^docs_src.*",
 ]
-plugins = ["sqlalchemy.ext.mypy.plugin"]
 
 [[tool.mypy.overrides]]
 module = [

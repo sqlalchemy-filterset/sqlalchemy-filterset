@@ -2,7 +2,7 @@ import re
 from typing import Any, Union
 from uuid import UUID
 
-from sqlalchemy import MetaData, Table
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
@@ -13,16 +13,17 @@ def camel_to_snake(came_str: str) -> str:
 
 @as_declarative()
 class Base:
-    id: Union[int, UUID]
-    metadata: MetaData
+    id: Union[sa.Column[int], sa.Column[UUID]]
+    metadata: sa.MetaData
 
-    __table__: Table
+    __table__: sa.Table
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # Для корректной работы mypy
         pass
 
-    @declared_attr
+    @declared_attr  # type: ignore
     def __tablename__(cls) -> str:  # noqa
-        return camel_to_snake(cls.__name__)
+        return camel_to_snake(cls.__name__)  # type: ignore
 
     __mapper_args__ = {"eager_defaults": True}
+    __allow_unmapped__ = True

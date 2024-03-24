@@ -291,7 +291,7 @@ class SearchFilter(BaseFilter):
 
     def __init__(
         self,
-        *fields: Sequence[ModelAttribute],
+        *fields: ModelAttribute,
         lookup_expr: LookupExpr = icontains,
         logic_expr: Callable = sa.or_,
     ) -> None:
