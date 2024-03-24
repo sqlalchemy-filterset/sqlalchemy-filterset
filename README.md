@@ -8,7 +8,10 @@
 [![PyPI version](https://badge.fury.io/py/sqlalchemy-filterset.svg)](https://badge.fury.io/py/sqlalchemy-filterset)
 [![Downloads](https://pepy.tech/badge/sqlalchemy-filterset)](https://pepy.tech/project/sqlalchemy-filterset)
 [![CodeQL](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml/badge.svg)](https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/actions/workflows/codeql.yml)
+
+
 <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/sqlalchemy-filterset?color=%2334D058">
+<img alt="SqlAlchemy - Version" src="https://img.shields.io/badge/sqlalchemy-_1.4+%7C_2.0+-%2334D058">
 
 ---
 **Documentation**: <a href="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/" target="_blank">https://sqlalchemy-filterset.github.io/sqlalchemy-filterset</a>
@@ -34,7 +37,7 @@ The key features are:
 ```bash
 pip install sqlalchemy-filterset
 ```
-Requirements: `Python 3.7+` `SQLAlchemy 1.4+`
+Requirements: `Python 3.7+` `SQLAlchemy 1.4+, 2+`
 
 
 ## Basic Usage
@@ -47,12 +50,12 @@ can be more error-prone and difficult to maintain.
 ### Define a FilterSet
 
 ```python
-from sqlalchemy_filterset import FilterSet, Filter, RangeFilter, BooleanFilter
+from sqlalchemy_filterset import BaseFilterSet, Filter, RangeFilter, BooleanFilter
 
 from myapp.models import Product
 
 
-class ProductFilterSet(FilterSet):
+class ProductFilterSet(BaseFilterSet):
     id = Filter(Product.id)
     price = RangeFilter(Product.price)
     is_active = BooleanFilter(Product.is_active)
@@ -77,14 +80,20 @@ Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
-# Create the filterset object
-filter_set = ProductFilterSet(session, select(Product))
+# Define sqlalchemy query
+query = select(Product)
 
-# Define the filter parameters
+# Define parameters for filtering
 filter_params = ProductFilterSchema(price=(10, 100), is_active=True)
 
+# Create the filterset object
+filter_set = ProductFilterSet(query)
+
 # Apply the filters to the query
-filtered_products = filter_set.filter(filter_params.dict())
+query = filter_set.filter_query(filter_params.dict(exclude_unset=True))
+
+# Execute the query
+session.execute(query).unique().scalars().all()
 ```
 
 This example will generate the following query:
