@@ -98,7 +98,7 @@ def sync_session(sync_database_url: str) -> Iterator[Session]:
 async def async_session(async_database_url: str) -> AsyncIterator[AsyncSession]:
     engine = create_async_engine(async_database_url)
 
-    Session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    Session = async_sessionmaker(engine, expire_on_commit=False)
     session: AsyncSession = Session()
 
     try:
