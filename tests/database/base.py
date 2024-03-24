@@ -2,7 +2,7 @@ import re
 from typing import Any, Union
 from uuid import UUID
 
-from sqlalchemy import Column, MetaData, Table
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
@@ -13,10 +13,10 @@ def camel_to_snake(came_str: str) -> str:
 
 @as_declarative()
 class Base:
-    id: Union[Column[int], Column[UUID]]
-    metadata: MetaData
+    id: Union[sa.Column[int], sa.Column[UUID]]
+    metadata: sa.MetaData
 
-    __table__: Table
+    __table__: sa.Table
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # Для корректной работы mypy
         pass
