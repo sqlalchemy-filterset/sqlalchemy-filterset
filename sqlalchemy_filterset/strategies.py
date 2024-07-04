@@ -41,6 +41,28 @@ class RelationJoinStrategy(BaseStrategy, ABC):
         return query.join(self.model, onclause=onclause)
 
 
+class ManyToManyRelationJoinStrategy(BaseStrategy, ABC):
+    def __init__(
+        self,
+        association_model: Type[Model],
+        association_onclause: ColumnElement[bool],
+        model: Type[Model],
+        association_to_model_onclause: ColumnElement[bool],
+    ) -> None:
+        self.association_model = association_model
+        self.association_onclause = association_onclause
+        self.model = model
+        self.association_to_model_onclause = association_to_model_onclause
+
+    def filter(self, query: Select, expression: Any) -> Select:
+        query = RelationJoinStrategy(self.association_model, self.association_onclause).filter(
+            query, True
+        )
+        return RelationJoinStrategy(self.model, self.association_to_model_onclause).filter(
+            query, expression
+        )
+
+
 class RelationSubqueryExistsStrategy(BaseStrategy):
     """
     This strategy makes exist subquery to a related model.
