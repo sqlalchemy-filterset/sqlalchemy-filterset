@@ -8,7 +8,7 @@ from sqlalchemy.sql import ColumnElement, Select
 from sqlalchemy.sql import operators as sa_op
 
 from sqlalchemy_filterset.constants import NullsPosition
-from sqlalchemy_filterset.operators import icontains
+from sqlalchemy_filterset.operators import icontains, is_null
 from sqlalchemy_filterset.strategies import BaseStrategy
 from sqlalchemy_filterset.types import LookupExpr, ModelAttribute
 
@@ -89,6 +89,14 @@ class NotInFilter(Filter):
 class BooleanFilter(Filter):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs, lookup_expr=sa_op.is_)
+
+
+class IsNullFilter(Filter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        :param field: Field of Model for filtration
+        """
+        super().__init__(*args, **kwargs, lookup_expr=is_null)
 
 
 class RangeFilter(BaseFilter):
