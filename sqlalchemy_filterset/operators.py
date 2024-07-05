@@ -11,12 +11,7 @@ def icontains(field: ModelAttribute, value: str) -> ColumnElement:
 
 
 def is_null(field: ModelAttribute, value: bool) -> Any:
-    if not isinstance(value, bool):
-        raise ValueError(
-            f"Value can only be True or False, but {value} ({type(value)}) was provided"
-        )
-    sa_ops = {
-        True: sa_op.is_,
-        False: sa_op.is_not,
-    }
-    return sa_ops[value](field, b=None)
+    if value:
+        return sa_op.is_(field, None)
+    else:
+        return sa_op.is_not(field, None)

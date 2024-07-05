@@ -27,19 +27,3 @@ class TestIsNullFilterBuildSelect(AssertsCompiledSQL):
             f"SELECT item.id FROM item WHERE {expected}",
             literal_binds=True,
         )
-
-    @pytest.mark.parametrize(
-        "value, exc_message",
-        [
-            (None, "None (<class 'NoneType'>)"),
-            (1, "1 (<class 'int'>)"),
-            ("1", "1 (<class 'str'>)"),
-        ],
-    )
-    def test_wrong_value_type(self, value: Any, exc_message: str) -> None:
-        filter_ = IsNullFilter(Item.name)
-        with pytest.raises(ValueError) as excinfo:
-            filter_.filter(select(Item.id), value, {})
-        assert (
-            str(excinfo.value) == f"Value can only be True or False, but {exc_message} was provided"
-        )
