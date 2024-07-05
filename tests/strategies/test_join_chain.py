@@ -1,19 +1,23 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import ManyToManyRelationJoinStrategy
+from sqlalchemy_filterset.strategies import JoinChainStrategy, RelationJoinStrategy
 from tests.models.base import Item, ItemLink, ItemToItemLink
 
 
-class TestManyToManyRelationJoinStrategy(AssertsCompiledSQL):
+class TestJoinChainStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = ManyToManyRelationJoinStrategy(
-            ItemToItemLink,
-            Item.id == ItemToItemLink.right_id,
-            ItemLink,
-            ItemLink.id == ItemToItemLink.left_id,
+        strategy = JoinChainStrategy(
+            RelationJoinStrategy(
+                ItemToItemLink,
+                Item.id == ItemToItemLink.right_id,
+            ),
+            RelationJoinStrategy(
+                ItemLink,
+                ItemLink.id == ItemToItemLink.left_id,
+            ),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), ItemLink.name == "test"),
@@ -25,11 +29,15 @@ class TestManyToManyRelationJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing_association_table(self) -> None:
-        strategy = ManyToManyRelationJoinStrategy(
-            ItemToItemLink,
-            Item.id == ItemToItemLink.right_id,
-            ItemLink,
-            ItemLink.id == ItemToItemLink.left_id,
+        strategy = JoinChainStrategy(
+            RelationJoinStrategy(
+                ItemToItemLink,
+                Item.id == ItemToItemLink.right_id,
+            ),
+            RelationJoinStrategy(
+                ItemLink,
+                ItemLink.id == ItemToItemLink.left_id,
+            ),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id).join(ItemToItemLink), ItemLink.name == "test"),
@@ -42,11 +50,15 @@ class TestManyToManyRelationJoinStrategy(AssertsCompiledSQL):
 
     # FIXME: Bug in deduplication (is not connected to ManyToMany)
     # def test_double_join_preventing(self) -> None:
-    #     strategy = ManyToManyRelationJoinStrategy(
-    #         ItemToItemLink,
-    #         Item.id == ItemToItemLink.right_id,
-    #         ItemLink,
-    #         ItemLink.id == ItemToItemLink.left_id,
+    #     strategy = JoinChainStrategy(
+    #         RelationJoinStrategy(
+    #             ItemToItemLink,
+    #             Item.id == ItemToItemLink.right_id,
+    #         ),
+    #         RelationJoinStrategy(
+    #             ItemLink,
+    #             ItemLink.id == ItemToItemLink.left_id,
+    #         ),
     #     )
     #     self.assert_compile(  # type: ignore[no-untyped-call]
     #         strategy.filter(
@@ -66,11 +78,15 @@ class TestManyToManyRelationJoinStrategy(AssertsCompiledSQL):
     #     )
 
     def test_double_join_with_different_onclause_association_table(self) -> None:
-        strategy = ManyToManyRelationJoinStrategy(
-            ItemToItemLink,
-            Item.id == ItemToItemLink.right_id,
-            ItemLink,
-            ItemLink.id == ItemToItemLink.left_id,
+        strategy = JoinChainStrategy(
+            RelationJoinStrategy(
+                ItemToItemLink,
+                Item.id == ItemToItemLink.right_id,
+            ),
+            RelationJoinStrategy(
+                ItemLink,
+                ItemLink.id == ItemToItemLink.left_id,
+            ),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(
@@ -86,11 +102,15 @@ class TestManyToManyRelationJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause(self) -> None:
-        strategy = ManyToManyRelationJoinStrategy(
-            ItemToItemLink,
-            Item.id == ItemToItemLink.right_id,
-            ItemLink,
-            ItemLink.id == ItemToItemLink.left_id,
+        strategy = JoinChainStrategy(
+            RelationJoinStrategy(
+                ItemToItemLink,
+                Item.id == ItemToItemLink.right_id,
+            ),
+            RelationJoinStrategy(
+                ItemLink,
+                ItemLink.id == ItemToItemLink.left_id,
+            ),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(

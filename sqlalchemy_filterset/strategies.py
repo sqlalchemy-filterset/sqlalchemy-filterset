@@ -1,5 +1,4 @@
 import copy
-from abc import ABC
 from typing import Any, List, Type, Union
 
 from sqlalchemy import literal_column, select
@@ -15,14 +14,17 @@ class BaseStrategy:
         return query.where(expression)
 
 
-class RelationJoinStrategy(BaseStrategy, ABC):
+class RelationJoinStrategy(BaseStrategy):
     def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
         self.model = model
         self.onclause = onclause
 
     def filter(self, query: Select, expression: Any) -> Select:
-        query = self._join_if_necessary(query)
+        query = self.apply_join(query)
         return query.where(expression)
+
+    def apply_join(self, query: Select) -> Select:
+        return self._join_if_necessary(query)
 
     def _join_if_necessary(self, query: Select) -> Select:
         joined_before = False
@@ -41,26 +43,22 @@ class RelationJoinStrategy(BaseStrategy, ABC):
         return query.join(self.model, onclause=onclause)
 
 
-class ManyToManyRelationJoinStrategy(BaseStrategy, ABC):
+class RelationOuterJoinStrategy(RelationJoinStrategy):
+    def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
+        return query.outerjoin(self.model, onclause=onclause)
+
+
+class JoinChainStrategy(BaseStrategy):
     def __init__(
         self,
-        association_model: Type[Model],
-        association_onclause: ColumnElement[bool],
-        model: Type[Model],
-        association_to_model_onclause: ColumnElement[bool],
+        *chain: RelationJoinStrategy,
     ) -> None:
-        self.association_model = association_model
-        self.association_onclause = association_onclause
-        self.model = model
-        self.association_to_model_onclause = association_to_model_onclause
+        self.chain = chain
 
     def filter(self, query: Select, expression: Any) -> Select:
-        query = RelationJoinStrategy(self.association_model, self.association_onclause).filter(
-            query, True
-        )
-        return RelationJoinStrategy(self.model, self.association_to_model_onclause).filter(
-            query, expression
-        )
+        for el in self.chain:
+            query = el.apply_join(query)
+        return query.where(expression)
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):
