@@ -37,6 +37,7 @@ class ParentFactory(AsyncSQLAlchemyModelFactory):
 class ItemFactory(AsyncSQLAlchemyModelFactory):
     id = factory.Faker("uuid4")
     parent = factory.SubFactory(ParentFactory)
+    grand_parent = factory.SubFactory(GrandParentFactory)
     date = factory.Faker("date_time_this_year")
     area = factory.Faker("pyint")
     is_active = factory.Faker("pybool")

@@ -60,3 +60,7 @@ class Item(Base):
         UUID, sa.ForeignKey("parent.id", ondelete="CASCADE"), nullable=False
     )
     parent: Mapped[Parent] = relationship("Parent", backref="childs")
+    grand_parent_id: sa.Column[uuid.UUID] = sa.Column(
+        UUID, sa.ForeignKey("grand_parent.id", ondelete="CASCADE"), nullable=False
+    )
+    grand_parent: Mapped[GrandParent] = relationship("GrandParent", backref="grandchilds")
