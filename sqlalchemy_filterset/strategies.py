@@ -30,20 +30,7 @@ class RelationJoinStrategy(ApplicableStrategy):
         self.onclause = onclause
 
     def apply(self, query: Select) -> Select:
-        return self._join_if_necessary(query)
-
-    def _join_if_necessary(self, query: Select) -> Select:
-        joined_before = False
-        for join in query.froms:
-            if hasattr(join, "right") and hasattr(join, "onclause"):
-                if join.right == self.model.__table__:
-                    if join.onclause.compare(self.onclause):
-                        joined_before = True
-                        break
-
-        if not joined_before:
-            query = self._build_join(query, onclause=self.onclause)
-        return query
+        return self._build_join(query, self.onclause)
 
     def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
         return query.join(self.model, onclause=onclause)

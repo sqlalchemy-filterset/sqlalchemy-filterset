@@ -13,7 +13,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         query = strategy.apply(select(Item.id))
         self.assert_compile(  # type: ignore[no-untyped-call]
             query,
-            "SELECT item.id FROM item JOIN parent " "ON parent.id = item.parent_id",
+            "SELECT item.id FROM item JOIN parent ON parent.id = item.parent_id",
             literal_binds=True,
         )
 

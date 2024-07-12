@@ -76,10 +76,11 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
             filter = self.filters[name]
             if hasattr(filter, "strategy") and isinstance(filter.strategy, ApplicableStrategy):
                 for strategy in applied_strategies:
-                    if strategy == applied_strategies:
+                    if strategy == filter.strategy:
                         break
                 else:
                     query = filter.strategy.apply(query)
+                    applied_strategies.append(filter.strategy)
             query = filter.filter(query, value, params)
         return query
 
