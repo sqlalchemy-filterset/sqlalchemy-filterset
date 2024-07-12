@@ -8,6 +8,9 @@ from tests.models.base import Item
 class TestBaseStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
+    def test_strategy_uniq(self) -> None:
+        assert BaseStrategy() != BaseStrategy()
+
     def test_filter(self) -> None:
         strategy = BaseStrategy()
         self.assert_compile(  # type: ignore[no-untyped-call]

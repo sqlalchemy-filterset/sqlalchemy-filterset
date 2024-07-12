@@ -38,9 +38,15 @@ class RelationJoinStrategy(ApplicableStrategy):
     def __eq__(self, another_strategy) -> bool:
         return (
             isinstance(another_strategy, RelationJoinStrategy)
+            and type(self) == type(another_strategy)
             and self.model == another_strategy.model
             and self.onclause.compare(another_strategy.onclause)
         )
+
+
+class RelationOuterJoinStrategy(RelationJoinStrategy):
+    def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
+        return query.outerjoin(self.model, onclause=onclause)
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):
