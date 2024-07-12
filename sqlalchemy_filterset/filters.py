@@ -1,19 +1,7 @@
 import abc
 import inspect
 import operator as op
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
 from sqlalchemy.sql import ColumnElement, Select
@@ -55,20 +43,15 @@ class BaseFilter:
         ...  # pragma: no cover
 
 
-TStrategy = TypeVar("TStrategy", bound=BaseStrategy)
-
-
-class Filter(BaseFilter, Generic[TStrategy]):
+class Filter(BaseFilter):
     """Filter results by field, value and lookup_expr"""
-
-    strategy: TStrategy
 
     def __init__(
         self,
         field: ModelAttribute,
         *,
         lookup_expr: LookupExpr = op.eq,
-        strategy: TStrategy = BaseStrategy(),
+        strategy: BaseStrategy = BaseStrategy(),
     ) -> None:
         """
         :param field: Model filed for filtration
@@ -116,7 +99,7 @@ class IsNullFilter(Filter):
         super().__init__(*args, **kwargs, lookup_expr=is_null)
 
 
-class RangeFilter(BaseFilter, Generic[TStrategy]):
+class RangeFilter(BaseFilter):
     """Filter results by field within specified range"""
 
     def __init__(
@@ -126,7 +109,7 @@ class RangeFilter(BaseFilter, Generic[TStrategy]):
         left_lookup_expr: LookupExpr = op.ge,
         right_lookup_expr: LookupExpr = op.le,
         logic_expr: Callable = sa.and_,
-        strategy: TStrategy = BaseStrategy(),
+        strategy: BaseStrategy = BaseStrategy(),
     ) -> None:
         """
         :param field: Filed of Model for filtration

@@ -88,6 +88,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
             Parent.date,
             strategy=RelationJoinStrategy(Parent, Item.parent_id == Parent.id),
         )
+        assert isinstance(filter_.strategy, RelationJoinStrategy)
         query = filter_.strategy.apply(select(Item.id))
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(query, (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),

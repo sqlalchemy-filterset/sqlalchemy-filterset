@@ -159,6 +159,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
             Parent.name,
             strategy=RelationJoinStrategy(Parent, Parent.id == Item.parent_id),
         )
+        assert isinstance(filter_.strategy, RelationJoinStrategy)
         query = filter_.strategy.apply(select(Item.id))
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(query, "test", {}),

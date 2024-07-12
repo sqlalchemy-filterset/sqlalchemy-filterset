@@ -14,7 +14,7 @@ class BaseStrategy:
     def filter(self, query: Select, expression: Any) -> Select:
         return query.where(expression)
 
-    def __eq__(self, another_strategy) -> bool:
+    def __eq__(self, another_strategy: Any) -> bool:
         return False
 
 
@@ -35,7 +35,7 @@ class RelationJoinStrategy(ApplicableStrategy):
     def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
         return query.join(self.model, onclause=onclause)
 
-    def __eq__(self, another_strategy) -> bool:
+    def __eq__(self, another_strategy: Any) -> bool:
         return (
             isinstance(another_strategy, RelationJoinStrategy)
             and type(self) == type(another_strategy)

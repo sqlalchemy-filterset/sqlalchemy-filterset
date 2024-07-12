@@ -1,7 +1,7 @@
 import abc
 import copy
 from collections import OrderedDict
-from typing import Any, Dict, Generic, Sequence, TypeVar
+from typing import Any, Dict, Generic, List, Sequence, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,7 +69,7 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
     def filter_query(self, params: Dict) -> Select:
         """Build filtration query"""
         query = self.get_base_query()
-        applied_strategies = []
+        applied_strategies: List[ApplicableStrategy] = []
         for name, value in params.items():
             if name not in self.filters:
                 continue
