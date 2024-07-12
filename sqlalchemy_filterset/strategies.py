@@ -1,5 +1,5 @@
+import abc
 import copy
-from abc import ABC, abstractmethod
 from typing import Any, List, Type, Union
 
 from sqlalchemy import literal_column, select
@@ -18,10 +18,10 @@ class BaseStrategy:
         return False
 
 
-class ApplicableStrategy(BaseStrategy, ABC):
-    @abstractmethod
+class ApplicableStrategy(BaseStrategy, abc.ABC):
+    @abc.abstractmethod
     def apply(self, query: Select) -> Select:
-        ...
+        ...  # pragma: no cover
 
 
 class RelationJoinStrategy(ApplicableStrategy):
