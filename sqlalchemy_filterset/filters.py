@@ -1,7 +1,19 @@
 import abc
 import inspect
 import operator as op
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+)
 
 import sqlalchemy as sa
 from sqlalchemy.sql import ColumnElement, Select
@@ -43,15 +55,20 @@ class BaseFilter:
         ...  # pragma: no cover
 
 
-class Filter(BaseFilter):
+TStrategy = TypeVar("TStrategy", bound=BaseStrategy)
+
+
+class Filter(BaseFilter, Generic[TStrategy]):
     """Filter results by field, value and lookup_expr"""
+
+    strategy: TStrategy
 
     def __init__(
         self,
         field: ModelAttribute,
         *,
         lookup_expr: LookupExpr = op.eq,
-        strategy: Optional[BaseStrategy] = None,
+        strategy: TStrategy = BaseStrategy(),
     ) -> None:
         """
         :param field: Model filed for filtration
@@ -62,7 +79,7 @@ class Filter(BaseFilter):
 
         self.field = field
         self.lookup_expr = lookup_expr
-        self.strategy = strategy if strategy is not None else BaseStrategy()
+        self.strategy = strategy
 
     def filter(self, query: Select, value: Any, values: Dict[str, Any]) -> Select:
         """Apply filtering by lookup_expr to a query instance
@@ -99,7 +116,7 @@ class IsNullFilter(Filter):
         super().__init__(*args, **kwargs, lookup_expr=is_null)
 
 
-class RangeFilter(BaseFilter):
+class RangeFilter(BaseFilter, Generic[TStrategy]):
     """Filter results by field within specified range"""
 
     def __init__(
@@ -109,7 +126,7 @@ class RangeFilter(BaseFilter):
         left_lookup_expr: LookupExpr = op.ge,
         right_lookup_expr: LookupExpr = op.le,
         logic_expr: Callable = sa.and_,
-        strategy: Optional[BaseStrategy] = None,
+        strategy: TStrategy = BaseStrategy(),
     ) -> None:
         """
         :param field: Filed of Model for filtration
@@ -125,7 +142,7 @@ class RangeFilter(BaseFilter):
         self.left_lookup_expr = left_lookup_expr
         self.right_lookup_expr = right_lookup_expr
         self.logic_expr = logic_expr
-        self.strategy = strategy if strategy is not None else BaseStrategy()
+        self.strategy = strategy
 
     def filter(
         self, query: Select, value: Optional[Tuple[Any, Any]], values: Dict[str, Any]

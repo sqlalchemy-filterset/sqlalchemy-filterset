@@ -1,5 +1,5 @@
 import copy
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, List, Type, Union
 
 from sqlalchemy import literal_column, select
@@ -14,15 +14,23 @@ class BaseStrategy:
     def filter(self, query: Select, expression: Any) -> Select:
         return query.where(expression)
 
+    def __eq__(self, another_strategy) -> bool:
+        return False
 
-class RelationJoinStrategy(BaseStrategy, ABC):
+
+class ApplicableStrategy(BaseStrategy, ABC):
+    @abstractmethod
+    def apply(self, query: Select) -> Select:
+        ...
+
+
+class RelationJoinStrategy(ApplicableStrategy):
     def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
         self.model = model
         self.onclause = onclause
 
-    def filter(self, query: Select, expression: Any) -> Select:
-        query = self._join_if_necessary(query)
-        return query.where(expression)
+    def apply(self, query: Select) -> Select:
+        return self._join_if_necessary(query)
 
     def _join_if_necessary(self, query: Select) -> Select:
         joined_before = False
@@ -39,6 +47,13 @@ class RelationJoinStrategy(BaseStrategy, ABC):
 
     def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
         return query.join(self.model, onclause=onclause)
+
+    def __eq__(self, another_strategy) -> bool:
+        return (
+            isinstance(another_strategy, RelationJoinStrategy)
+            and self.model == another_strategy.model
+            and self.onclause.compare(another_strategy.onclause)
+        )
 
 
 class RelationSubqueryExistsStrategy(BaseStrategy):

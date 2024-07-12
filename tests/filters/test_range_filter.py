@@ -88,8 +88,9 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
             Parent.date,
             strategy=RelationJoinStrategy(Parent, Item.parent_id == Parent.id),
         )
+        query = filter_.strategy.apply(select(Item.id))
         self.assert_compile(  # type: ignore[no-untyped-call]
-            filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),
+            filter_.filter(query, (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),
             "SELECT item.id FROM item JOIN parent ON item.parent_id = parent.id "
             "WHERE parent.date >= '2000-01-01 00:00:00' AND parent.date <= '2000-01-02 00:00:00'",
             literal_binds=True,

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import Select
 
 from sqlalchemy_filterset.filters import BaseFilter
+from sqlalchemy_filterset.strategies import ApplicableStrategy
 
 
 class FilterSetMetaclass(abc.ABCMeta):
@@ -68,10 +69,18 @@ class BaseFilterSet(Generic[Model], metaclass=FilterSetMetaclass):
     def filter_query(self, params: Dict) -> Select:
         """Build filtration query"""
         query = self.get_base_query()
+        applied_strategies = []
         for name, value in params.items():
             if name not in self.filters:
                 continue
-            query = self.filters[name].filter(query, value, params)
+            filter = self.filters[name]
+            if hasattr(filter, "strategy") and isinstance(filter.strategy, ApplicableStrategy):
+                for strategy in applied_strategies:
+                    if strategy == applied_strategies:
+                        break
+                else:
+                    query = filter.strategy.apply(query)
+            query = filter.filter(query, value, params)
         return query
 
     def count_query(self, params: Dict) -> Select:
