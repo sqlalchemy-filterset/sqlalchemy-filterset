@@ -13,7 +13,7 @@ from .filters import (
     RangeFilter,
     SearchFilter,
 )
-from .filtersets import AsyncFilterSet, FilterSet
+from .filtersets import AsyncFilterSet, BaseFilterSet, FilterSet
 from .strategies import BaseStrategy, RelationJoinStrategy, RelationSubqueryExistsStrategy
 
 __all__ = [
@@ -31,6 +31,7 @@ __all__ = [
     "SearchFilter",
     "IsNullFilter",
     "AsyncFilterSet",
+    "BaseFilterSet",
     "FilterSet",
     "BaseStrategy",
     "RelationJoinStrategy",
