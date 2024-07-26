@@ -1,4 +1,5 @@
 import copy
+import functools
 from typing import Any, List, Type, Union
 
 from sqlalchemy import literal_column, select
@@ -15,11 +16,18 @@ class BaseStrategy:
 
 
 class RelationJoinStrategy(BaseStrategy):
-    def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
+    def __init__(
+        self,
+        model: Type[Model],
+        onclause: ColumnElement[bool],
+        *,
+        is_outer: bool = False,
+        is_full: bool = False,
+    ) -> None:
         self.model = model
         self.onclause = onclause
-        self.is_outer = False
-        self.is_full = False
+        self.is_outer = is_outer
+        self.is_full = is_full
 
     def filter(self, query: Select, expression: Any) -> Select:
         query = self.apply_join(query)
@@ -54,12 +62,7 @@ class RelationJoinStrategy(BaseStrategy):
         return query
 
     def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
-        return query.join(self.model, onclause=onclause)
-
-
-class RelationOuterJoinStrategy(RelationJoinStrategy):
-    def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
-        return query.outerjoin(self.model, onclause=onclause)
+        return query.join(self.model, onclause=onclause, isouter=self.is_outer, full=self.is_full)
 
 
 class JoinChainStrategy(BaseStrategy):
@@ -70,8 +73,9 @@ class JoinChainStrategy(BaseStrategy):
         self.chain = chain
 
     def filter(self, query: Select, expression: Any) -> Select:
-        for el in self.chain:
-            query = el.apply_join(query)
+        query = functools.reduce(
+            lambda query, strategy: strategy.apply_join(query), self.chain, query
+        )
         return query.where(expression)
 
 

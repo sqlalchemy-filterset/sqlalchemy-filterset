@@ -17,6 +17,22 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
             literal_binds=True,
         )
 
+        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_outer=True)
+        self.assert_compile(  # type: ignore[no-untyped-call]
+            strategy.filter(select(Item.id), Parent.name == "test"),
+            "SELECT item.id FROM item LEFT OUTER JOIN parent "
+            "ON parent.id = item.parent_id WHERE parent.name = 'test'",
+            literal_binds=True,
+        )
+
+        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_full=True)
+        self.assert_compile(  # type: ignore[no-untyped-call]
+            strategy.filter(select(Item.id), Parent.name == "test"),
+            "SELECT item.id FROM item FULL OUTER JOIN parent "
+            "ON parent.id = item.parent_id WHERE parent.name = 'test'",
+            literal_binds=True,
+        )
+
     def test_double_join_preventing(self) -> None:
         strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
         self.assert_compile(  # type: ignore[no-untyped-call]
@@ -76,7 +92,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
 
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(
-                select(Item.id).outerjoin(Parent, onclause=Parent.id == Item.parent_id),
+                select(Item.id).join(Parent, onclause=Parent.id == Item.parent_id, isouter=True),
                 Parent.name == "test",
             ),
             "SELECT item.id FROM item "
