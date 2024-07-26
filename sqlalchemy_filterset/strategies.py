@@ -5,7 +5,7 @@ from typing import Any, List, Type, Union
 from sqlalchemy import literal_column, select
 from sqlalchemy.sql import Select
 from sqlalchemy.sql.elements import ColumnElement
-from sqlalchemy.sql.selectable import Exists, ScalarSelect
+from sqlalchemy.sql.selectable import Exists, Join, ScalarSelect
 
 from sqlalchemy_filterset.types import Model
 
@@ -19,6 +19,8 @@ class RelationJoinStrategy(BaseStrategy, ABC):
     def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
         self.model = model
         self.onclause = onclause
+        self.is_outer = False
+        self.is_full = False
 
     def filter(self, query: Select, expression: Any) -> Select:
         query = self._join_if_necessary(query)
@@ -26,12 +28,24 @@ class RelationJoinStrategy(BaseStrategy, ABC):
 
     def _join_if_necessary(self, query: Select) -> Select:
         joined_before = False
-        for join in query.froms:
-            if hasattr(join, "right") and hasattr(join, "onclause"):
-                if join.right == self.model.__table__:
-                    if join.onclause.compare(self.onclause):
-                        joined_before = True
-                        break
+        to_check = list(query.get_final_froms())
+        while to_check:
+            element = to_check.pop()
+            if not isinstance(element, Join):
+                continue
+
+            if (
+                element.right == self.model.__table__
+                and element.onclause is not None
+                and element.onclause.compare(self.onclause)
+                and element.isouter == self.is_outer
+                and element.full == self.is_full
+            ):
+                joined_before = True
+                break
+
+            to_check.append(element.left)
+            to_check.append(element.right)
 
         if not joined_before:
             query = self._build_join(query, onclause=self.onclause)
