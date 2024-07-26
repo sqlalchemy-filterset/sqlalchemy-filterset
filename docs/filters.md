@@ -340,7 +340,7 @@ Resulting sql expressions:
     and apply `LimitOffsetFilter`,
     we may end up with duplicate records. For example, if user with id 1 has 2 roles,
     we will get duplicate records of user 1 with different roles, which may affect the pagination results.
-    We need to be attentive and use `RelationSubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
+    We need to be attentive and use `SubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
     that the join statement is set up correctly and it will not cause any issues with the pagination results.
 
 
@@ -576,7 +576,7 @@ where category.title = 'test';
 ```
 
 
-### RelationSubqueryExistsStrategy
+### SubqueryExistsStrategy
 
 This strategy is good for many-to-one relations.
 It makes exists subquery with onclause and filter expression in `where`.
@@ -589,7 +589,7 @@ it will add filter expression to the `where` clause.
 ```python
 product_title = Filter(
     Product.title,
-    strategy=RelationSubqueryExistsStrategy(
+    strategy=SubqueryExistsStrategy(
         Product, onclause=Category.id == Product.category_id
     ),
 )

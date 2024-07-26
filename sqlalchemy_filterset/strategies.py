@@ -83,7 +83,7 @@ class MultiJoinStrategy(BaseStrategy):
         return query.where(expression)
 
 
-class RelationSubqueryExistsStrategy(BaseStrategy):
+class SubqueryExistsStrategy(BaseStrategy):
     """
     This strategy makes exist subquery to a related model.
     It also contains optimization:
@@ -131,7 +131,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
             ):
                 base_query_of_exists = clause.element.element
                 # Check base_query_of_exists is selecting from target table
-                if self.model.__table__ not in base_query_of_exists.froms:
+                if self.model.__table__ not in base_query_of_exists.get_final_froms():
                     continue
                 if self.__is_query_contains_onclause(base_query_of_exists, self.onclause):
                     return index
@@ -143,3 +143,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
             if onclause.compare(onclouse):
                 return True
         return False
+
+
+# TODO: Deprecated
+RelationSubqueryExistsStrategy = SubqueryExistsStrategy

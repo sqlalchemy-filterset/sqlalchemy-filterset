@@ -7,11 +7,7 @@ from sqlalchemy import and_, or_, select
 from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import RangeFilter
-from sqlalchemy_filterset.strategies import (
-    BaseStrategy,
-    JoinStrategy,
-    RelationSubqueryExistsStrategy,
-)
+from sqlalchemy_filterset.strategies import BaseStrategy, JoinStrategy, SubqueryExistsStrategy
 from sqlalchemy_filterset.types import ModelAttribute
 from tests.models.base import Item, Parent
 
@@ -73,7 +69,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_subquery_exists_strategy(self) -> None:
         filter_ = RangeFilter(
             Parent.date,
-            strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
+            strategy=SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),

@@ -19,6 +19,7 @@ from .strategies import (
     JoinStrategy,
     RelationJoinStrategy,
     RelationSubqueryExistsStrategy,
+    SubqueryExistsStrategy,
 )
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     "BaseStrategy",
     "JoinStrategy",
     "RelationJoinStrategy",
+    "SubqueryExistsStrategy",
     "RelationSubqueryExistsStrategy",
 ]
 
