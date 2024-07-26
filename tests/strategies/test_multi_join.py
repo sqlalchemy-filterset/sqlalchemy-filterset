@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import MultiJoinStrategy, RelationJoinStrategy
+from sqlalchemy_filterset.strategies import JoinStrategy, MultiJoinStrategy
 from tests.models.base import Item, ItemLink, ItemToItemLink
 
 
@@ -10,11 +10,11 @@ class TestMultiJoinStrategy(AssertsCompiledSQL):
 
     def test_filter(self) -> None:
         strategy = MultiJoinStrategy(
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
             ),
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemLink,
                 ItemLink.id == ItemToItemLink.left_id,
             ),
@@ -30,11 +30,11 @@ class TestMultiJoinStrategy(AssertsCompiledSQL):
 
     def test_double_join_preventing_association_table(self) -> None:
         strategy = MultiJoinStrategy(
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
             ),
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemLink,
                 ItemLink.id == ItemToItemLink.left_id,
             ),
@@ -50,11 +50,11 @@ class TestMultiJoinStrategy(AssertsCompiledSQL):
 
     def test_double_join_preventing(self) -> None:
         strategy = MultiJoinStrategy(
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
             ),
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemLink,
                 ItemLink.id == ItemToItemLink.left_id,
             ),
@@ -78,11 +78,11 @@ class TestMultiJoinStrategy(AssertsCompiledSQL):
 
     def test_double_join_with_different_onclause_association_table(self) -> None:
         strategy = MultiJoinStrategy(
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
             ),
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemLink,
                 ItemLink.id == ItemToItemLink.left_id,
             ),
@@ -102,11 +102,11 @@ class TestMultiJoinStrategy(AssertsCompiledSQL):
 
     def test_double_join_with_different_onclause(self) -> None:
         strategy = MultiJoinStrategy(
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
             ),
-            RelationJoinStrategy(
+            JoinStrategy(
                 ItemLink,
                 ItemLink.id == ItemToItemLink.left_id,
             ),

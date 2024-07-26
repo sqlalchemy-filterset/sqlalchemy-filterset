@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import RelationJoinStrategy
+from sqlalchemy_filterset.strategies import JoinStrategy
 from tests.models.base import GrandParent, Item, Parent
 
 
@@ -9,7 +9,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -17,7 +17,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
             literal_binds=True,
         )
 
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_outer=True)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_outer=True)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item LEFT OUTER JOIN parent "
@@ -25,7 +25,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
             literal_binds=True,
         )
 
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_full=True)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.parent_id, is_full=True)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item FULL OUTER JOIN parent "
@@ -34,7 +34,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing(self) -> None:
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item JOIN parent "
@@ -77,7 +77,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause(self) -> None:
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.id)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.id)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id).join(Parent), Parent.name == "test"),
             "SELECT item.id FROM item "
@@ -88,7 +88,7 @@ class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_join_types(self) -> None:
-        strategy = RelationJoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
+        strategy = JoinStrategy(Parent, onclause=Parent.id == Item.parent_id)
 
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(

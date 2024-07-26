@@ -7,11 +7,11 @@ from sqlalchemy_filterset import (
     Filter,
     FilterSet,
     InFilter,
+    JoinStrategy,
     LimitOffsetFilter,
     OrderingField,
     OrderingFilter,
     RangeFilter,
-    RelationJoinStrategy,
     SearchFilter,
 )
 
@@ -24,7 +24,7 @@ class ProductFilterSet(FilterSet):
     is_active = Filter(Product.is_active)
     category_type = Filter(
         Category.type,
-        strategy=RelationJoinStrategy(
+        strategy=JoinStrategy(
             Category,
             Product.category_id == Category.id,
         ),

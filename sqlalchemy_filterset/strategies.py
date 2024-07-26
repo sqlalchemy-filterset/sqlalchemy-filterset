@@ -15,7 +15,7 @@ class BaseStrategy:
         return query.where(expression)
 
 
-class RelationJoinStrategy(BaseStrategy):
+class JoinStrategy(BaseStrategy):
     def __init__(
         self,
         model: Type[Model],
@@ -65,10 +65,14 @@ class RelationJoinStrategy(BaseStrategy):
         return query.join(self.model, onclause=onclause, isouter=self.is_outer, full=self.is_full)
 
 
+# TODO: Deprecated
+RelationJoinStrategy = JoinStrategy
+
+
 class MultiJoinStrategy(BaseStrategy):
     def __init__(
         self,
-        *joins: RelationJoinStrategy,
+        *joins: JoinStrategy,
     ) -> None:
         self.joins = joins
 

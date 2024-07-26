@@ -9,7 +9,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 from sqlalchemy_filterset.filters import RangeFilter
 from sqlalchemy_filterset.strategies import (
     BaseStrategy,
-    RelationJoinStrategy,
+    JoinStrategy,
     RelationSubqueryExistsStrategy,
 )
 from sqlalchemy_filterset.types import ModelAttribute
@@ -86,7 +86,7 @@ class TestRangeFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = RangeFilter(
             Parent.date,
-            strategy=RelationJoinStrategy(Parent, Item.parent_id == Parent.id),
+            strategy=JoinStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), (datetime(2000, 1, 1), datetime(2000, 1, 2)), {}),

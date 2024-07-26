@@ -547,7 +547,7 @@ id = Filter(Product.id)
 id = Filter(Product.id, strategy=BaseStrategy())
 ```
 
-### RelationJoinStrategy
+### JoinStrategy
 
 Join strategies are good for filtering by one-to-many or one-to-one relations.
 It joins relation table by given `onclause`.
@@ -561,7 +561,7 @@ If a relation with the same `onclause` has already been joined it will not be jo
 ```python
 category_title = Filter(
     Category.title,
-    strategy=RelationJoinStrategy(
+    strategy=JoinStrategy(
         Category, onclause=Product.category_id == Category.id
     ),
 )

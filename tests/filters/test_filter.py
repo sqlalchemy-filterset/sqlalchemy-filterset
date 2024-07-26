@@ -13,7 +13,7 @@ from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.operators import icontains
 from sqlalchemy_filterset.strategies import (
     BaseStrategy,
-    RelationJoinStrategy,
+    JoinStrategy,
     RelationSubqueryExistsStrategy,
 )
 from sqlalchemy_filterset.types import ModelAttribute
@@ -157,7 +157,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationJoinStrategy(Parent, Parent.id == Item.parent_id),
+            strategy=JoinStrategy(Parent, Parent.id == Item.parent_id),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), "test", {}),
