@@ -5,7 +5,7 @@ from sqlalchemy_filterset.strategies import JoinStrategy
 from tests.models.base import GrandParent, Item, Parent
 
 
-class TestRelationInnerJoinStrategy(AssertsCompiledSQL):
+class TestJoinStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:

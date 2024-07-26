@@ -17,6 +17,7 @@ from .filtersets import AsyncFilterSet, BaseFilterSet, FilterSet
 from .strategies import (
     BaseStrategy,
     JoinStrategy,
+    MultiJoinStrategy,
     RelationJoinStrategy,
     RelationSubqueryExistsStrategy,
     SubqueryExistsStrategy,
@@ -41,6 +42,7 @@ __all__ = [
     "FilterSet",
     "BaseStrategy",
     "JoinStrategy",
+    "MultiJoinStrategy",
     "RelationJoinStrategy",
     "SubqueryExistsStrategy",
     "RelationSubqueryExistsStrategy",

@@ -1,7 +1,7 @@
 import uuid
 
 from pydantic import BaseModel
-from webapp.models import Category, CategoryType, Product
+from webapp.models import Category, CategoryType, Product, Tag, TagToProduct
 
 from sqlalchemy_filterset import (
     Filter,
@@ -9,6 +9,7 @@ from sqlalchemy_filterset import (
     InFilter,
     JoinStrategy,
     LimitOffsetFilter,
+    MultiJoinStrategy,
     OrderingField,
     OrderingFilter,
     RangeFilter,
@@ -29,6 +30,13 @@ class ProductFilterSet(FilterSet):
             Product.category_id == Category.id,
         ),
     )
+    tag_title = Filter(
+        Tag.title,
+        strategy=MultiJoinStrategy(
+            JoinStrategy(TagToProduct, onclause=Product.id == TagToProduct.right_id),
+            JoinStrategy(Tag, onclause=Tag.id == TagToProduct.left_id),
+        ),
+    )
     ordering = OrderingFilter(
         name=OrderingField(Product.name),
         price=OrderingField(Product.price),
@@ -43,6 +51,7 @@ class ProductFilterSchema(BaseModel):
     price: tuple[float, float] | None
     is_active: bool | None
     category_type: CategoryType | None
+    tag_title: str | None
     ordering: list[str] | None
     limit_offset: tuple[int | None, int | None] | None
 
