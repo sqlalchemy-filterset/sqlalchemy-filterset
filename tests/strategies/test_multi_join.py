@@ -1,15 +1,15 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import JoinChainStrategy, RelationJoinStrategy
+from sqlalchemy_filterset.strategies import MultiJoinStrategy, RelationJoinStrategy
 from tests.models.base import Item, ItemLink, ItemToItemLink
 
 
-class TestJoinChainStrategy(AssertsCompiledSQL):
+class TestMultiJoinStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = JoinChainStrategy(
+        strategy = MultiJoinStrategy(
             RelationJoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
@@ -29,7 +29,7 @@ class TestJoinChainStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing_association_table(self) -> None:
-        strategy = JoinChainStrategy(
+        strategy = MultiJoinStrategy(
             RelationJoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
@@ -49,7 +49,7 @@ class TestJoinChainStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_preventing(self) -> None:
-        strategy = JoinChainStrategy(
+        strategy = MultiJoinStrategy(
             RelationJoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
@@ -77,7 +77,7 @@ class TestJoinChainStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause_association_table(self) -> None:
-        strategy = JoinChainStrategy(
+        strategy = MultiJoinStrategy(
             RelationJoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,
@@ -101,7 +101,7 @@ class TestJoinChainStrategy(AssertsCompiledSQL):
         )
 
     def test_double_join_with_different_onclause(self) -> None:
-        strategy = JoinChainStrategy(
+        strategy = MultiJoinStrategy(
             RelationJoinStrategy(
                 ItemToItemLink,
                 Item.id == ItemToItemLink.right_id,

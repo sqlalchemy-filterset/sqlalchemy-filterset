@@ -65,16 +65,16 @@ class RelationJoinStrategy(BaseStrategy):
         return query.join(self.model, onclause=onclause, isouter=self.is_outer, full=self.is_full)
 
 
-class JoinChainStrategy(BaseStrategy):
+class MultiJoinStrategy(BaseStrategy):
     def __init__(
         self,
-        *chain: RelationJoinStrategy,
+        *joins: RelationJoinStrategy,
     ) -> None:
-        self.chain = chain
+        self.joins = joins
 
     def filter(self, query: Select, expression: Any) -> Select:
         query = functools.reduce(
-            lambda query, strategy: strategy.apply_join(query), self.chain, query
+            lambda query, strategy: strategy.apply_join(query), self.joins, query
         )
         return query.where(expression)
 
