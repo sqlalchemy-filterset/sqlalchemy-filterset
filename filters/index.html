@@ -1,0 +1,1680 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SQLAlchemy Filterset - an easy way to create adaptive filters and filter SQLAlchemy queries">
+      
+      
+      
+        <link rel="canonical" href="https://sqlalchemy-filterset.github.io/sqlalchemy-filterset/filters/">
+      
+      
+        <link rel="prev" href="../filtersets/">
+      
+      
+        <link rel="next" href="../examples/fastapi/">
+      
+      
+      <link rel="icon" href="../img/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.2.7">
+    
+    
+      
+        <title>Filters - SQLAlchemy Filterset</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-95YP40ZTZ1"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-95YP40ZTZ1",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-95YP40ZTZ1",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SQLAlchemy Filterset" class="md-header__button md-logo" aria-label="SQLAlchemy Filterset" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 12v7.88c.04.3-.06.62-.29.83a.996.996 0 0 1-1.41 0l-2.01-2.01a.989.989 0 0 1-.29-.83V12h-.03L4.21 4.62a1 1 0 0 1 .17-1.4c.19-.14.4-.22.62-.22h14c.22 0 .43.08.62.22a1 1 0 0 1 .17 1.4L14.03 12H14Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SQLAlchemy Filterset
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Filters
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/sqlalchemy-filterset/sqlalchemy-filterset" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sqlalchemy-filterset
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SQLAlchemy Filterset" class="md-nav__button md-logo" aria-label="SQLAlchemy Filterset" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 12v7.88c.04.3-.06.62-.29.83a.996.996 0 0 1-1.41 0l-2.01-2.01a.989.989 0 0 1-.29-.83V12h-.03L4.21 4.62a1 1 0 0 1 .17-1.4c.19-.14.4-.22.62-.22h14c.22 0 .43.08.62.22a1 1 0 0 1 .17 1.4L14.03 12H14Z"/></svg>
+
+    </a>
+    SQLAlchemy Filterset
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sqlalchemy-filterset/sqlalchemy-filterset" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    sqlalchemy-filterset
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../filtersets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Filtersets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Filters
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Filters
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-filters" class="md-nav__link">
+    Base filters
+  </a>
+  
+    <nav class="md-nav" aria-label="Base filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filter" class="md-nav__link">
+    Filter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rangefilter" class="md-nav__link">
+    RangeFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#searchfilter" class="md-nav__link">
+    SearchFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    Sorting
+  </a>
+  
+    <nav class="md-nav" aria-label="Sorting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#orderingfilter" class="md-nav__link">
+    OrderingFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    Pagination
+  </a>
+  
+    <nav class="md-nav" aria-label="Pagination">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limitoffsetfilter" class="md-nav__link">
+    LimitOffsetFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-filters" class="md-nav__link">
+    Custom filters
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#infilternotinfilter" class="md-nav__link">
+    InFilter/NotInFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#booleanfilter" class="md-nav__link">
+    BooleanFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methodfilter" class="md-nav__link">
+    MethodFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-filter" class="md-nav__link">
+    Custom filter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-strategy" class="md-nav__link">
+    Filter strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basestrategy" class="md-nav__link">
+    BaseStrategy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joinstrategy" class="md-nav__link">
+    JoinStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="JoinStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multijoinstrategy" class="md-nav__link">
+    MultiJoinStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="MultiJoinStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subqueryexistsstrategy" class="md-nav__link">
+    SubqueryExistsStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="SubqueryExistsStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_2" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/fastapi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FastApi
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-filters" class="md-nav__link">
+    Base filters
+  </a>
+  
+    <nav class="md-nav" aria-label="Base filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filter" class="md-nav__link">
+    Filter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rangefilter" class="md-nav__link">
+    RangeFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#searchfilter" class="md-nav__link">
+    SearchFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    Sorting
+  </a>
+  
+    <nav class="md-nav" aria-label="Sorting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#orderingfilter" class="md-nav__link">
+    OrderingFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    Pagination
+  </a>
+  
+    <nav class="md-nav" aria-label="Pagination">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limitoffsetfilter" class="md-nav__link">
+    LimitOffsetFilter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-filters" class="md-nav__link">
+    Custom filters
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#infilternotinfilter" class="md-nav__link">
+    InFilter/NotInFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#booleanfilter" class="md-nav__link">
+    BooleanFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methodfilter" class="md-nav__link">
+    MethodFilter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-filter" class="md-nav__link">
+    Custom filter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-strategy" class="md-nav__link">
+    Filter strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basestrategy" class="md-nav__link">
+    BaseStrategy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joinstrategy" class="md-nav__link">
+    JoinStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="JoinStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multijoinstrategy" class="md-nav__link">
+    MultiJoinStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="MultiJoinStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subqueryexistsstrategy" class="md-nav__link">
+    SubqueryExistsStrategy
+  </a>
+  
+    <nav class="md-nav" aria-label="SubqueryExistsStrategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_2" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>Filters</h1>
+
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The <code>Filter</code> class is used to filter records in a database.
+When we filter a query using a <code>FilterSet</code>, each filter sequentially takes a query object and a value argument.
+The query object is the base query that the <code>Filter</code> will modify with the specified filter, while the value argument is the value to use for filtering.</p>
+<h2 id="base-filters">Base filters<a class="headerlink" href="#base-filters" title="Permanent link">&para;</a></h2>
+<h3 id="filter">Filter<a class="headerlink" href="#filter" title="Permanent link">&para;</a></h3>
+<p>The Filter filters records in a database by field and <code>lookup_expr</code>.</p>
+<ul>
+<li><code>field</code> - a field in a database model that the <code>Filter</code> will be applied to.</li>
+<li><code>lookup_expr</code> - a function that represents a lookup expression, such as an operator from the operator or <code>sqlalchemy.sql.operators</code> modules.</li>
+</ul>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="kn">import</span> <span class="n">operators</span> <span class="k">as</span> <span class="n">sa_op</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">Filter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">lookup_expr</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">eq</span><span class="p">)</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">lookup_expr</span><span class="o">=</span><span class="n">sa_op</span><span class="o">.</span><span class="n">in_op</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">lookup_expr</span><span class="o">=</span><span class="n">sa_op</span><span class="o">.</span><span class="n">ilike_op</span><span class="p">)</span>
+
+
+<span class="c1"># filter records by id = 123</span>
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">123</span><span class="p">}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">dict</label><label for="__tabbed_1_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">value1</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="s2">&quot;some string&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field1&quot;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s2">&quot;field2&quot;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">field1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">field2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+
+
+<span class="n">value1</span> <span class="o">=</span> <span class="mi">123</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="s2">&quot;some string&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span><span class="n">field1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">field2</span><span class="o">=</span><span class="n">value2</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
+    <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"id": 123}</code></td>
+<td><code>select * from product where id = 123;</code></td>
+</tr>
+<tr>
+<td><code>{"ids": [123, 345, 678]}</code></td>
+<td><code>select * from product where id in (123, 345, 678);</code></td>
+</tr>
+<tr>
+<td><code>{"name": "some name"}</code></td>
+<td><code>select * from product where name like 'some name';</code></td>
+</tr>
+</tbody>
+</table>
+<p>Here are some examples of sql conditions to be generated by various lookup expressions:</p>
+<table>
+<thead>
+<tr>
+<th>operator</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>operator.eq</td>
+<td>field = value</td>
+</tr>
+<tr>
+<td>operator.ne</td>
+<td>field != value</td>
+</tr>
+<tr>
+<td>operator.le</td>
+<td>field &lt;= value</td>
+</tr>
+<tr>
+<td>operator.lt</td>
+<td>field &lt; value</td>
+</tr>
+<tr>
+<td>operator.ge</td>
+<td>field &gt;= value</td>
+</tr>
+<tr>
+<td>operator.gt</td>
+<td>field &gt; value</td>
+</tr>
+<tr>
+<td>sqlalchemy.sql.operators.in_op</td>
+<td>field IN value</td>
+</tr>
+<tr>
+<td>sqlalchemy.sql.operators.is_</td>
+<td>field IS value</td>
+</tr>
+<tr>
+<td>sqlalchemy.sql.operators.like_op</td>
+<td>field LIKE value</td>
+</tr>
+<tr>
+<td>sqlalchemy.sql.operators.ilike_op</td>
+<td>LOWER(field) LIKE value</td>
+</tr>
+</tbody>
+</table>
+<p>All available operators can be found in the following modules: <br>
+<a href="https://docs.python.org/3/library/operator.html"><code>operator</code></a>,
+<a href="https://docs.sqlalchemy.org/en/20/core/operators.html"><code>sqlalchemy.sql.operators</code></a>,
+<a href="https://github.com/sqlalchemy-filterset/sqlalchemy-filterset/blob/main/sqlalchemy_filterset/operators.py"><code>sqlalchemy-filterset.operators</code></a></p>
+<h3 id="rangefilter">RangeFilter<a class="headerlink" href="#rangefilter" title="Permanent link">&para;</a></h3>
+<p>The <code>RangeFilter</code> class is used to filter records in a database by a specific field within a specified range from start to end values.</p>
+<ul>
+<li><code>field</code> - a field in a database model that the RangeFilter will be applied to.</li>
+<li><code>left_lookup_expr/right_lookup_expr</code> - lookup expressions, such as operators from the operator module (<code>op.ge</code>, <code>op.gt</code>, <code>op.le</code>, <code>op.lt</code>).</li>
+<li><code>logic_expr</code> - logical operator, such as and_ or or_, that is used to produce a conjunction of the border expressions.</li>
+</ul>
+<p>For example:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">RangeFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">RangeFilter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>
+    <span class="n">price_outer</span> <span class="o">=</span> <span class="n">RangeFilter</span><span class="p">(</span>
+        <span class="n">Product</span><span class="o">.</span><span class="n">price</span><span class="p">,</span>
+        <span class="n">left_lookup_expr</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span>
+        <span class="n">right_lookup_expr</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
+        <span class="n">logic_expr</span><span class="o">=</span><span class="n">sa_op</span><span class="o">.</span><span class="n">or_</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># filter records by the price field within a range of 1000 to 5000</span>
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">dict</label><label for="__tabbed_2_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">start_value1</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">end_value1</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">start_value1</span><span class="p">,</span> <span class="n">end_value1</span><span class="p">)}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">price</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+
+
+<span class="n">start_value1</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">end_value1</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span><span class="n">field1</span><span class="o">=</span><span class="p">(</span><span class="n">start_value1</span><span class="p">,</span> <span class="n">end_value1</span><span class="p">))</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
+    <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"price": (100, 1000)}</code></td>
+<td><code>select * from product where price &gt;= 100 and price &lt;= 1000;</code></td>
+</tr>
+<tr>
+<td><code>{"price_outer": (100, 1000)}</code></td>
+<td><code>select * from product where price &lt; 100 or price &gt; 1000;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="searchfilter">SearchFilter<a class="headerlink" href="#searchfilter" title="Permanent link">&para;</a></h3>
+<p><code>SearchFilter</code> allows you to search for a given string in specified fields.</p>
+<ul>
+<li><code>*fields</code> - one or several fields in a database model that the <code>SearchFilter</code> will be applied to.</li>
+<li><code>lookup_expr</code> - lookup expression, default - <code>lower(field) like '%{value}%'</code>.</li>
+<li><code>logic_expr</code> - logical operator, such as <code>and_</code> or <code>or_</code>, to produce a conjunction of search expressions.</li>
+</ul>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">SearchFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="n">SearchFilter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">Product</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+
+
+<span class="c1"># filter records where name or description filds contain the text &#39;string&#39;</span>
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">dict</label><label for="__tabbed_3_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">value1</span> <span class="o">=</span> <span class="s2">&quot;string1&quot;</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="s2">&quot;string2&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field1&quot;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s2">&quot;field2&quot;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">field1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">field2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+
+
+<span class="n">value1</span> <span class="o">=</span> <span class="s2">&quot;string1&quot;</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="s2">&quot;string2&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span><span class="n">field1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">field2</span><span class="o">=</span><span class="n">value2</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
+    <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"search": "string"}</code></td>
+<td><code>select * from product</code><br><code>where lower(name) like '%string%' or lower(description) like '%string%';</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul>
+<li>Sql expression depends on the database engine. For more information, see the <a href="https://docs.sqlalchemy.org/en/14/core/sqlelement.html#sqlalchemy.sql.expression.ColumnElement.ilike">official documentation sqlalchemy</a>.</li>
+</ul>
+</div>
+<h2 id="sorting">Sorting<a class="headerlink" href="#sorting" title="Permanent link">&para;</a></h2>
+<h3 id="orderingfilter">OrderingFilter<a class="headerlink" href="#orderingfilter" title="Permanent link">&para;</a></h3>
+<p><code>OrderingFilter</code> allows you to specify the order in which the results of a query should be returned by adding an <code>order by</code> clause to the query based on specified fields.</p>
+<ul>
+<li><code>**fields</code> - one or several OrderingField that define possible sorting options.</li>
+</ul>
+<p><code>OrderingField</code></p>
+<ul>
+<li><code>field</code> - a field in a database model that the <code>OrderingFilter</code> will be applied to.</li>
+<li><code>nulls</code> - specifies whether null values should be sorted first or last.</li>
+</ul>
+<p>To apply the <code>OrderingFilter</code> to a query, pass it a sequence of field names and the direction of the ordering (ascending or descending by prefixing with "-").</p>
+<p>Here's an example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">OrderingFilter</span><span class="p">,</span> <span class="n">OrderingField</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">ordering</span> <span class="o">=</span> <span class="n">OrderingFilter</span><span class="p">(</span>
+        <span class="n">price</span><span class="o">=</span><span class="n">OrderingField</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">price</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">OrderingField</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nulls</span><span class="o">=</span><span class="n">NullsPosition</span><span class="o">.</span><span class="n">last</span><span class="p">),</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">OrderingField</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="c1"># order records by name, descending price and by id</span>
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ordering&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;-price&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">dict</label><label for="__tabbed_4_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">ordering_field1</span> <span class="o">=</span> <span class="s2">&quot;field1&quot;</span>
+<span class="n">ordering_field2</span> <span class="o">=</span> <span class="s2">&quot;-field2&quot;</span>
+<span class="n">ordering_field3</span> <span class="o">=</span> <span class="s2">&quot;field3&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ordering&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ordering_field1</span><span class="p">,</span> <span class="n">ordering_field2</span><span class="p">,</span> <span class="n">ordering_field3</span><span class="p">]}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">ordering</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+
+
+<span class="n">ordering_field1</span> <span class="o">=</span> <span class="s2">&quot;field1&quot;</span>
+<span class="n">ordering_field2</span> <span class="o">=</span> <span class="s2">&quot;-field2&quot;</span>
+<span class="n">ordering_field3</span> <span class="o">=</span> <span class="s2">&quot;field3&quot;</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span>
+    <span class="n">ordering</span><span class="o">=</span><span class="p">[</span><span class="n">ordering_field1</span><span class="p">,</span> <span class="n">ordering_field2</span><span class="p">,</span> <span class="n">ordering_field3</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"ordering": ["price"]}</code></td>
+<td><code>select * from product order by price;</code></td>
+</tr>
+<tr>
+<td><code>{"ordering": ["-price", "id"]}</code></td>
+<td><code>select * from product order by price desc, id;</code></td>
+</tr>
+<tr>
+<td><code>{"ordering": ["name", "-price", "id"]}</code></td>
+<td><code>select * from product</code><br><code>order by name nulls last, price desc, id;</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="pagination">Pagination<a class="headerlink" href="#pagination" title="Permanent link">&para;</a></h2>
+<h3 id="limitoffsetfilter">LimitOffsetFilter<a class="headerlink" href="#limitoffsetfilter" title="Permanent link">&para;</a></h3>
+<p><code>LimitOffsetFilter</code> applies limit and offset pagination to a query.
+It is used to limit the number of results returned by the query and to specify a starting point (offset) in the results.</p>
+<p>This is useful for paginating results when displaying them to the user,
+as it allows you to retrieve a specific page of results rather than retrieving all results at once.</p>
+<p>To use <code>LimitOffsetFilter</code>, you pass it a query instance and a tuple containing the limit and offset values. Here is an example:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">LimitOffsetFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">pagination</span> <span class="o">=</span> <span class="n">LimitOffsetFilter</span><span class="p">()</span>
+
+
+<span class="c1"># Out of the 100 records received in total,</span>
+<span class="c1"># only 10 records should be returned, starting from the 20th record.</span>
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">dict</label><label for="__tabbed_5_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">limit_value</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">offset_value</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pagination&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">limit_value</span><span class="p">,</span> <span class="n">offset_value</span><span class="p">)}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">pagination</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+
+<span class="n">limit_value</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">offset_value</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span>
+    <span class="n">pagination</span><span class="o">=</span><span class="p">(</span><span class="n">limit_value</span><span class="p">,</span> <span class="n">offset_value</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"pagination": (10, 0)}</code></td>
+<td><code>select * from product limit 10 offset 0;</code></td>
+</tr>
+<tr>
+<td><code>{"pagination": (10, 10)}</code></td>
+<td><code>select * from product limit 10 offset 10;</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">LimitOffsetFilter and Joined Tables: Getting Accurate Pagination Results</p>
+<ul>
+<li>
+<p>When using this filter with joined tables, be aware that the join may modify
+the resulting set of records, which can affect the accuracy of pagination.
+This may include issues such as duplicate records or excluded records.
+It is important to take this into consideration and ensure
+that the join is properly set up to avoid these issues when using the <code>LimitOffsetFilter</code>.</p>
+</li>
+<li>
+<p>If we use the query:
+<div class="highlight"><pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">roles</span><span class="p">.</span><span class="o">*</span>
+<span class="k">from</span><span class="w"> </span><span class="n">users</span>
+<span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">user_roles</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">user_roles</span><span class="p">.</span><span class="n">user_id</span>
+<span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">roles</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">user_roles</span><span class="p">.</span><span class="n">role_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">roles</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</code></pre></div>
+and apply <code>LimitOffsetFilter</code>,
+we may end up with duplicate records. For example, if user with id 1 has 2 roles,
+we will get duplicate records of user 1 with different roles, which may affect the pagination results.
+We need to be attentive and use <code>SubqueryExistsStrategy</code> or modify sql query with group by or other methods to ensure
+that the join statement is set up correctly and it will not cause any issues with the pagination results.</p>
+</li>
+</ul>
+</div>
+<h2 id="custom-filters">Custom filters<a class="headerlink" href="#custom-filters" title="Permanent link">&para;</a></h2>
+<h3 id="infilternotinfilter">InFilter/NotInFilter<a class="headerlink" href="#infilternotinfilter" title="Permanent link">&para;</a></h3>
+<p><code>InFilter</code> and <code>NotInFilter</code> are subclasses of the Filter class and allow you to filter a field based on a list using the <code>IN</code> and <code>NOT IN</code> SQL operators, respectively.
+Under the hood it is a <code>Filter</code> with special <code>in</code>/<code>not_in</code> lookup expressions.</p>
+<p>To use these filters, you can specify them in your <code>FilterSet</code> class like any other <code>Filter</code> and pass them a list of values to filter by. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">InFilter</span><span class="p">,</span> <span class="n">NotInFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">InFilter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">excluded_ids</span> <span class="o">=</span> <span class="n">NotInFilter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;excluded_ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">dict</label><label for="__tabbed_6_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">value1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">]</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field1&quot;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s2">&quot;field2&quot;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">field1</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">field2</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+
+<span class="n">value1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">]</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span><span class="n">field1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">field2</span><span class="o">=</span><span class="n">value2</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
+    <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"ids": [1, 2, 3]}</code></td>
+<td><code>select * from product where id in (1, 2, 3);</code></td>
+</tr>
+<tr>
+<td><code>{"excluded_ids": [1, 2, 3]}</code></td>
+<td><code>select * from product where id not in (1, 2, 3);</code></td>
+</tr>
+<tr>
+<td><code>{"ids": []}</code></td>
+<td><code>select * from product where id IN (NULL) AND (1 != 1);</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul>
+<li>
+<p>Filtering by <code>None</code> value is not possible for sqlalchemy <code>in_</code> operator.</p>
+</li>
+<li>
+<p>By passing an empty list, filtering will work according to the standard sqlalchemy rules: <a href="https://docs.sqlalchemy.org/en/20/core/operators.html">Empty IN Expressions</a>.</p>
+</li>
+</ul>
+</div>
+<h3 id="booleanfilter">BooleanFilter<a class="headerlink" href="#booleanfilter" title="Permanent link">&para;</a></h3>
+<p><code>BooleanFilter</code> is a subclass of the <code>Filter</code> class that allows you to filter a field based on a boolean value using the <code>=</code>/<code>!=</code> SQL operators.
+Under the hood it is a <code>Filter</code> with special <code>operator.eq</code> and <code>operator.ne</code> lookup expressions.</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">BooleanFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">BooleanFilter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">is_active</span><span class="p">)</span>
+
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is_active&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div></p>
+<p>Filter schema pattern:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">dict</label><label for="__tabbed_7_2">pydantic</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">value1</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;field1&quot;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s2">&quot;field2&quot;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductFilterSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">field1</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">field2</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+
+<span class="n">value1</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="n">ProductFilterSchema</span><span class="p">(</span><span class="n">field1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">field2</span><span class="o">=</span><span class="n">value2</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
+    <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"is_active": True}</code></td>
+<td><code>select * from product where is_active is true;</code></td>
+</tr>
+<tr>
+<td><code>{"is_active": False}</code></td>
+<td><code>select * from product where is_active is false;</code></td>
+</tr>
+<tr>
+<td><code>{"is_active": None}</code></td>
+<td><code>select * from product where is_active is null;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="methodfilter">MethodFilter<a class="headerlink" href="#methodfilter" title="Permanent link">&para;</a></h3>
+<p><code>MethodFilter</code> allows to define a custom filtering behavior for a particular field.</p>
+<p>Here's an example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="kn">import</span> <span class="n">Select</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">or_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">MethodFilter</span>
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">available</span> <span class="o">=</span> <span class="n">MethodFilter</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;filter_available&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_available</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="n">Select</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Select</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">and_</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">is_active</span><span class="o">.</span><span class="n">is_</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">Product</span><span class="o">.</span><span class="n">price</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">or_</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">is_active</span><span class="o">.</span><span class="n">is_</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">Product</span><span class="o">.</span><span class="n">price</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span>
+
+
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div>
+<p>Filter schema pattern is custom and depends on the <code>value</code> attribute expected in the <code>MethodFilter</code> filter method.</p>
+<p>Resulting sql expressions:</p>
+<table>
+<thead>
+<tr>
+<th>filter_params</th>
+<th>SQL expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{"available": True}</code></td>
+<td><code>select * from product where is_active is true and price &gt; 100;</code></td>
+</tr>
+<tr>
+<td><code>{"available": False}</code></td>
+<td><code>select * from product where is_active is false or price &lt;= 100;</code></td>
+</tr>
+<tr>
+<td><code>{"available": None}</code></td>
+<td><code>select * from product;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-filter">Custom filter<a class="headerlink" href="#custom-filter" title="Permanent link">&para;</a></h3>
+<p>An alternative way to add custom filter behavior is to create a separate filter.
+To achieve this, a <code>CustomFilter</code> must extend the base filter class and override its filter method.</p>
+<p>For example, the behavior of the filter method example above can be achieved as follows:
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.sql</span> <span class="kn">import</span> <span class="n">Select</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">or_</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy_filterset</span> <span class="kn">import</span> <span class="n">FilterSet</span><span class="p">,</span> <span class="n">BaseFilter</span>
+
+
+<span class="k">class</span> <span class="nc">AvailableFilter</span><span class="p">(</span><span class="n">BaseFilter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Select</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Select</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">and_</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">is_active</span><span class="o">.</span><span class="n">is_</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">Product</span><span class="o">.</span><span class="n">price</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="n">or_</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">is_active</span><span class="o">.</span><span class="n">is_</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">Product</span><span class="o">.</span><span class="n">price</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span>
+
+
+
+<span class="k">class</span> <span class="nc">ProductFilterSet</span><span class="p">(</span><span class="n">FilterSet</span><span class="p">):</span>
+    <span class="n">available</span> <span class="o">=</span> <span class="n">AvailableFilter</span><span class="p">()</span>
+
+
+<span class="n">filter_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">filter_set</span> <span class="o">=</span> <span class="n">ProductFilterSet</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">select</span><span class="p">(</span><span class="n">Product</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">filter_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">filter_params</span><span class="p">)</span>
+</code></pre></div></p>
+<h2 id="filter-strategy">Filter strategy<a class="headerlink" href="#filter-strategy" title="Permanent link">&para;</a></h2>
+<p>Strategy is part of a <code>Filter</code> that controls how to connect the <code>Filter</code> expression with a query.
+The main target of it is filtering by related models in the most optimized way.</p>
+<h3 id="basestrategy">BaseStrategy<a class="headerlink" href="#basestrategy" title="Permanent link">&para;</a></h3>
+<p><code>BaseStrategy</code> is the simplest and default strategy. It simply connects the expression built by <code>Filter</code> to query
+by <code>query.where</code> method.  It's the default value of filters.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># The same result</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="n">BaseStrategy</span><span class="p">())</span>
+</code></pre></div>
+<h3 id="joinstrategy">JoinStrategy<a class="headerlink" href="#joinstrategy" title="Permanent link">&para;</a></h3>
+<p>Join strategies are good for filtering by one-to-many or one-to-one relations.
+It joins table by given <code>onclause</code>.
+If a table with the same <code>onclause</code> has already been joined it will not be joined twice.</p>
+<ul>
+<li><code>model</code> - a model or table which you want to join.</li>
+<li><code>oncaluse</code> - an onclause expression that will be used for the join.</li>
+<li><code>is_outer</code> - if True, generate <code>LEFT OUTER</code> join. Default False.</li>
+<li><code>is_full</code> - if True, generate <code>FULL OUTER</code> join. Default False.</li>
+</ul>
+<h4 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">category_title</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span>
+    <span class="n">Category</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">JoinStrategy</span><span class="p">(</span>
+        <span class="n">Category</span><span class="p">,</span> <span class="n">onclause</span><span class="o">=</span><span class="n">Product</span><span class="o">.</span><span class="n">category_id</span> <span class="o">==</span> <span class="n">Category</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example of result query:
+<div class="highlight"><pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">product</span>
+<span class="w">  </span><span class="k">join</span><span class="w"> </span><span class="n">category</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">category</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">category_id</span>
+<span class="k">where</span><span class="w"> </span><span class="n">category</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+<h3 id="multijoinstrategy">MultiJoinStrategy<a class="headerlink" href="#multijoinstrategy" title="Permanent link">&para;</a></h3>
+<p>Apply multiple <code>JoinStrategy</code> for filter. May used in cases of many-to-many filters.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Every case of many-to-many filtering is unique and requires query analysis.
+Do not use it <code>MultiJoinStrategy</code> blindly.</p>
+</div>
+<ul>
+<li><code>*joins</code> - sequence of <code>JoinStrategy</code> you want to apply.</li>
+</ul>
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">tag_title</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span>
+    <span class="n">Tag</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">MultiJoinStrategy</span><span class="p">(</span>
+        <span class="n">JoinStrategy</span><span class="p">(</span><span class="n">TagToProduct</span><span class="p">,</span> <span class="n">onclause</span><span class="o">=</span><span class="n">Product</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">TagToProduct</span><span class="o">.</span><span class="n">right_id</span><span class="p">),</span>
+        <span class="n">JoinStrategy</span><span class="p">(</span><span class="n">Tag</span><span class="p">,</span> <span class="n">onclause</span><span class="o">=</span><span class="n">Tag</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">TagToProduct</span><span class="o">.</span><span class="n">left_id</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example of result query:
+<div class="highlight"><pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">product</span>
+<span class="w">  </span><span class="k">join</span><span class="w"> </span><span class="n">tag_to_product</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tag_to_product</span><span class="p">.</span><span class="n">right_id</span>
+<span class="w">  </span><span class="k">join</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">tag</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tag_to_product</span><span class="p">.</span><span class="n">left_id</span>
+<span class="k">where</span><span class="w"> </span><span class="n">tag</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+<h3 id="subqueryexistsstrategy">SubqueryExistsStrategy<a class="headerlink" href="#subqueryexistsstrategy" title="Permanent link">&para;</a></h3>
+<p>This strategy is good for many-to-one relations.
+It makes exists subquery with onclause and filter expression in <code>where</code>.
+If the query already has exists subquery with same onclause and table,
+it will add filter expression to the <code>where</code> clause.</p>
+<h4 id="usage_2">Usage<a class="headerlink" href="#usage_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">product_title</span> <span class="o">=</span> <span class="n">Filter</span><span class="p">(</span>
+    <span class="n">Product</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">SubqueryExistsStrategy</span><span class="p">(</span>
+        <span class="n">Product</span><span class="p">,</span> <span class="n">onclause</span><span class="o">=</span><span class="n">Category</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">Product</span><span class="o">.</span><span class="n">category_id</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Example of result query:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">-- select all categories for which there is a product with the name &#39;test&#39;</span>
+
+<span class="k">select</span><span class="w"> </span><span class="o">*</span>
+<span class="k">from</span><span class="w"> </span><span class="n">category</span>
+<span class="k">where</span><span class="w"> </span><span class="k">exists</span><span class="p">(</span><span class="k">select</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">             </span><span class="k">from</span><span class="w"> </span><span class="n">product</span>
+<span class="w">             </span><span class="k">where</span><span class="w"> </span><span class="n">category</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">category_id</span>
+<span class="w">               </span><span class="k">and</span><span class="w"> </span><span class="n">product</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test&#39;</span><span class="p">);</span>
+</code></pre></div>
+<details class="info">
+<summary>Efficient Data Filtering: Using the EXISTS Clause in SQL</summary>
+<p>The <code>exists</code> keyword is used in the above query to optimize the performance of the query by only returning the categories that have at least one product that meets the specified criteria (in this case, a product with the title of "test").</p>
+<p>The subquery within the <code>exists</code> clause only needs to return one column, in this case the constant <code>1</code>, to check whether there is at least one row that meets the criteria specified in the subquery's <code>where</code> clause. Since it only needs to check for the existence of one row, this approach is more efficient than using a traditional <code>join</code> and <code>where</code> clause to filter the data.</p>
+<p>Additionally, using <code>exists</code> allows you to check for the existence of related data without actually retrieving the related data, which makes it more efficient when you don't need to retrieve the related data but just check if it exist or not.</p>
+</details>
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "content.code.annotate"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      
+    
+  </body>
+</html>
