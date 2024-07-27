@@ -1,5 +1,5 @@
 import copy
-from abc import ABC
+import functools
 from typing import Any, List, Type, Union
 
 from sqlalchemy import literal_column, select
@@ -15,16 +15,26 @@ class BaseStrategy:
         return query.where(expression)
 
 
-class RelationJoinStrategy(BaseStrategy, ABC):
-    def __init__(self, model: Type[Model], onclause: ColumnElement[bool]) -> None:
+class JoinStrategy(BaseStrategy):
+    def __init__(
+        self,
+        model: Type[Model],
+        onclause: ColumnElement[bool],
+        *,
+        is_outer: bool = False,
+        is_full: bool = False,
+    ) -> None:
         self.model = model
         self.onclause = onclause
-        self.is_outer = False
-        self.is_full = False
+        self.is_outer = is_outer
+        self.is_full = is_full
 
     def filter(self, query: Select, expression: Any) -> Select:
-        query = self._join_if_necessary(query)
+        query = self.apply_join(query)
         return query.where(expression)
+
+    def apply_join(self, query: Select) -> Select:
+        return self._join_if_necessary(query)
 
     def _join_if_necessary(self, query: Select) -> Select:
         joined_before = False
@@ -52,10 +62,28 @@ class RelationJoinStrategy(BaseStrategy, ABC):
         return query
 
     def _build_join(self, query: Select, onclause: ColumnElement[bool]) -> Select:
-        return query.join(self.model, onclause=onclause)
+        return query.join(self.model, onclause=onclause, isouter=self.is_outer, full=self.is_full)
 
 
-class RelationSubqueryExistsStrategy(BaseStrategy):
+# TODO: Deprecated
+RelationJoinStrategy = JoinStrategy
+
+
+class MultiJoinStrategy(BaseStrategy):
+    def __init__(
+        self,
+        *joins: JoinStrategy,
+    ) -> None:
+        self.joins = joins
+
+    def filter(self, query: Select, expression: Any) -> Select:
+        query = functools.reduce(
+            lambda query, strategy: strategy.apply_join(query), self.joins, query
+        )
+        return query.where(expression)
+
+
+class SubqueryExistsStrategy(BaseStrategy):
     """
     This strategy makes exist subquery to a related model.
     It also contains optimization:
@@ -103,7 +131,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
             ):
                 base_query_of_exists = clause.element.element
                 # Check base_query_of_exists is selecting from target table
-                if self.model.__table__ not in base_query_of_exists.froms:
+                if self.model.__table__ not in base_query_of_exists.get_final_froms():
                     continue
                 if self.__is_query_contains_onclause(base_query_of_exists, self.onclause):
                     return index
@@ -115,3 +143,7 @@ class RelationSubqueryExistsStrategy(BaseStrategy):
             if onclause.compare(onclouse):
                 return True
         return False
+
+
+# TODO: Deprecated
+RelationSubqueryExistsStrategy = SubqueryExistsStrategy

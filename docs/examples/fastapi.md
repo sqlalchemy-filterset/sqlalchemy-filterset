@@ -88,4 +88,4 @@ with `FastAPI` and `SQLAlchemy`. It shows the structure of an application that u
 including the creation of a `FastAPI` application, models, schemas, and filters.
 The example also includes the usage of various filters such as `InFilter`, `RangeFilter`,
 and `OrderingFilter` to filter data from the database. The example also demonstrates the use of
-`RelationJoinStrategy` to filter data from related models.
+`JoinStrategy` to filter data from related models.

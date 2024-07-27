@@ -1,15 +1,15 @@
 from sqlalchemy import select
 from sqlalchemy.testing import AssertsCompiledSQL
 
-from sqlalchemy_filterset.strategies import RelationSubqueryExistsStrategy
+from sqlalchemy_filterset.strategies import SubqueryExistsStrategy
 from tests.models.base import GrandParent, Item, Parent
 
 
-class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
+class TestSubqueryExistsStrategy(AssertsCompiledSQL):
     __dialect__: str = "default"
 
     def test_filter(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
+        strategy = SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         self.assert_compile(  # type: ignore[no-untyped-call]
             strategy.filter(select(Item.id), Parent.name == "test"),
             "SELECT item.id FROM item WHERE EXISTS "
@@ -18,7 +18,7 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_preventing(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
+        strategy = SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
         res = strategy.filter(first, Parent.name != "test1")
         self.assert_compile(  # type: ignore[no-untyped-call]
@@ -30,9 +30,9 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_with_preventing_with_reversed_onclause(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
+        strategy = SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
-        strategy1 = RelationSubqueryExistsStrategy(Parent, Parent.id == Item.parent_id)
+        strategy1 = SubqueryExistsStrategy(Parent, Parent.id == Item.parent_id)
         res = strategy1.filter(first, Parent.name != "test1")
         self.assert_compile(  # type: ignore[no-untyped-call]
             res,
@@ -43,9 +43,9 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_double_exist_with_different_onclause(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
+        strategy = SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         first = strategy.filter(select(Item.id), Parent.name == "test")
-        strategy1 = RelationSubqueryExistsStrategy(Parent, Item.parent_id != Parent.id)
+        strategy1 = SubqueryExistsStrategy(Parent, Item.parent_id != Parent.id)
         res = strategy1.filter(first, Parent.name != "test1")
         self.assert_compile(  # type: ignore[no-untyped-call]
             res,
@@ -60,7 +60,7 @@ class TestRelationSubqueryExistsStrategy(AssertsCompiledSQL):
         )
 
     def test_exist_with_not_matched_exist(self) -> None:
-        strategy = RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
+        strategy = SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id)
         base_query = select(Item.id).where(
             select(GrandParent).where(GrandParent.id == Item.id).exists()
         )

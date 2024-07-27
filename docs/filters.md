@@ -340,7 +340,7 @@ Resulting sql expressions:
     and apply `LimitOffsetFilter`,
     we may end up with duplicate records. For example, if user with id 1 has 2 roles,
     we will get duplicate records of user 1 with different roles, which may affect the pagination results.
-    We need to be attentive and use `RelationSubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
+    We need to be attentive and use `SubqueryExistsStrategy` or modify sql query with group by or other methods to ensure
     that the join statement is set up correctly and it will not cause any issues with the pagination results.
 
 
@@ -547,21 +547,23 @@ id = Filter(Product.id)
 id = Filter(Product.id, strategy=BaseStrategy())
 ```
 
-### RelationJoinStrategy
+### JoinStrategy
 
 Join strategies are good for filtering by one-to-many or one-to-one relations.
-It joins relation table by given `onclause`.
-If a relation with the same `onclause` has already been joined it will not be joined twice.
+It joins table by given `onclause`.
+If a table with the same `onclause` has already been joined it will not be joined twice.
 
 - `model` - a model or table which you want to join.
 - `oncaluse` - an onclause expression that will be used for the join.
+- `is_outer` - if True, generate `LEFT OUTER` join. Default False.
+- `is_full` - if True, generate `FULL OUTER` join. Default False.
 
 #### Usage
 
 ```python
 category_title = Filter(
     Category.title,
-    strategy=RelationJoinStrategy(
+    strategy=JoinStrategy(
         Category, onclause=Product.category_id == Category.id
     ),
 )
@@ -575,12 +577,41 @@ select *
 where category.title = 'test';
 ```
 
+### MultiJoinStrategy
 
-### RelationSubqueryExistsStrategy
+Apply multiple `JoinStrategy` for filter. May used in cases of many-to-many filters.
+!!! warning
+    Every case of many-to-many filtering is unique and requires query analysis.
+    Do not use it `MultiJoinStrategy` blindly.
+
+- `*joins` - sequence of `JoinStrategy` you want to apply.
+
+#### Usage
+
+```python
+tag_title = Filter(
+    Tag.title,
+    strategy=MultiJoinStrategy(
+        JoinStrategy(TagToProduct, onclause=Product.id == TagToProduct.right_id),
+        JoinStrategy(Tag, onclause=Tag.id == TagToProduct.left_id),
+    )
+)
+```
+
+Example of result query:
+```sql
+select *
+  from product
+  join tag_to_product on product.id = tag_to_product.right_id
+  join tag on tag.id = tag_to_product.left_id
+where tag.title = 'test';
+```
+
+### SubqueryExistsStrategy
 
 This strategy is good for many-to-one relations.
 It makes exists subquery with onclause and filter expression in `where`.
-If the query already has exists subquery with same onclause and relation,
+If the query already has exists subquery with same onclause and table,
 it will add filter expression to the `where` clause.
 
 
@@ -589,7 +620,7 @@ it will add filter expression to the `where` clause.
 ```python
 product_title = Filter(
     Product.title,
-    strategy=RelationSubqueryExistsStrategy(
+    strategy=SubqueryExistsStrategy(
         Product, onclause=Category.id == Product.category_id
     ),
 )

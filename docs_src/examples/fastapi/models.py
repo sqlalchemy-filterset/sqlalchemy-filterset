@@ -20,6 +20,26 @@ class Category(Base):
     title = Column(String)
 
 
+class Tag(Base):
+    __tablename__ = "tags"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String)
+
+
+class TagToProduct(Base):
+    __tablename__ = "tag_to_product"
+    left_id = Column(
+        UUID,
+        ForeignKey("tag.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    right_id = Column(
+        UUID,
+        ForeignKey("product.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+
 class Product(Base):
     __tablename__ = "products"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

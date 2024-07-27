@@ -11,11 +11,7 @@ from sqlalchemy.testing import AssertsCompiledSQL
 
 from sqlalchemy_filterset.filters import Filter
 from sqlalchemy_filterset.operators import icontains
-from sqlalchemy_filterset.strategies import (
-    BaseStrategy,
-    RelationJoinStrategy,
-    RelationSubqueryExistsStrategy,
-)
+from sqlalchemy_filterset.strategies import BaseStrategy, JoinStrategy, SubqueryExistsStrategy
 from sqlalchemy_filterset.types import ModelAttribute
 from tests.models.base import Item, ItemType, Parent
 
@@ -145,7 +141,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_subquery_exists_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationSubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
+            strategy=SubqueryExistsStrategy(Parent, Item.parent_id == Parent.id),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), "test", {}),
@@ -157,7 +153,7 @@ class TestFilterBuildSelect(AssertsCompiledSQL):
     def test_inner_join_strategy(self) -> None:
         filter_ = Filter(
             Parent.name,
-            strategy=RelationJoinStrategy(Parent, Parent.id == Item.parent_id),
+            strategy=JoinStrategy(Parent, Parent.id == Item.parent_id),
         )
         self.assert_compile(  # type: ignore[no-untyped-call]
             filter_.filter(select(Item.id), "test", {}),

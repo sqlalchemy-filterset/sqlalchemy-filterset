@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
+from typing import List
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
@@ -45,6 +46,24 @@ class Parent(Base):
     name: sa.Column[str] = sa.Column(sa.String, nullable=True)
 
 
+class ItemToItemLink(Base):
+    left_id: sa.Column[uuid.UUID] = sa.Column(
+        UUID,
+        sa.ForeignKey("item_link.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    right_id: sa.Column[uuid.UUID] = sa.Column(
+        UUID,
+        sa.ForeignKey("item.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+
+class ItemLink(Base):
+    id: sa.Column[uuid.UUID] = sa.Column(UUID, primary_key=True, default=uuid.uuid4)
+    name: sa.Column[str] = sa.Column(sa.String, nullable=True)
+
+
 class Item(Base):
     id: sa.Column[uuid.UUID] = sa.Column(UUID, primary_key=True, default=uuid.uuid4)
     name: sa.Column[str] = sa.Column(sa.String, nullable=True)
@@ -60,3 +79,5 @@ class Item(Base):
         UUID, sa.ForeignKey("parent.id", ondelete="CASCADE"), nullable=False
     )
     parent: Mapped[Parent] = relationship("Parent", backref="childs")
+
+    links: Mapped[List["ItemLink"]] = relationship(secondary="item_to_item_link")
